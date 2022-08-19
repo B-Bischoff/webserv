@@ -40,7 +40,7 @@ void Server::serverLoop()
 	std::string hello = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 5000\n\n";
 
 	std::ifstream ifs("pages/index.html", std::ios::in);
-	std::string webPageContent ((std::istreambuf_iterator<char>(ifs)), 
+	std::string webPageContent ((std::istreambuf_iterator<char>(ifs)), x
 			(std::istreambuf_iterator<char>()));
 
 	hello += webPageContent;
