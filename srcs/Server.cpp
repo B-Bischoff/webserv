@@ -51,13 +51,13 @@ void Server::serverInit()
 
 void Server::serverLoop()
 {
-	// Just change path here, for now accept html and png and that's it!
 
     while(1)
     {
+		// Just change path here, for now accept html and png and that's it!
 		//Put the build_response here will make sure that if we make change inside the file
 		//change will be applied on the client page
-		header.build_response("gif.gif");
+		header.build_response("pages/video.webm");
         printf("\n+++++++ Waiting for new connection ++++++++\n\n");
         if ((new_socket = accept(server_fd, (struct sockaddr *)&_address, (socklen_t*)&_addrlen))<0)
         {

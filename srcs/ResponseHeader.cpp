@@ -6,13 +6,13 @@
 /*   By: tarchimb <tarchimb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/19 17:07:48 by tarchimb          #+#    #+#             */
-/*   Updated: 2022/08/19 18:50:22 by tarchimb         ###   ########.fr       */
+/*   Updated: 2022/08/19 18:56:00 by tarchimb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ResponseHeader.hpp"
 
-ResponseHeader::ResponseHeader() : protocol("HTTP/1.1"), 
+ResponseHeader::ResponseHeader() : protocol("HTTP/1.1 "), 
 	method("200 OK\n"), content_type("Content-Type: "), content_length("Content-Length: ") {}
 
 ResponseHeader::~ResponseHeader() {}
@@ -160,4 +160,6 @@ void	ResponseHeader::build_response(std::string path)
 	content_size = webPageContent.size();
 	response_header = protocol + method + content_type + get_extension_file(path) + "\n" 
 	+ content_length + std::to_string(content_size).c_str() + "\n\n" + webPageContent;
+
+	std::cout << response_header.c_str() << std::endl;
 }
