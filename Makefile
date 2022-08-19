@@ -6,18 +6,21 @@
 #    By: tarchimb <tarchimb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/11/17 11:24:39 by tarchimb          #+#    #+#              #
-#    Updated: 2022/08/19 15:11:25 by tarchimb         ###   ########.fr        #
+#    Updated: 2022/08/19 17:12:34 by tarchimb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS		=	Server.cpp						
+SRCS		=	Server.cpp				\
+				ResponseHeader.cpp		
 
 OBJS		=	$(addprefix ${OBJS_DIR}/, ${SRCS:.cpp=.o})
 
 OBJS_DIR	=	objects
 SRCS_DIR	=	srcs
 
-INCLUDES	=	./includes/Server.hpp			
+INCLUDES	=	./includes/Server.hpp			\
+				./includes/webserv.hpp			\
+				./includes/ResponseHeader.hpp	
 
 CC			= 	c++
 CFLAGS		= 	-Wall -Wextra -Werror -g #-fsanitize=address

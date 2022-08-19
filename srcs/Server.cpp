@@ -1,7 +1,21 @@
 #include "Server.hpp"
 
+int server_fd = 0;
+int	new_socket = 0;
+
+void	my_handler(int signal)
+{
+	std::cout << "Caught signal " << signal << std::endl;
+	shutdown(server_fd, SHUT_RDWR);
+	shutdown(new_socket, SHUT_RDWR);
+	close(server_fd);
+	close(new_socket);
+	exit(0);
+}
+
 Server::Server()
 {
+	signal(SIGINT, my_handler);
 	serverInit();
 	serverLoop();
 }
@@ -11,7 +25,7 @@ void Server::serverInit()
     _addrlen = sizeof(_address);
 
     // Creating socket file descriptor
-    if ((_serverFd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
         perror("In socket");
         exit(EXIT_FAILURE);
@@ -23,12 +37,12 @@ void Server::serverInit()
     
     memset(_address.sin_zero, '\0', sizeof _address.sin_zero);
     
-    if (bind(_serverFd, (struct sockaddr *)&_address, sizeof(_address))<0)
+    if (bind(server_fd, (struct sockaddr *)&_address, sizeof(_address))<0)
     {
         perror("In bind");
         exit(EXIT_FAILURE);
     }
-    if (listen(_serverFd, 10) < 0)
+    if (listen(server_fd, 10) < 0)
     {
         perror("In listen");
         exit(EXIT_FAILURE);
@@ -37,31 +51,27 @@ void Server::serverInit()
 
 void Server::serverLoop()
 {
-	std::string hello = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 5000\n\n";
-
-	std::ifstream ifs("pages/index.html", std::ios::in);
-	std::string webPageContent ((std::istreambuf_iterator<char>(ifs)), x
-			(std::istreambuf_iterator<char>()));
-
-	hello += webPageContent;
-
+	// Just change path here, for now accept html and png and that's it!
 
     while(1)
     {
+		//Put the build_response here will make sure that if we make change inside the file
+		//change will be applied on the client page
+		header.build_response("gif.gif");
         printf("\n+++++++ Waiting for new connection ++++++++\n\n");
-        if ((_newSocket = accept(_serverFd, (struct sockaddr *)&_address, (socklen_t*)&_addrlen))<0)
+        if ((new_socket = accept(server_fd, (struct sockaddr *)&_address, (socklen_t*)&_addrlen))<0)
         {
             perror("In accept");
             exit(EXIT_FAILURE);
         }
         
         char buffer[30000] = {0};
-		_valRead = read(_newSocket, &buffer, 30000);
+		_valRead = read(new_socket, &buffer, 30000);
 		std::string buf = buffer;
 		std::cout << buf << std::endl;
 
-        write(_newSocket , hello.c_str() , hello.length());
+        write(new_socket , header.response_header.c_str() , header.content_size);
         printf("------------------Hello message sent-------------------");
-        close(_newSocket);
+        close(new_socket);
     }
 }

@@ -10,13 +10,16 @@
 #include <cstring>
 #include <fstream>
 #include <string>
-
+#include <signal.h>
+#include "webserv.hpp"
 #define PORT 8080
+
 
 class Server {
 private:
-	int _serverFd, _newSocket, _valRead, _addrlen;
+	int _valRead, _addrlen;
 	struct sockaddr_in _address;
+	ResponseHeader	header;
 
 	void serverInit();
 	void serverLoop();
