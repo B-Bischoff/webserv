@@ -6,7 +6,7 @@
 /*   By: tarchimb <tarchimb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/19 17:07:48 by tarchimb          #+#    #+#             */
-/*   Updated: 2022/08/19 18:56:00 by tarchimb         ###   ########.fr       */
+/*   Updated: 2022/08/22 11:19:02 by tarchimb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,5 +161,5 @@ void	ResponseHeader::build_response(std::string path)
 	response_header = protocol + method + content_type + get_extension_file(path) + "\n" 
 	+ content_length + std::to_string(content_size).c_str() + "\n\n" + webPageContent;
 
-	std::cout << response_header.c_str() << std::endl;
+	// std::cout << response_header.c_str() << std::endl;
 }

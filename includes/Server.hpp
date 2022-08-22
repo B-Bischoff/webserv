@@ -17,7 +17,7 @@
 
 class Server {
 private:
-	int _valRead, _addrlen;
+	int _valRead, _addrlen, _server_fd, _new_socket;
 	struct sockaddr_in _address;
 	ResponseHeader	header;
 
