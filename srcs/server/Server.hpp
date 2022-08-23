@@ -12,6 +12,7 @@
 #include <string>
 #include <signal.h>
 #include "webserv.hpp"
+#include "RequestHeader.hpp"
 #define PORT 8080
 
 

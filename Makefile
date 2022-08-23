@@ -1,62 +1,53 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: tarchimb <tarchimb@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2021/11/17 11:24:39 by tarchimb          #+#    #+#              #
-#    Updated: 2022/08/19 17:12:34 by tarchimb         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
+VPATH = ./: \
+		srcs/: \
+		srcs/response/: \
+		srcs/request/: \
+		srcs/server/: \
+		includes/: 
 
-SRCS		=	Server.cpp				\
-				ResponseHeader.cpp		
+SRCS = 	webserv.cpp \
+		Server.cpp  \
+		ResponseHeader.cpp \
+		RequestHeader.cpp
 
-OBJS		=	$(addprefix ${OBJS_DIR}/, ${SRCS:.cpp=.o})
+OBJS = $(addprefix .objects/, $(SRCS:.cpp=.o))
 
-OBJS_DIR	=	objects
-SRCS_DIR	=	srcs
+INCLUDES =	webserv.hpp \
+			ResponseHeader.hpp \
+			Server.hpp \
+			RequestHeader.hpp
+			
 
-INCLUDES	=	./includes/Server.hpp			\
-				./includes/webserv.hpp			\
-				./includes/ResponseHeader.hpp	
+CC = g++
 
-CC			= 	c++
-CFLAGS		= 	-Wall -Wextra -Werror -g #-fsanitize=address
+CFLAGS = -Wall -Wextra -Werror
 
-LIBINCLUDES	=	-Iincludes -Ilibft/includes
+DEBUG_FLAGS = #-fsanitize=address -g3
 
-LIBS		=	${LIB}							
+NAME = webserv
 
-LIB			=	libwebserv.a						
+IINCLUDES = -Iincludes -Isrcs/server -Isrcs/response -Isrcs/request
 
-NAME		=	webserv
+RM = rm -rf
 
-RM			=	rm -rf	
+all: $(NAME)
 
-MKDIR		=	mkdir -p
+$(NAME): $(OBJS) $(INCLUDES) Makefile
+	@$(CC) $(OBJS) ${CFLAGS} ${IINCLUDES} -o $@
+	@echo "$(ERASE)$(GREEN)[CREATED $(NAME)]$(END)"
 
-all:		libft ${NAME}
-
-${OBJS_DIR}/%.o: 	${SRCS_DIR}/%.cpp	${INCLUDES} $(OBJDIRS)
-			${MKDIR} $(@D) $(DMPDIR)$(@D)
-			${CC} ${CFLAGS} ${LIBINCLUDES} -c $< -o $@
-
-$(LIB):		${OBJS} ${INCLUDES}
-			ar rcs ${LIB} ${OBJS}
-
-libft:		${INCLUDES}
-
-${NAME}:	${NAME}.cpp ${LIBS}
-			$(CC) ${CFLAGS} ${LIBINCLUDES} ${NAME}.cpp ${LIBS} -o ${NAME}
+.objects/%.o:	%.cpp Makefile $(INCLUDES)
+	@mkdir -p .objects
+	@$(CC) $(CFLAGS) ${IINCLUDES} -c $< -o $@
+	@printf "$(ERASE)$(BLUE)[BUILDING]$(END) $@"
 
 clean:
-			${RM} ${OBJS} $(OBJS_DIR)
+	@${RM} ${OBJS}
+	@echo "${RED}[DELETED WEBSERV OBJS]${END}"
 
-fclean:		clean
-			${RM} ${LIB} ${NAME} ${LIBS} ${NAME}.dSYM
+fclean:	clean
+	@${RM} ${NAME}
+	@${RM} .objects
+	@echo "${RED}[DELETED]${END} ${NAME}"
 
-re:			fclean all
-
-.PHONY: 	all clean fclean re object
+re:	fclean all

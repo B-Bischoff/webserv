@@ -37,13 +37,11 @@ void Server::serverInit()
 
 void Server::serverLoop()
 {
-
     while(1)
     {
 		// Just change path here, for now accept html and png and that's it!
 		//Put the build_response here will make sure that if we make change inside the file
 		//change will be applied on the client page
-		header.build_response("pages/gif.gif");
         printf("\n+++++++ Waiting for new connection ++++++++\n\n");
         if ((_new_socket = accept(_server_fd, (struct sockaddr *)&_address, (socklen_t*)&_addrlen))<0)
         {
@@ -54,7 +52,9 @@ void Server::serverLoop()
         char buffer[30000] = {0};
 		_valRead = read(_new_socket, &buffer, 30000);
 		std::string buf = buffer;
-		std::cout << buf << std::endl;
+		RequestHeader	request(buf);
+		header.build_response(request.getPath());
+		// std::cout << buf << std::endl;
 
         write(_new_socket , header.response_header.c_str() , header.content_size);
         printf("------------------Hello message sent-------------------");
