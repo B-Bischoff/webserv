@@ -26,19 +26,19 @@ DEBUG_FLAGS = #-fsanitize=address -g3
 
 NAME = webserv
 
-IINCLUDES = -Iincludes -Isrcs/server -Isrcs/response -Isrcs/request
+LINK := ${addprefix -I, ${subst /:,,${VPATH}}}
 
 RM = rm -rf
 
 all: $(NAME)
 
 $(NAME): $(OBJS) $(INCLUDES) Makefile
-	@$(CC) $(OBJS) ${CFLAGS} ${IINCLUDES} -o $@
+	@$(CC) $(OBJS) ${CFLAGS} -o $@
 	@echo "$(ERASE)$(GREEN)[CREATED $(NAME)]$(END)"
 
 .objects/%.o:	%.cpp Makefile $(INCLUDES)
 	@mkdir -p .objects
-	@$(CC) $(CFLAGS) ${IINCLUDES} -c $< -o $@
+	$(CC) $(CFLAGS) ${LINK} -c $< -o $@
 	@printf "$(ERASE)$(BLUE)[BUILDING]$(END) $@"
 
 clean:
