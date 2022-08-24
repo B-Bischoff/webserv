@@ -3,19 +3,34 @@ VPATH = ./: \
 		srcs/response/: \
 		srcs/request/: \
 		srcs/server/: \
-		includes/: 
+		includes/: \
+		srcs/ManageRequest/: \
+		srcs/ManageRequest/RequestCheck/: \
+		srcs/ManageRequest/RequestCheck/get/: \
+		srcs/ManageRequest/RequestCheck/post/: \
+		srcs/ManageRequest/RequestCheck/delete/: 
+		
 
 SRCS = 	webserv.cpp \
 		Server.cpp  \
+		ManageRequest.cpp \
 		ResponseHeader.cpp \
-		RequestHeader.cpp
+		RequestHeader.cpp \
+		Get.cpp \
+		Post.cpp \
+		Delete.cpp 
 
 OBJS = $(addprefix .objects/, $(SRCS:.cpp=.o))
 
 INCLUDES =	webserv.hpp \
 			ResponseHeader.hpp \
 			Server.hpp \
-			RequestHeader.hpp
+			ManageRequest.hpp \
+			RequestHeader.hpp \
+			RequestCheck.hpp \
+			Get.hpp \
+			Post.hpp \
+			Delete.hpp
 			
 
 CC = g++
@@ -26,7 +41,7 @@ DEBUG_FLAGS = #-fsanitize=address -g3
 
 NAME = webserv
 
-IINCLUDES = -Iincludes -Isrcs/server -Isrcs/response -Isrcs/request
+IINCLUDES = -Iincludes -Isrcs/server -Isrcs/response -Isrcs/request -Isrcs/RequestCheck -Isrcs/RequestCheck/Get -Isrcs/RequestCheck/Post -Isrcs/RequestCheck/Delete
 
 RM = rm -rf
 

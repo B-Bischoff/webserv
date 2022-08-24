@@ -4,6 +4,11 @@
 #include <iostream>
 #include <istream>
 #include <sstream>
+#include <unistd.h>
+#include <fstream>
+
+#define MAX_BODY_SIZE 30000
+#define ROOT_PATH "./pages"
 
 
 class RequestHeader
@@ -14,13 +19,15 @@ class RequestHeader
 		std::string	_version;
 		//Version?
 
-		RequestHeader();
-
 	public:
-		RequestHeader(std::string request_content);
+		RequestHeader();
 		~RequestHeader();
 
-		std::string	getPath() const;
+		std::string		getPath() const;
+		std::string		getMethod() const;
+		std::string		getVersion() const;
+
+		void			readRequest(int socket);
 };
 
 #endif

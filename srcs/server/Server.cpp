@@ -8,6 +8,7 @@ Server::Server()
 
 void Server::serverInit()
 {
+	(void)_valRead;
     _addrlen = sizeof(_address);
 
     // Creating socket file descriptor
@@ -16,8 +17,9 @@ void Server::serverInit()
         perror("In socket");
         exit(EXIT_FAILURE);
     }
-
-    _address.sin_family = AF_INET;
+	int yes = 1;
+	setsockopt(_server_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+    _address.sin_family = AF_INET; 
     _address.sin_addr.s_addr = INADDR_ANY;
     _address.sin_port = htons( PORT );
     
@@ -37,26 +39,27 @@ void Server::serverInit()
 
 void Server::serverLoop()
 {
+	RequestHeader	req;
+	
     while(1)
     {
-		// Just change path here, for now accept html and png and that's it!
-		//Put the build_response here will make sure that if we make change inside the file
-		//change will be applied on the client page
         printf("\n+++++++ Waiting for new connection ++++++++\n\n");
         if ((_new_socket = accept(_server_fd, (struct sockaddr *)&_address, (socklen_t*)&_addrlen))<0)
         {
             perror("In accept");
             exit(EXIT_FAILURE);
         }
-        
-        char buffer[30000] = {0};
-		_valRead = read(_new_socket, &buffer, 30000);
-		std::string buf = buffer;
-		RequestHeader	request(buf);
-		header.build_response(request.getPath());
-		// std::cout << buf << std::endl;
-
-        write(_new_socket , header.response_header.c_str() , header.content_size);
+		req.readRequest(_new_socket);
+		// if (req.getMethod() == "GET")
+		Get	get(req);
+		// else if (req.getMethod() == "POST")
+			// Post post(req);
+		// else if (req.getMethod() == "DELETE")
+			// Delete del(req);
+		// else
+			// std::cerr << "error" << std::endl;
+		header.build_response(get._path, get._body, get._size, get._status);
+        write(_new_socket , header.response_header.c_str() , get._size);
         printf("------------------Hello message sent-------------------");
         close(_new_socket);
     }
