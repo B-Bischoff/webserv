@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   responseHeader.hpp                                 :+:      :+:    :+:   */
+/*   ResponseHeader.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tarchimb <tarchimb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/19 17:05:50 by tarchimb          #+#    #+#             */
-/*   Updated: 2022/08/19 18:28:19 by tarchimb         ###   ########.fr       */
+/*   Updated: 2022/08/24 10:44:36 by tarchimb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ class ResponseHeader
 		int		content_size;
 		ResponseHeader();
 		~ResponseHeader();
-		void	build_response(std::string path);
+		void	build_response(std::string path, std::string body, int sizeBody, std::string status);
 };
 
 #endif
