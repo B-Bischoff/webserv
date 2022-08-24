@@ -5,10 +5,10 @@ VPATH = ./: \
 		srcs/server/: \
 		includes/: \
 		srcs/ManageRequest/: \
-		srcs/ManageRequest/RequestCheck/: \
-		srcs/ManageRequest/RequestCheck/get/: \
-		srcs/ManageRequest/RequestCheck/post/: \
-		srcs/ManageRequest/RequestCheck/delete/: 
+		srcs/ManageRequest/Method/: \
+		srcs/ManageRequest/Method/get/: \
+		srcs/ManageRequest/Method/post/: \
+		srcs/ManageRequest/Method/delete/: 
 		
 
 SRCS = 	webserv.cpp \
@@ -16,6 +16,7 @@ SRCS = 	webserv.cpp \
 		ManageRequest.cpp \
 		ResponseHeader.cpp \
 		RequestHeader.cpp \
+		Method.cpp \
 		Get.cpp \
 		Post.cpp \
 		Delete.cpp 
@@ -27,7 +28,7 @@ INCLUDES =	webserv.hpp \
 			Server.hpp \
 			ManageRequest.hpp \
 			RequestHeader.hpp \
-			RequestCheck.hpp \
+			Method.hpp \
 			Get.hpp \
 			Post.hpp \
 			Delete.hpp
@@ -41,19 +42,19 @@ DEBUG_FLAGS = #-fsanitize=address -g3
 
 NAME = webserv
 
-IINCLUDES = -Iincludes -Isrcs/server -Isrcs/response -Isrcs/request -Isrcs/RequestCheck -Isrcs/RequestCheck/Get -Isrcs/RequestCheck/Post -Isrcs/RequestCheck/Delete
+LINK := ${addprefix -I, ${subst /:,,${VPATH}}}
 
 RM = rm -rf
 
 all: $(NAME)
 
 $(NAME): $(OBJS) $(INCLUDES) Makefile
-	@$(CC) $(OBJS) ${CFLAGS} ${IINCLUDES} -o $@
+	@$(CC) $(OBJS) ${CFLAGS} -o $@
 	@echo "$(ERASE)$(GREEN)[CREATED $(NAME)]$(END)"
 
 .objects/%.o:	%.cpp Makefile $(INCLUDES)
 	@mkdir -p .objects
-	@$(CC) $(CFLAGS) ${IINCLUDES} -c $< -o $@
+	@$(CC) $(CFLAGS) ${LINK} -c $< -o $@
 	@printf "$(ERASE)$(BLUE)[BUILDING]$(END) $@"
 
 clean:

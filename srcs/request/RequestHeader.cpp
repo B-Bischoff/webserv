@@ -19,6 +19,8 @@ void	RequestHeader::readRequest(int socket)
 	std::cout << tmp.str() << std::endl;
 	tmp >> _method;
 	tmp >> _path;
+	if (_path == "/")
+		_path = "/index.html";
 	tmp >> _version;
 	_path = ROOT_PATH + _path;
 }

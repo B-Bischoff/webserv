@@ -11,7 +11,6 @@ void Server::serverInit()
 	(void)_valRead;
     _addrlen = sizeof(_address);
 
-    // Creating socket file descriptor
     if ((_server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
         perror("In socket");
@@ -39,7 +38,10 @@ void Server::serverInit()
 
 void Server::serverLoop()
 {
+	ManageRequest	manager;
 	RequestHeader	req;
+	Method			dst;
+	Get				get;
 	
     while(1)
     {
@@ -50,16 +52,9 @@ void Server::serverLoop()
             exit(EXIT_FAILURE);
         }
 		req.readRequest(_new_socket);
-		// if (req.getMethod() == "GET")
-		Get	get(req);
-		// else if (req.getMethod() == "POST")
-			// Post post(req);
-		// else if (req.getMethod() == "DELETE")
-			// Delete del(req);
-		// else
-			// std::cerr << "error" << std::endl;
-		header.build_response(get._path, get._body, get._size, get._status);
-        write(_new_socket , header.response_header.c_str() , get._size);
+		dst = manager.identify(req);
+		header.build_response(dst.getPath(), dst.getBody(), dst.getSize(), dst.getStatus());
+        write(_new_socket , header.response_header.c_str() , dst.getSize());
         printf("------------------Hello message sent-------------------");
         close(_new_socket);
     }

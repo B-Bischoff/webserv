@@ -6,7 +6,7 @@
 /*   By: tarchimb <tarchimb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/19 17:07:48 by tarchimb          #+#    #+#             */
-/*   Updated: 2022/08/24 11:11:41 by tarchimb         ###   ########.fr       */
+/*   Updated: 2022/08/24 14:48:19 by tarchimb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,7 @@ std::string	ResponseHeader::get_extension_file(std::string path)
 		return (dst = "video/3gpp2");
 	else if (path.find(".7z\0", 0) != path.npos)
 		return (dst = "application/x-7z-compressed");
-	return (dst = "");
+	return (dst = "plain/text");
 }
 
 void	ResponseHeader::build_response(std::string path, std::string body, int sizeBody, std::string status)

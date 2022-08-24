@@ -6,7 +6,6 @@
 #include <sstream>
 #include <unistd.h>
 #include <fstream>
-
 #define MAX_BODY_SIZE 30000
 #define ROOT_PATH "./pages"
 
@@ -17,7 +16,6 @@ class RequestHeader
 		std::string	_method;
 		std::string	_path;
 		std::string	_version;
-		//Version?
 
 	public:
 		RequestHeader();
