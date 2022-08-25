@@ -14,6 +14,8 @@ class RequestHeader
 		std::string	_version;
 		//Version?
 
+		// Server datas 
+
 		RequestHeader();
 
 	public:
