@@ -98,10 +98,17 @@ void Server::serverLoop()
 					}
 					else
 					{
+						//std::string buf = buffer;
+						RequestHeader	request;
+
 						std::string buf = buffer;
-						RequestHeader	request(buf);
-						header.build_response(request.getPath());
+						request.readRequest(buf);
+						ManageRequest manager;
+						Method dst = manager.identify(request);
+						header.build_response(dst.getPath(), dst.getBody(), dst.getSize(), dst.getStatus());
 						std::cout << header.response_header << std::endl;
+
+						std::cout << "----> " << header.response_header.size() << " | " << dst.getSize() << std::endl;
 						
 						if (send(i, header.response_header.c_str(), header.response_header.size(), 0) == -1)
 							perror("send");

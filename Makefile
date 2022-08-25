@@ -3,19 +3,35 @@ VPATH = ./: \
 		srcs/response/: \
 		srcs/request/: \
 		srcs/server/: \
-		includes/: 
+		includes/: \
+		srcs/ManageRequest/: \
+		srcs/ManageRequest/Method/: \
+		srcs/ManageRequest/Method/get/: \
+		srcs/ManageRequest/Method/post/: \
+		srcs/ManageRequest/Method/delete/: 
+		
 
 SRCS = 	webserv.cpp \
 		Server.cpp  \
+		ManageRequest.cpp \
 		ResponseHeader.cpp \
-		RequestHeader.cpp
+		RequestHeader.cpp \
+		Method.cpp \
+		Get.cpp \
+		Post.cpp \
+		Delete.cpp 
 
 OBJS = $(addprefix .objects/, $(SRCS:.cpp=.o))
 
 INCLUDES =	webserv.hpp \
 			ResponseHeader.hpp \
 			Server.hpp \
-			RequestHeader.hpp
+			ManageRequest.hpp \
+			RequestHeader.hpp \
+			Method.hpp \
+			Get.hpp \
+			Post.hpp \
+			Delete.hpp
 			
 
 CC = g++
@@ -38,7 +54,7 @@ $(NAME): $(OBJS) $(INCLUDES) Makefile
 
 .objects/%.o:	%.cpp Makefile $(INCLUDES)
 	@mkdir -p .objects
-	$(CC) $(CFLAGS) ${LINK} -c $< -o $@
+	@$(CC) $(CFLAGS) ${LINK} -c $< -o $@
 	@printf "$(ERASE)$(BLUE)[BUILDING]$(END) $@"
 
 clean:

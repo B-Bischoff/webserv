@@ -6,7 +6,7 @@
 /*   By: tarchimb <tarchimb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/19 17:07:48 by tarchimb          #+#    #+#             */
-/*   Updated: 2022/08/23 09:22:12 by tarchimb         ###   ########.fr       */
+/*   Updated: 2022/08/24 14:48:19 by tarchimb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,22 +146,13 @@ std::string	ResponseHeader::get_extension_file(std::string path)
 		return (dst = "video/3gpp2");
 	else if (path.find(".7z\0", 0) != path.npos)
 		return (dst = "application/x-7z-compressed");
-	return (dst = "");
+	return (dst = "plain/text");
 }
 
-void	ResponseHeader::build_response(std::string path)
+void	ResponseHeader::build_response(std::string path, std::string body, int sizeBody, std::string status)
 {
-	//Open file and get contents
-	path = "./pages" + path;
-	std::cout << path << std::endl;
-	std::ifstream ifs(path, std::ios::in);
-	std::string 	file ((std::istreambuf_iterator<char>(ifs)),
-			(std::istreambuf_iterator<char>()));
-			
-	// Build response with parameters
-	content_size = file.size();
-	response_header = protocol + method + content_type + get_extension_file(path) + "\n" 
-	+ content_length + std::to_string(content_size).c_str() + "\n\n" + file;
+	response_header = protocol + status + content_type + get_extension_file(path) + "\n" 
+	+ content_length + std::to_string(sizeBody).c_str() + "\n\n" + body;
 
-	// std::cout << response_header.c_str() << std::endl;
+	std::cout << response_header.c_str() << std::endl;
 }
