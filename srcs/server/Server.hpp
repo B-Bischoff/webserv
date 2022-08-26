@@ -12,6 +12,7 @@
 #include <string>
 #include <signal.h>
 #include "poll.h"
+#include "fcntl.h"
 #include "webserv.hpp"
 #include "RequestHeader.hpp"
 #include "Method.hpp"
@@ -37,12 +38,16 @@ private:
 	ResponseHeader	header;
 
 	fd_set _master, _readFds;
-	int _fdmax;
+	int _fdmax = 0;
 
 	void serverInit();
 	void serverSocketInit();
 
 	void serverLoop();
+
+	void addFd(const int& fd, fd_set& set);
+	void acceptConnection();
+	void processClientRequest(const int& fd);
 
 public:
 	Server();

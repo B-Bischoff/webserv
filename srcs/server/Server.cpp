@@ -9,10 +9,8 @@ Server::Server()
 void Server::serverInit()
 {
 	serverSocketInit();
-
-	FD_SET(_serverSocket, &_master);
-	_fdmax = _serverSocket;
-
+	FD_ZERO(&_master);
+	addFd(_serverSocket, _master);
 }
 
 void Server::serverSocketInit()
@@ -64,62 +62,71 @@ void Server::serverLoop()
 		{
 			if (FD_ISSET(i, &_readFds)) // Socket ready to communicate
 			{
-				std::cout << "socket " << i << " is set" << " | fd max: " << _fdmax << std::endl;
 				if (i == _serverSocket) // Server detects incoming connection
 				{
-					_newSocket = accept(_serverSocket, (struct sockaddr*)&_address, (socklen_t*)&_addrlen);
-					if (_newSocket == -1)
-					{
-						perror("accept");
-					}
-					else
-					{
-						std::cout << "New incoming connection (fd: " << _newSocket << ")" << std::endl;
-						FD_SET(_newSocket, &_master);
-						std::cout << _newSocket << " added to master" << std::endl;
-						if (_newSocket > _fdmax)
-							_fdmax = _newSocket;
-					}
+					acceptConnection();
 				}
 				else // Client wants to communicate
 				{
-					std::cout << "client" << i << " wants to communicate" << std::endl;
-					char buffer[30000];
-					int nbytes = recv(i, buffer, sizeof(buffer), 0);
-					if (nbytes <= 0)
-					{
-						if (nbytes == 0)
-							std::cout << "Socket: " << i << " disconnected" << std::endl;
-						else
-							perror("recv");
-						std::cout << "Socket: " << i << " quit" << std::endl;
-						close(i);
-						FD_CLR(i, &_master);
-					}
-					else
-					{
-						//std::string buf = buffer;
-						RequestHeader	request;
-
-						std::string buf = buffer;
-						request.readRequest(buf);
-						ManageRequest manager;
-						Method dst = manager.identify(request);
-						header.build_response(dst.getPath(), dst.getBody(), dst.getSize(), dst.getStatus());
-						std::cout << header.response_header << std::endl;
-
-						std::cout << "----> " << header.response_header.size() << " | " << dst.getSize() << std::endl;
-						
-						if (send(i, header.response_header.c_str(), header.response_header.size(), 0) == -1)
-							perror("send");
-
-
-						// close(i);
-						// FD_CLR(i, &_master);
-						std::cout << "client " << i << "closed after data send" << std::endl;
-					}
+					processClientRequest(i);
 				}
 			}
 		}
     }
+}
+
+void Server::acceptConnection()
+{
+	_newSocket = accept(_serverSocket, (struct sockaddr*)&_address, (socklen_t*)&_addrlen);
+	if (_newSocket == -1)
+		perror("accept");
+	else
+	{
+		std::cout << "New incoming connection (fd: " << _newSocket << ")" << std::endl;
+		fcntl(_newSocket, F_SETFL, O_NONBLOCK); // Set fd to non-blockant (prg will not get stuck on recv)
+		addFd(_newSocket, _master);
+	}
+}
+
+void Server::processClientRequest(const int& fd)
+{
+
+	std::cout << "client " << fd << " wants to communicate" << std::endl;
+	char buffer[30000];
+	int nbytes = recv(fd, buffer, sizeof(buffer), 0);
+	if (nbytes <= 0)
+	{
+		if (nbytes == 0)
+			std::cout << "Socket: " << fd << " disconnected" << std::endl;
+		else
+			perror("recv");
+		std::cout << "Socket: " << fd << " quit" << std::endl;
+		close(fd);
+		FD_CLR(fd, &_master);
+	}
+	else
+	{
+		RequestHeader	request;
+
+		std::string buf = buffer;
+		std::cout << buf << std::endl;
+		request.readRequest(buf);
+		ManageRequest manager;
+		Method dst = manager.identify(request);
+		header.build_response(dst.getPath(), dst.getBody(), dst.getSize(), dst.getStatus());
+		//std::cout << header.response_header << std::endl;
+
+		if (send(fd, header.response_header.c_str(), header.response_header.size(), 0) == -1)
+			perror("send");
+
+		//close (fd);
+		//FD_CLR(fd, &_master);
+	}
+}
+
+void Server::addFd(const int &fd, fd_set& set)
+{
+	FD_SET(fd, &set);
+	if (fd > _fdmax)
+		_fdmax = fd;
 }
