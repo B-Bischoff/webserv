@@ -9,13 +9,11 @@ RequestHeader::~RequestHeader()
 
 }
 
-void	RequestHeader::readRequest(int socket)
+void	RequestHeader::readRequest(std::string& request)
 {
-	char				buf[MAX_BODY_SIZE] = {0};
 	std::stringstream	tmp;
 
-	read(socket, &buf , MAX_BODY_SIZE);
-	tmp << buf;
+	tmp << request;
 	std::cout << tmp.str() << std::endl;
 	tmp >> _method;
 	tmp >> _path;

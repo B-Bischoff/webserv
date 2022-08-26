@@ -8,28 +8,37 @@ Server::Server()
 
 void Server::serverInit()
 {
-	(void)_valRead;
-    _addrlen = sizeof(_address);
+	serverSocketInit();
+	FD_ZERO(&_master);
+	addFd(_serverSocket, _master);
+}
 
-    if ((_server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
+void Server::serverSocketInit()
+{
+    _addrlen = sizeof(_address); // IPV4
+
+    _address.sin_family = AF_INET;
+    _address.sin_addr.s_addr = INADDR_ANY;
+    _address.sin_port = htons(PORT);
+    memset(_address.sin_zero, '\0', sizeof _address.sin_zero);
+
+    // Creating socket file descriptor
+    if ((_serverSocket = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
         perror("In socket");
         exit(EXIT_FAILURE);
     }
+	 
+	// Reuse socket even if it's "already in use"
 	int yes = 1;
-	setsockopt(_server_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
-    _address.sin_family = AF_INET; 
-    _address.sin_addr.s_addr = INADDR_ANY;
-    _address.sin_port = htons( PORT );
+	setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
     
-    memset(_address.sin_zero, '\0', sizeof _address.sin_zero);
-    
-    if (bind(_server_fd, (struct sockaddr *)&_address, sizeof(_address))<0)
+    if (bind(_serverSocket, (struct sockaddr *)&_address, sizeof(_address)) < 0)
     {
         perror("In bind");
         exit(EXIT_FAILURE);
     }
-    if (listen(_server_fd, 10) < 0)
+    if (listen(_serverSocket, 10) < 0)
     {
         perror("In listen");
         exit(EXIT_FAILURE);
@@ -38,24 +47,86 @@ void Server::serverInit()
 
 void Server::serverLoop()
 {
-	ManageRequest	manager;
-	RequestHeader	req;
-	Method			dst;
-	Get				get;
-	
     while(1)
     {
         printf("\n+++++++ Waiting for new connection ++++++++\n\n");
-        if ((_new_socket = accept(_server_fd, (struct sockaddr *)&_address, (socklen_t*)&_addrlen))<0)
-        {
-            perror("In accept");
-            exit(EXIT_FAILURE);
-        }
-		req.readRequest(_new_socket);
-		dst = manager.identify(req);
-		header.build_response(dst.getPath(), dst.getBody(), dst.getSize(), dst.getStatus());
-        write(_new_socket , header.response_header.c_str() , dst.getSize());
-        printf("------------------Hello message sent-------------------");
-        close(_new_socket);
+
+		_readFds = _master;
+		if (select(_fdmax + 1, &_readFds, NULL, NULL, NULL) == -1)
+		{
+			perror("Select");
+			exit(EXIT_FAILURE);
+		}
+
+		for (int i = 0; i <= _fdmax; i++)
+		{
+			if (FD_ISSET(i, &_readFds)) // Socket ready to communicate
+			{
+				if (i == _serverSocket) // Server detects incoming connection
+				{
+					acceptConnection();
+				}
+				else // Client wants to communicate
+				{
+					processClientRequest(i);
+				}
+			}
+		}
     }
+}
+
+void Server::acceptConnection()
+{
+	_newSocket = accept(_serverSocket, (struct sockaddr*)&_address, (socklen_t*)&_addrlen);
+	if (_newSocket == -1)
+		perror("accept");
+	else
+	{
+		std::cout << "New incoming connection (fd: " << _newSocket << ")" << std::endl;
+		fcntl(_newSocket, F_SETFL, O_NONBLOCK); // Set fd to non-blockant (prg will not get stuck on recv)
+		addFd(_newSocket, _master);
+	}
+}
+
+void Server::processClientRequest(const int& fd)
+{
+
+	std::cout << "client " << fd << " wants to communicate" << std::endl;
+	char buffer[30000];
+	int nbytes = recv(fd, buffer, sizeof(buffer), 0);
+	if (nbytes <= 0)
+	{
+		if (nbytes == 0)
+			std::cout << "Socket: " << fd << " disconnected" << std::endl;
+		else
+			perror("recv");
+		std::cout << "Socket: " << fd << " quit" << std::endl;
+		close(fd);
+		FD_CLR(fd, &_master);
+	}
+	else
+	{
+		RequestHeader	request;
+
+		std::string buf = buffer;
+		std::cout << buf << std::endl;
+		request.readRequest(buf);
+		ManageRequest manager;
+		Method dst = manager.identify(request);
+		header.build_response(dst.getPath(), dst.getBody(), dst.getSize(), dst.getStatus());
+		//std::cout << header.response_header << std::endl;
+
+		if (send(fd, header.response_header.c_str(), header.response_header.size(), 0) == -1)
+			perror("send");
+
+		//close (fd);
+		//FD_CLR(fd, &_master);
+	}
+}
+
+void Server::addFd(const int &fd, fd_set& set)
+{
+	FD_SET(fd, &set);
+	if (fd > _fdmax)
+		_fdmax = fd;
 }

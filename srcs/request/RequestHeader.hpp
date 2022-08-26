@@ -25,7 +25,7 @@ class RequestHeader
 		std::string		getMethod() const;
 		std::string		getVersion() const;
 
-		void			readRequest(int socket);
+		void			readRequest(std::string& request);
 };
 
 #endif
