@@ -13,19 +13,21 @@ VPATH = ./: \
 
 SRCS = 	webserv.cpp \
 		Server.cpp  \
+		VirtualServer.cpp  \
 		ManageRequest.cpp \
 		ResponseHeader.cpp \
 		RequestHeader.cpp \
 		Method.cpp \
 		Get.cpp \
 		Post.cpp \
-		Delete.cpp 
+		Delete.cpp \
 
 OBJS = $(addprefix .objects/, $(SRCS:.cpp=.o))
 
 INCLUDES =	webserv.hpp \
 			ResponseHeader.hpp \
 			Server.hpp \
+			VirtualServer.hpp \
 			ManageRequest.hpp \
 			RequestHeader.hpp \
 			Method.hpp \

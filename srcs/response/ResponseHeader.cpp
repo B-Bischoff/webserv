@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ResponseHeader.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tarchimb <tarchimb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: brice <brice@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/19 17:07:48 by tarchimb          #+#    #+#             */
-/*   Updated: 2022/08/24 14:48:19 by tarchimb         ###   ########.fr       */
+/*   Updated: 2022/08/26 11:50:25 by brice            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,5 +154,5 @@ void	ResponseHeader::build_response(std::string path, std::string body, int size
 	response_header = protocol + status + content_type + get_extension_file(path) + "\n" 
 	+ content_length + std::to_string(sizeBody).c_str() + "\n\n" + body;
 
-	std::cout << response_header.c_str() << std::endl;
+	//std::cout << response_header.c_str() << std::endl;
 }

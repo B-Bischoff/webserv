@@ -20,34 +20,31 @@
 #include "Post.hpp"
 #include "Delete.hpp"
 #include "ManageRequest.hpp"
-
-#define PORT 8080
-
-/*
-	The server will from now use the select function to handle connections
-	It requires to keep track the highest fd
-	It is also necessary to create three 
-
-*/
+#include "VirtualServer.hpp"
+#include <vector>
+#include <iterator>
 
 class Server {
 private:
-	int _addrlen;
-	int _serverSocket, _newSocket;
-	struct sockaddr_in _address;
+	// Might use Map instead of vector to identify virtual servers from their socket 
+	std::vector<VirtualServer> _servers;
+
+	int _newSocket;
 	ResponseHeader	header;
 
 	fd_set _master, _readFds;
 	int _fdmax = 0;
 
 	void serverInit();
-	void serverSocketInit();
+	void createVirtualServer(const std::string& name, const unsigned int& port);
 
 	void serverLoop();
 
 	void addFd(const int& fd, fd_set& set);
-	void acceptConnection();
+	void acceptConnection(const int& serverSocket);
 	void processClientRequest(const int& fd);
+
+	bool isAVirtualServer(const int& fd) const;
 
 public:
 	Server();
