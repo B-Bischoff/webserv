@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-Server::Server()
+Server::Server() : _fdmax(0)
 {
 	serverInit();
 	serverLoop();

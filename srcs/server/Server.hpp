@@ -40,7 +40,7 @@ private:
 	ResponseHeader	header;
 
 	fd_set _master, _readFds;
-	int _fdmax = 0;
+	int _fdmax;
 
 	void serverInit();
 	void serverSocketInit();
