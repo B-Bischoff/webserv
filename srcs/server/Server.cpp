@@ -8,41 +8,19 @@ Server::Server() : _fdmax(0)
 
 void Server::serverInit()
 {
-	serverSocketInit();
-	FD_ZERO(&_master);
-	addFd(_serverSocket, _master);
+	FD_ZERO(&_master); // Clear master set
+
+	// Virtual servers will soon be loaded from config file
+	createVirtualServer("MainServer", 8080);
+	createVirtualServer("SecondaryServer", 9090);
 }
 
-void Server::serverSocketInit()
+void Server::createVirtualServer(const std::string &name, const unsigned int& port)
 {
-    _addrlen = sizeof(_address); // IPV4
+	VirtualServer virtualServer(name, port); // Check virtual server creation
 
-    _address.sin_family = AF_INET;
-    _address.sin_addr.s_addr = INADDR_ANY;
-    _address.sin_port = htons(PORT);
-    memset(_address.sin_zero, '\0', sizeof _address.sin_zero);
-
-    // Creating socket file descriptor
-    if ((_serverSocket = socket(AF_INET, SOCK_STREAM, 0)) == 0)
-    {
-        perror("In socket");
-        exit(EXIT_FAILURE);
-    }
-	 
-	// Reuse socket even if it's "already in use"
-	int yes = 1;
-	setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
-    
-    if (bind(_serverSocket, (struct sockaddr *)&_address, sizeof(_address)) < 0)
-    {
-        perror("In bind");
-        exit(EXIT_FAILURE);
-    }
-    if (listen(_serverSocket, 10) < 0)
-    {
-        perror("In listen");
-        exit(EXIT_FAILURE);
-    }
+	_servers.push_back(virtualServer);
+	addFd(virtualServer.getServerSocket(), _master);
 }
 
 void Server::serverLoop()
@@ -67,12 +45,14 @@ void Server::serverLoop()
 		{
 			if (FD_ISSET(i, &_readFds)) // Socket ready to communicate
 			{
-				if (i == _serverSocket) // Server detects incoming connection
+				if (isAVirtualServer(i)) // Incoming connection from new client
 				{
-					acceptConnection();
+					acceptConnection(i);
 				}
 				else // Client wants to communicate
 				{
+					// Redirect client request to the correct virtual server
+					// The virtual server depends of the request header (port, servName, ...)
 					processClientRequest(i);
 				}
 			}
@@ -80,9 +60,9 @@ void Server::serverLoop()
     }
 }
 
-void Server::acceptConnection()
+void Server::acceptConnection(const int& serverSocket)
 {
-	_newSocket = accept(_serverSocket, (struct sockaddr*)&_address, (socklen_t*)&_addrlen);
+	_newSocket = accept(serverSocket, NULL, NULL);
 	if (_newSocket == -1)
 		perror("accept");
 	else
@@ -132,4 +112,13 @@ void Server::addFd(const int &fd, fd_set& set)
 	FD_SET(fd, &set);
 	if (fd > _fdmax)
 		_fdmax = fd;
+}
+
+bool Server::isAVirtualServer(const int& fd) const
+{
+	// Might use iterator
+	for (unsigned int i = 0; i < _servers.size(); i++)
+		if (fd == _servers[i].getServerSocket())
+			return true;
+	return false;
 }

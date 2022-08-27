@@ -14,7 +14,7 @@ void	RequestHeader::readRequest(std::string& request)
 	std::stringstream	tmp;
 
 	tmp << request;
-	std::cout << tmp.str() << std::endl;
+	//std::cout << tmp.str() << std::endl;
 	tmp >> _method;
 	tmp >> _path;
 	if (_path == "/")
