@@ -11,6 +11,8 @@
 #include <fstream>
 #include <string>
 #include <signal.h>
+#include <vector>
+#include <iterator>
 #include "poll.h"
 #include "fcntl.h"
 #include "webserv.hpp"
@@ -21,8 +23,8 @@
 #include "Delete.hpp"
 #include "ManageRequest.hpp"
 #include "VirtualServer.hpp"
-#include <vector>
-#include <iterator>
+#include "ErrorStatus.hpp"
+#include "ResponseHeader.hpp"
 
 class Server {
 private:
@@ -33,7 +35,7 @@ private:
 	ResponseHeader	header;
 
 	fd_set _master, _readFds;
-	int _fdmax = 0;
+	int _fdmax;
 
 	void serverInit();
 	void createVirtualServer(const std::string& name, const unsigned int& port);

@@ -6,7 +6,7 @@
 /*   By: tarchimb <tarchimb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/19 17:05:50 by tarchimb          #+#    #+#             */
-/*   Updated: 2022/08/24 10:44:36 by tarchimb         ###   ########.fr       */
+/*   Updated: 2022/08/26 11:38:37 by tarchimb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,12 @@
 #include <fstream>
 #include <string>
 #include <signal.h>
+#include "Method.hpp"
 
 class ResponseHeader
 {
 	private:
 		std::string	protocol;
-		std::string	method;
 		std::string	content_type;
 		std::string	content_length;
 		std::string	get_extension_file(std::string path);
@@ -40,7 +40,7 @@ class ResponseHeader
 		int		content_size;
 		ResponseHeader();
 		~ResponseHeader();
-		void	build_response(std::string path, std::string body, int sizeBody, std::string status);
+		void	build_response(Method &method);
 };
 
 #endif

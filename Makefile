@@ -8,7 +8,8 @@ VPATH = ./: \
 		srcs/ManageRequest/Method/: \
 		srcs/ManageRequest/Method/get/: \
 		srcs/ManageRequest/Method/post/: \
-		srcs/ManageRequest/Method/delete/: 
+		srcs/ManageRequest/Method/delete/: \
+		srcs/Status/:
 		
 
 SRCS = 	webserv.cpp \
@@ -21,6 +22,7 @@ SRCS = 	webserv.cpp \
 		Get.cpp \
 		Post.cpp \
 		Delete.cpp \
+		ErrorStatus.cpp
 
 OBJS = $(addprefix .objects/, $(SRCS:.cpp=.o))
 
@@ -33,7 +35,8 @@ INCLUDES =	webserv.hpp \
 			Method.hpp \
 			Get.hpp \
 			Post.hpp \
-			Delete.hpp
+			Delete.hpp \
+			ErrorStatus.hpp
 			
 
 CC = g++
