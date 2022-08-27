@@ -20,6 +20,8 @@
 #include "Post.hpp"
 #include "Delete.hpp"
 #include "ManageRequest.hpp"
+#include "ErrorStatus.hpp"
+#include "ResponseHeader.hpp"
 
 #define PORT 8080
 

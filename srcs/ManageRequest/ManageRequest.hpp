@@ -6,13 +6,17 @@
 #include "Post.hpp"
 #include "Delete.hpp"
 #include "RequestHeader.hpp"
+#include "ErrorStatus.hpp"
+#include "webserv.hpp"
+// #include <exception>
+#include <stdexcept>
+
+
+
 class ManageRequest
 {
 	private:
-		Get		_get;
-		// Post	_post;
-		// Delete	_delete;
-
+		
 	public:
 		ManageRequest();
 		~ManageRequest();

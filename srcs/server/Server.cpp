@@ -47,6 +47,11 @@ void Server::serverSocketInit()
 
 void Server::serverLoop()
 {
+	ManageRequest	manager;
+	RequestHeader	req;
+	Get				get;
+	Method			dst;
+	
     while(1)
     {
         printf("\n+++++++ Waiting for new connection ++++++++\n\n");
@@ -113,9 +118,7 @@ void Server::processClientRequest(const int& fd)
 		request.readRequest(buf);
 		ManageRequest manager;
 		Method dst = manager.identify(request);
-		header.build_response(dst.getPath(), dst.getBody(), dst.getSize(), dst.getStatus());
-		//std::cout << header.response_header << std::endl;
-
+		header.build_response(dst);
 		if (send(fd, header.response_header.c_str(), header.response_header.size(), 0) == -1)
 			perror("send");
 
