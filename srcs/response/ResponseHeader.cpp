@@ -6,24 +6,25 @@
 /*   By: tarchimb <tarchimb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/19 17:07:48 by tarchimb          #+#    #+#             */
-/*   Updated: 2022/08/24 14:48:19 by tarchimb         ###   ########.fr       */
+/*   Updated: 2022/08/27 14:17:48 by tarchimb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ResponseHeader.hpp"
 
 ResponseHeader::ResponseHeader() : protocol("HTTP/1.1 "), 
-	method("200 OK\n"), content_type("Content-Type: "), content_length("Content-Length: ") {}
+	content_type("Content-Type: "), content_length("Content-Length: ") {}
 
 ResponseHeader::~ResponseHeader() {}
 
 std::string	ResponseHeader::get_extension_file(std::string path)
 {
 	std::string	dst;
-	if (path.find(".png\0", 0) != path.npos)
-		return (dst = "image/png");
-	else if (path.find(".html\0", 0) != path.npos)
+	
+	if (path.find(".html\0", 0) != path.npos || path.empty() == true)
 		return (dst = "text/html");
+	else if (path.find(".png\0", 0) != path.npos)
+		return (dst = "image/png");
 	else if (path.find(".aac\0", 0) != path.npos)
 		return (dst = "audio/aac");
 	else if (path.find(".abw\0", 0) != path.npos)
@@ -149,10 +150,8 @@ std::string	ResponseHeader::get_extension_file(std::string path)
 	return (dst = "plain/text");
 }
 
-void	ResponseHeader::build_response(std::string path, std::string body, int sizeBody, std::string status)
+void	ResponseHeader::build_response(Method &method)
 {
-	response_header = protocol + status + content_type + get_extension_file(path) + "\n" 
-	+ content_length + std::to_string(sizeBody).c_str() + "\n\n" + body;
-
-	std::cout << response_header.c_str() << std::endl;
+	response_header = protocol + method.getStatus() + "\n" + content_type + get_extension_file(method.getPath()) + "\n" 
+	+ content_length + std::to_string(method.getSize()).c_str() + "\n\n" + method.getBody();
 }

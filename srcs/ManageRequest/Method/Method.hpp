@@ -15,6 +15,10 @@
 #include <signal.h>
 #include "RequestHeader.hpp"
 
+#define ERROR_404 "404 Not Found"
+#define STATUS_204 "204 No Content"
+#define	STATUS_200 "200 OK"
+
 class Method
 {
 	private:

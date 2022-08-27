@@ -40,8 +40,8 @@ void Server::serverLoop()
 {
 	ManageRequest	manager;
 	RequestHeader	req;
-	Method			dst;
 	Get				get;
+	Method			dst;
 	
     while(1)
     {
@@ -53,8 +53,8 @@ void Server::serverLoop()
         }
 		req.readRequest(_new_socket);
 		dst = manager.identify(req);
-		header.build_response(dst.getPath(), dst.getBody(), dst.getSize(), dst.getStatus());
-        write(_new_socket , header.response_header.c_str() , dst.getSize());
+		header.build_response(dst);
+        write(_new_socket , header.response_header.c_str() , header.response_header.size());
         printf("------------------Hello message sent-------------------");
         close(_new_socket);
     }

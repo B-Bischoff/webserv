@@ -2,23 +2,40 @@
 
 Method ManageRequest::identify(RequestHeader request)
 {
-	if (request.getMethod() == "GET")
+	Method empty;
+	try
 	{
-		return (_get.readFile(request));
-	}
-	else if (request.getMethod() == "POST")
-	{
+		if (request.getMethod() == "GET")
+		{
+			Get	get;
+			get.readFile(request);
+			return (get);
+		}
+		else if (request.getMethod() == "POST")
+		{
 
-	}
-	else if (request.getMethod() == "DELETE")
-	{
+		}
+		else if (request.getMethod() == "DELETE")
+		{
 
-	}
-	else
-	{
+		}
+		else
+		{
 
+		}
 	}
-	return (_get);
+	catch(const char *e)
+	{
+		ErrorStatus	error;
+		std::cout << "Exception catched" << std::endl;
+		// std::cout << e.what();
+		return (error.buildError(e));
+	}
+	catch(...)
+	{
+		std::cout << "Unknown Exception catched" << std::endl;
+	}
+	return (empty);
 }
 
 ManageRequest::ManageRequest()
