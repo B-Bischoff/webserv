@@ -6,11 +6,11 @@ VirtualServer::VirtualServer()
 	// Default constructor should not be called
 }
 
-VirtualServer::VirtualServer(const std::string& name, const unsigned int& port)
-	: _name(name), _port(port)
+VirtualServer::VirtualServer(const std::string& name, const char* ip, const unsigned int& port)
+	: _name(name),_ip(ip), _port(port)
 {
 	init(); // Add verification (return, try, ...)
-	std::cout << "Virtual server '" << _name << "' initialized successfully." << std::endl;
+	std::cout << "Virtual server '" << _name << "' is now listening on: " << _ip << ":" << _port << std::endl;
 }
 
 void VirtualServer::init()
@@ -18,7 +18,7 @@ void VirtualServer::init()
     _addrlen = sizeof(_address); // IPV4
 
     _address.sin_family = AF_INET;
-    _address.sin_addr.s_addr = INADDR_ANY;
+    _address.sin_addr.s_addr = inet_addr(_ip.c_str());
     _address.sin_port = htons(_port);
     memset(_address.sin_zero, '\0', sizeof _address.sin_zero);
 
@@ -48,6 +48,11 @@ void VirtualServer::init()
 const std::string& VirtualServer::getName() const
 {
 	return _name;
+}
+
+const std::string& VirtualServer::getIp() const
+{
+	return _ip;
 }
 
 const unsigned int& VirtualServer::getPort() const

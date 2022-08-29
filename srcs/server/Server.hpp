@@ -38,13 +38,18 @@ private:
 	int _fdmax;
 
 	void serverInit();
-	void createVirtualServer(const std::string& name, const unsigned int& port);
+	void createVirtualServer(const std::string& name, const char* ip, const unsigned int& port);
 
 	void serverLoop();
 
 	void addFd(const int& fd, fd_set& set);
+
 	void acceptConnection(const int& serverSocket);
-	void processClientRequest(const int& fd);
+	void listenClient(const int& clientFd);
+
+	const VirtualServer& identifyServerFromRequest(const RequestHeader& request) const;
+
+	void processClientRequest(const int& clientFd, std::string& buffer);
 
 	bool isAVirtualServer(const int& fd) const;
 

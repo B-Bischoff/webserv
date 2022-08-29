@@ -11,16 +11,23 @@ void Server::serverInit()
 	FD_ZERO(&_master); // Clear master set
 
 	// Virtual servers will soon be loaded from config file
-	createVirtualServer("MainServer", 8080);
-	createVirtualServer("SecondaryServer", 9090);
+	createVirtualServer("MainServer", "127.0.0.1", 8080);
+	createVirtualServer("SecondaryServer", "127.0.0.5", 9090);
 }
 
-void Server::createVirtualServer(const std::string &name, const unsigned int& port)
+void Server::createVirtualServer(const std::string &name, const char* ip, const unsigned int& port)
 {
-	VirtualServer virtualServer(name, port); // Check virtual server creation
+	VirtualServer virtualServer(name, ip, port); // Check virtual server creation
 
 	_servers.push_back(virtualServer);
 	addFd(virtualServer.getServerSocket(), _master);
+}
+
+void Server::addFd(const int &fd, fd_set& set)
+{
+	FD_SET(fd, &set);
+	if (fd > _fdmax)
+		_fdmax = fd;
 }
 
 void Server::serverLoop()
@@ -32,7 +39,7 @@ void Server::serverLoop()
 	
     while(1)
     {
-        printf("\n+++++++ Waiting for new connection ++++++++\n\n");
+		std::cout << std::endl << "+++++++ Waiting for new connection ++++++++" << std::endl << std::endl;
 
 		_readFds = _master;
 		if (select(_fdmax + 1, &_readFds, NULL, NULL, NULL) == -1)
@@ -53,7 +60,7 @@ void Server::serverLoop()
 				{
 					// Redirect client request to the correct virtual server
 					// The virtual server depends of the request header (port, servName, ...)
-					processClientRequest(i);
+					listenClient(i);
 				}
 			}
 		}
@@ -73,45 +80,67 @@ void Server::acceptConnection(const int& serverSocket)
 	}
 }
 
-void Server::processClientRequest(const int& fd)
+void Server::listenClient(const int& clientFd)
 {
 
-	std::cout << "client " << fd << " wants to communicate" << std::endl;
+	std::cout << "client " << clientFd << " wants to communicate" << std::endl;
 	char buffer[30000];
-	int nbytes = recv(fd, buffer, sizeof(buffer), 0);
-	if (nbytes <= 0)
+	int nbytes = recv(clientFd, buffer, sizeof(buffer), 0);
+	if (nbytes <= 0) // Client disconnected or recv error
 	{
 		if (nbytes == 0)
-			std::cout << "Socket: " << fd << " disconnected" << std::endl;
+			std::cout << "Socket: " << clientFd << " disconnected" << std::endl;
 		else
 			perror("recv");
-		std::cout << "Socket: " << fd << " quit" << std::endl;
-		close(fd);
-		FD_CLR(fd, &_master);
+		std::cout << "Socket: " << clientFd << " quit" << std::endl;
+		close(clientFd);
+		FD_CLR(clientFd, &_master);
 	}
 	else
 	{
-		RequestHeader	request;
-
-		std::string buf = buffer;
-		std::cout << buf << std::endl;
-		request.readRequest(buf);
-		ManageRequest manager;
-		Method dst = manager.identify(request);
-		header.build_response(dst);
-		if (send(fd, header.response_header.c_str(), header.response_header.size(), 0) == -1)
-			perror("send");
-
-		//close (fd);
-		//FD_CLR(fd, &_master);
+		std::string buf = buffer; // Convert char* to string
+		processClientRequest(clientFd, buf);
 	}
 }
 
-void Server::addFd(const int &fd, fd_set& set)
+void Server::processClientRequest(const int& clientFd, std::string& buffer)
 {
-	FD_SET(fd, &set);
-	if (fd > _fdmax)
-		_fdmax = fd;
+		RequestHeader	request;
+
+		std::cout << buffer << std::endl;
+		request.readRequest(buffer);
+
+		// Testing virtual server identification
+		identifyServerFromRequest(request);
+
+		ManageRequest manager;
+		Method dst = manager.identify(request);
+		header.build_response(dst);
+		if (send(clientFd, header.response_header.c_str(), header.response_header.size(), 0) == -1)
+			perror("send");
+}
+
+const VirtualServer& Server::identifyServerFromRequest(const RequestHeader& request) const
+{
+	std::string host = request.getHost();
+	if (host.find(':') != std::string::npos) // host contains port
+	{
+		std::string ip = host.substr(0, host.find(':'));
+		std::string port = host.substr(host.find(':') + 1, host.length() - 1);
+
+		for (int i = 0; i < static_cast<int>(_servers.size()); i++)
+		{
+			if (ip == _servers[i].getIp() && port == std::to_string(_servers[i].getPort()))
+			{
+				std::cout << _servers[i].getName() << " should process request." << std::endl;
+				return _servers[i];
+			}
+		}
+	}
+
+	// Default server should be returned
+
+	return _servers[0];
 }
 
 bool Server::isAVirtualServer(const int& fd) const
