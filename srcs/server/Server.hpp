@@ -11,6 +11,8 @@
 #include <fstream>
 #include <string>
 #include <signal.h>
+#include <vector>
+#include <iterator>
 #include "poll.h"
 #include "fcntl.h"
 #include "webserv.hpp"
@@ -20,36 +22,36 @@
 #include "Post.hpp"
 #include "Delete.hpp"
 #include "ManageRequest.hpp"
+#include "VirtualServer.hpp"
 #include "ErrorStatus.hpp"
 #include "ResponseHeader.hpp"
 
-#define PORT 8080
-
-/*
-	The server will from now use the select function to handle connections
-	It requires to keep track the highest fd
-	It is also necessary to create three 
-
-*/
-
 class Server {
 private:
-	int _addrlen;
-	int _serverSocket, _newSocket;
-	struct sockaddr_in _address;
+	// Might use Map instead of vector to identify virtual servers from their socket 
+	std::vector<VirtualServer> _servers;
+
+	int _newSocket;
 	ResponseHeader	header;
 
 	fd_set _master, _readFds;
 	int _fdmax;
 
 	void serverInit();
-	void serverSocketInit();
+	void createVirtualServer(const std::string& name, const char* ip, const unsigned int& port);
 
 	void serverLoop();
 
 	void addFd(const int& fd, fd_set& set);
-	void acceptConnection();
-	void processClientRequest(const int& fd);
+
+	void acceptConnection(const int& serverSocket);
+	void listenClient(const int& clientFd);
+
+	const VirtualServer& identifyServerFromRequest(const RequestHeader& request) const;
+
+	void processClientRequest(const int& clientFd, std::string& buffer);
+
+	bool isAVirtualServer(const int& fd) const;
 
 public:
 	Server();

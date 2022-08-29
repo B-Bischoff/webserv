@@ -8,41 +8,26 @@ Server::Server() : _fdmax(0)
 
 void Server::serverInit()
 {
-	serverSocketInit();
-	FD_ZERO(&_master);
-	addFd(_serverSocket, _master);
+	FD_ZERO(&_master); // Clear master set
+
+	// Virtual servers will soon be loaded from config file
+	createVirtualServer("MainServer", "127.0.0.1", 8080);
+	createVirtualServer("SecondaryServer", "127.0.0.5", 9090);
 }
 
-void Server::serverSocketInit()
+void Server::createVirtualServer(const std::string &name, const char* ip, const unsigned int& port)
 {
-    _addrlen = sizeof(_address); // IPV4
+	VirtualServer virtualServer(name, ip, port); // Check virtual server creation
 
-    _address.sin_family = AF_INET;
-    _address.sin_addr.s_addr = INADDR_ANY;
-    _address.sin_port = htons(PORT);
-    memset(_address.sin_zero, '\0', sizeof _address.sin_zero);
+	_servers.push_back(virtualServer);
+	addFd(virtualServer.getServerSocket(), _master);
+}
 
-    // Creating socket file descriptor
-    if ((_serverSocket = socket(AF_INET, SOCK_STREAM, 0)) == 0)
-    {
-        perror("In socket");
-        exit(EXIT_FAILURE);
-    }
-	 
-	// Reuse socket even if it's "already in use"
-	int yes = 1;
-	setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
-    
-    if (bind(_serverSocket, (struct sockaddr *)&_address, sizeof(_address)) < 0)
-    {
-        perror("In bind");
-        exit(EXIT_FAILURE);
-    }
-    if (listen(_serverSocket, 10) < 0)
-    {
-        perror("In listen");
-        exit(EXIT_FAILURE);
-    }
+void Server::addFd(const int &fd, fd_set& set)
+{
+	FD_SET(fd, &set);
+	if (fd > _fdmax)
+		_fdmax = fd;
 }
 
 void Server::serverLoop()
@@ -54,7 +39,7 @@ void Server::serverLoop()
 	
     while(1)
     {
-        printf("\n+++++++ Waiting for new connection ++++++++\n\n");
+		std::cout << std::endl << "+++++++ Waiting for new connection ++++++++" << std::endl << std::endl;
 
 		_readFds = _master;
 		if (select(_fdmax + 1, &_readFds, NULL, NULL, NULL) == -1)
@@ -67,22 +52,24 @@ void Server::serverLoop()
 		{
 			if (FD_ISSET(i, &_readFds)) // Socket ready to communicate
 			{
-				if (i == _serverSocket) // Server detects incoming connection
+				if (isAVirtualServer(i)) // Incoming connection from new client
 				{
-					acceptConnection();
+					acceptConnection(i);
 				}
 				else // Client wants to communicate
 				{
-					processClientRequest(i);
+					// Redirect client request to the correct virtual server
+					// The virtual server depends of the request header (port, servName, ...)
+					listenClient(i);
 				}
 			}
 		}
     }
 }
 
-void Server::acceptConnection()
+void Server::acceptConnection(const int& serverSocket)
 {
-	_newSocket = accept(_serverSocket, (struct sockaddr*)&_address, (socklen_t*)&_addrlen);
+	_newSocket = accept(serverSocket, NULL, NULL);
 	if (_newSocket == -1)
 		perror("accept");
 	else
@@ -93,43 +80,74 @@ void Server::acceptConnection()
 	}
 }
 
-void Server::processClientRequest(const int& fd)
+void Server::listenClient(const int& clientFd)
 {
 
-	std::cout << "client " << fd << " wants to communicate" << std::endl;
+	std::cout << "client " << clientFd << " wants to communicate" << std::endl;
 	char buffer[30000];
-	int nbytes = recv(fd, buffer, sizeof(buffer), 0);
-	if (nbytes <= 0)
+	int nbytes = recv(clientFd, buffer, sizeof(buffer), 0);
+	if (nbytes <= 0) // Client disconnected or recv error
 	{
 		if (nbytes == 0)
-			std::cout << "Socket: " << fd << " disconnected" << std::endl;
+			std::cout << "Socket: " << clientFd << " disconnected" << std::endl;
 		else
 			perror("recv");
-		std::cout << "Socket: " << fd << " quit" << std::endl;
-		close(fd);
-		FD_CLR(fd, &_master);
+		std::cout << "Socket: " << clientFd << " quit" << std::endl;
+		close(clientFd);
+		FD_CLR(clientFd, &_master);
 	}
 	else
 	{
-		RequestHeader	request;
-
-		std::string buf = buffer;
-		std::cout << buf << std::endl;
-		request.readRequest(buf);
-		ManageRequest manager;
-		Method dst = manager.identify(request);
-		header.build_response(dst);
-		if (send(fd, header.response_header.c_str(), header.response_header.size(), 0) == -1)
-			perror("send");
-
-		//close (fd);
-		//FD_CLR(fd, &_master);
+		std::string buf = buffer; // Convert char* to string
+		processClientRequest(clientFd, buf);
 	}
 }
 
-void Server::addFd(const int &fd, fd_set& set)
+void Server::processClientRequest(const int& clientFd, std::string& buffer)
 {
-	FD_SET(fd, &set);
-	if (fd > _fdmax)
-		_fdmax = fd;
+		RequestHeader	request;
+
+		std::cout << buffer << std::endl;
+		request.readRequest(buffer);
+
+		// Testing virtual server identification
+		identifyServerFromRequest(request);
+
+		ManageRequest manager;
+		Method dst = manager.identify(request);
+		header.build_response(dst);
+		if (send(clientFd, header.response_header.c_str(), header.response_header.size(), 0) == -1)
+			perror("send");
+}
+
+const VirtualServer& Server::identifyServerFromRequest(const RequestHeader& request) const
+{
+	std::string host = request.getHost();
+	if (host.find(':') != std::string::npos) // host contains port
+	{
+		std::string ip = host.substr(0, host.find(':'));
+		std::string port = host.substr(host.find(':') + 1, host.length() - 1);
+
+		for (int i = 0; i < static_cast<int>(_servers.size()); i++)
+		{
+			if (ip == _servers[i].getIp() && port == std::to_string(_servers[i].getPort()))
+			{
+				std::cout << _servers[i].getName() << " should process request." << std::endl;
+				return _servers[i];
+			}
+		}
+	}
+
+	// Default server should be returned
+
+	return _servers[0];
+}
+
+bool Server::isAVirtualServer(const int& fd) const
+{
+	// Might use iterator
+	for (unsigned int i = 0; i < _servers.size(); i++)
+		if (fd == _servers[i].getServerSocket())
+			return true;
+	return false;
 }

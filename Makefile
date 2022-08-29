@@ -14,6 +14,7 @@ VPATH = ./: \
 
 SRCS = 	webserv.cpp \
 		Server.cpp  \
+		VirtualServer.cpp  \
 		ManageRequest.cpp \
 		ResponseHeader.cpp \
 		RequestHeader.cpp \
@@ -28,6 +29,7 @@ OBJS = $(addprefix .objects/, $(SRCS:.cpp=.o))
 INCLUDES =	webserv.hpp \
 			ResponseHeader.hpp \
 			Server.hpp \
+			VirtualServer.hpp \
 			ManageRequest.hpp \
 			RequestHeader.hpp \
 			Method.hpp \
@@ -48,6 +50,20 @@ NAME = webserv
 LINK := ${addprefix -I, ${subst /:,,${VPATH}}}
 
 RM = rm -rf
+
+ifeq ($(OS), Darwin)
+	END=$'\x1b[0m
+	RED=$'\x1b[31m
+	GREEN=$'\x1b[32m
+	BLUE=$'\x1b[34m
+	ERASE=\033[2K\r
+else
+	END=\033[0m
+	RED=\033[31m
+	GREEN=\033[32m
+	BLUE=\033[34m
+	ERASE=\033[2K\r
+endif
 
 all: $(NAME)
 
