@@ -8,8 +8,7 @@
 #include "RequestHeader.hpp"
 #include "ErrorStatus.hpp"
 #include "webserv.hpp"
-// #include <exception>
-#include <stdexcept>
+#include <exception>
 
 
 

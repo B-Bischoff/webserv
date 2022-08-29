@@ -25,7 +25,6 @@ class Method
 	
 	protected:
 		int			_size;
-		int			_statusValue;
 		std::string	_body;
 		std::string _path;
 		std::string _status;
@@ -39,9 +38,6 @@ class Method
 		std::string	getBody() const;
 		std::string	getPath() const;
 		std::string	getStatus() const;
-
-		void		updateStatus(Method method, int statusValue);
-
 };
 
 #endif
