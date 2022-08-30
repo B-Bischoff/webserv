@@ -11,8 +11,9 @@ void Server::serverInit()
 	FD_ZERO(&_master); // Clear master set
 
 	// Virtual servers will soon be loaded from config file
-	createVirtualServer("MainServer", "127.0.0.1", 8080);
-	createVirtualServer("SecondaryServer", "127.0.0.5", 9090);
+	createVirtualServer("localhost", "127.0.0.2", 8080);
+	createVirtualServer("secondary_server", "127.0.0.3", 80);
+	createVirtualServer("third_server", "0.0.0.0", 9090);
 }
 
 void Server::createVirtualServer(const std::string &name, const char* ip, const unsigned int& port)
@@ -111,7 +112,9 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		request.readRequest(buffer);
 
 		// Testing virtual server identification
-		identifyServerFromRequest(request);
+		//identifyServerFromRequest(request);
+		VirtualServerSelector selector(_servers, request);
+		selector.selectServerFromRequest();
 
 		ManageRequest manager;
 		Method dst = manager.identify(request);

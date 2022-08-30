@@ -23,6 +23,7 @@
 #include "Delete.hpp"
 #include "ManageRequest.hpp"
 #include "VirtualServer.hpp"
+#include "VirtualServerSelector.hpp"
 #include "ErrorStatus.hpp"
 #include "ResponseHeader.hpp"
 
