@@ -11,9 +11,9 @@ void Server::serverInit()
 	FD_ZERO(&_master); // Clear master set
 
 	// Virtual servers will soon be loaded from config file
-	createVirtualServer("localhost", "127.0.0.2", 8080);
-	createVirtualServer("secondary_server", "127.0.0.3", 80);
-	createVirtualServer("third_server", "0.0.0.0", 9090);
+	createVirtualServer("localhost", "0.0.0.0", 8081);
+	createVirtualServer("secondary_server", "127.0.0.1", 8081);
+	//createVirtualServer("third_server", "127.0.0.1", 8080);
 }
 
 void Server::createVirtualServer(const std::string &name, const char* ip, const unsigned int& port)
@@ -75,7 +75,8 @@ void Server::acceptConnection(const int& serverSocket)
 		perror("accept");
 	else
 	{
-		std::cout << "New incoming connection (fd: " << _newSocket << ")" << std::endl;
+		std::cout << "New incoming connection (fd: " << _newSocket << ")";
+		std::cout << " received from fd: " << serverSocket << std::endl;
 		fcntl(_newSocket, F_SETFL, O_NONBLOCK); // Set fd to non-blockant (prg will not get stuck on recv)
 		addFd(_newSocket, _master);
 	}
@@ -112,38 +113,15 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		request.readRequest(buffer);
 
 		// Testing virtual server identification
-		//identifyServerFromRequest(request);
 		VirtualServerSelector selector(_servers, request);
 		selector.selectServerFromRequest();
+
 
 		ManageRequest manager;
 		Method dst = manager.identify(request);
 		header.build_response(dst);
 		if (send(clientFd, header.response_header.c_str(), header.response_header.size(), 0) == -1)
 			perror("send");
-}
-
-const VirtualServer& Server::identifyServerFromRequest(const RequestHeader& request) const
-{
-	std::string host = request.getHost();
-	if (host.find(':') != std::string::npos) // host contains port
-	{
-		std::string ip = host.substr(0, host.find(':'));
-		std::string port = host.substr(host.find(':') + 1, host.length() - 1);
-
-		for (int i = 0; i < static_cast<int>(_servers.size()); i++)
-		{
-			if (ip == _servers[i].getIp() && port == std::to_string(_servers[i].getPort()))
-			{
-				std::cout << _servers[i].getName() << " should process request." << std::endl;
-				return _servers[i];
-			}
-		}
-	}
-
-	// Default server should be returned
-
-	return _servers[0];
 }
 
 bool Server::isAVirtualServer(const int& fd) const

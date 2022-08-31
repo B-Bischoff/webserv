@@ -48,8 +48,6 @@ private:
 	void acceptConnection(const int& serverSocket);
 	void listenClient(const int& clientFd);
 
-	const VirtualServer& identifyServerFromRequest(const RequestHeader& request) const;
-
 	void processClientRequest(const int& clientFd, std::string& buffer);
 
 	bool isAVirtualServer(const int& fd) const;

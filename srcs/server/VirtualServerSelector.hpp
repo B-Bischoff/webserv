@@ -16,8 +16,11 @@ class VirtualServerSelector
 		unsigned int _port;
 
 		void parsePortAndHost();
+
 		std::vector<VirtualServer> compareToIpAndPort();
-		std::vector<VirtualServer> compareToNameAndPort();
+		VirtualServer& compareToNameOrDefault(std::vector<VirtualServer>& servers);
+		std::vector<VirtualServer> compareToNameAndPort(std::vector<VirtualServer>& servers);
+		VirtualServer& compareToDefault(std::vector<VirtualServer>& servers);
 
 	public:
 		VirtualServerSelector(const std::vector<VirtualServer>& servers, const RequestHeader& request);
