@@ -28,7 +28,7 @@ void VirtualServerSelector::parsePortAndHost()
 	std::cout << "Hostname: " << _hostName << " | port: " << _port << std::endl;
 }
 
-const VirtualServer& VirtualServerSelector::selectServerFromRequest()
+int VirtualServerSelector::selectServerFromRequest()
 {
 	std::vector<VirtualServer> matchingServers;
 
@@ -38,7 +38,7 @@ const VirtualServer& VirtualServerSelector::selectServerFromRequest()
 	{
 		std::cout << "EXACT IP AND PORT" << std::endl;
 		std::cout << matchingServers[0].getName() << " " << matchingServers[0].getIp()<<":"<<matchingServers[0].getPort()<<std::endl;
-		return matchingServers[0];
+		return matchingServers[0].getServerSocket();
 	}
 
 	if (matchingServers.size() == 0) // Find from all possible servers
@@ -67,7 +67,7 @@ std::vector<VirtualServer> VirtualServerSelector::compareToIpAndPort()
 	return matchingServers;
 }
 
-VirtualServer& VirtualServerSelector::compareToNameOrDefault(std::vector<VirtualServer>& servers)
+int VirtualServerSelector::compareToNameOrDefault(std::vector<VirtualServer>& servers)
 {
 	std::vector<VirtualServer> matchingServers;
 
@@ -75,7 +75,7 @@ VirtualServer& VirtualServerSelector::compareToNameOrDefault(std::vector<Virtual
 	if (matchingServers.size() > 0) // Cannot be greater than 1 because servers can't have the exact same name
 	{
 		std::cout << matchingServers[0].getName() << " " << matchingServers[0].getIp()<<":"<<matchingServers[0].getPort()<<std::endl;
-		return matchingServers[0];
+		return matchingServers[0].getServerSocket();
 	}
 	
 	// To do: research with weird syntax (wildcards and stuff ...)
@@ -103,10 +103,40 @@ std::vector<VirtualServer> VirtualServerSelector::compareToNameAndPort(std::vect
 	return matchingServers;
 }
 
-VirtualServer& VirtualServerSelector::compareToDefault(std::vector<VirtualServer>& servers)
+int VirtualServerSelector::compareToDefault(std::vector<VirtualServer>& servers)
 {
 	std::cout << "DEFAULT SERVER" << std::endl;
 
+	int defaultServerSocket = 0;
+	int serverIndex = 0;
 
-	return servers[0];
+	for (int i = 0; i < static_cast<int>(servers.size()); i++)
+	{
+		if (servers[i].getPort() == _port)
+		{
+			if (servers[i].getIp() == "0.0.0.0" && defaultServerSocket == 0)
+			{
+				defaultServerSocket = servers[i].getServerSocket();
+				serverIndex = i;
+			}
+			if (servers[i].getIp() != "0.0.0.0" && !isASpecificIp(_hostName))
+			{
+				std::cout << servers[i].getName() << " " << servers[i].getIp()<<":"<<servers[i].getPort()<<std::endl;
+				return servers[i].getServerSocket();
+			}
+		}
+	}
+
+	std::cout << servers[serverIndex].getName() << " " << servers[serverIndex].getIp()<<":"<<servers[serverIndex].getPort()<<std::endl;
+	return defaultServerSocket;
+}
+
+bool VirtualServerSelector::isASpecificIp(const std::string ip) const
+{
+	if (ip.find_first_not_of("0123456789.") != std::string::npos)
+		return false;
+	else if (ip == "0.0.0.0")
+		return false;
+	else
+		return true;
 }

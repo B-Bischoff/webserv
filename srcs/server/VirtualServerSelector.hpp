@@ -18,14 +18,16 @@ class VirtualServerSelector
 		void parsePortAndHost();
 
 		std::vector<VirtualServer> compareToIpAndPort();
-		VirtualServer& compareToNameOrDefault(std::vector<VirtualServer>& servers);
+		int compareToNameOrDefault(std::vector<VirtualServer>& servers);
 		std::vector<VirtualServer> compareToNameAndPort(std::vector<VirtualServer>& servers);
-		VirtualServer& compareToDefault(std::vector<VirtualServer>& servers);
+		int compareToDefault(std::vector<VirtualServer>& servers);
+
+		bool isASpecificIp(const std::string) const;
 
 	public:
 		VirtualServerSelector(const std::vector<VirtualServer>& servers, const RequestHeader& request);
 
-		const VirtualServer& selectServerFromRequest();
+		int selectServerFromRequest();
 };
 
 #endif
