@@ -10,7 +10,8 @@ VirtualServer::VirtualServer(const std::string& name, const char* ip, const unsi
 	: _name(name),_ip(ip), _port(port)
 {
 	init(); // Add verification (return, try, ...)
-	std::cout << "Virtual server '" << _name << "' is now listening on: " << _ip << ":" << _port << std::endl;
+	std::cout << "Virtual server '" << _name << "' is now listening on: " << _ip;
+	std::cout << ":" << _port << " with fd:" << _serverSocket << std::endl;
 }
 
 void VirtualServer::init()
@@ -31,12 +32,16 @@ void VirtualServer::init()
 	 
 	// Reuse socket even if it's "already in use"
 	int yes = 1;
-	setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+	if (setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) < 0)
+	{
+		perror("In setsockopt");
+		exit(EXIT_FAILURE);
+	}
     
     if (bind(_serverSocket, (struct sockaddr *)&_address, sizeof(_address)) < 0)
     {
         perror("In bind");
-        exit(EXIT_FAILURE);
+		// exit(EXIT_FAILURE);
     }
     if (listen(_serverSocket, 10) < 0)
     {

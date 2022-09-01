@@ -15,6 +15,7 @@ VPATH = ./: \
 SRCS = 	webserv.cpp \
 		Server.cpp  \
 		VirtualServer.cpp  \
+		VirtualServerSelector.cpp  \
 		ManageRequest.cpp \
 		ResponseHeader.cpp \
 		RequestHeader.cpp \
@@ -30,6 +31,7 @@ INCLUDES =	webserv.hpp \
 			ResponseHeader.hpp \
 			Server.hpp \
 			VirtualServer.hpp \
+			VirtualServerSelector.hpp  \
 			ManageRequest.hpp \
 			RequestHeader.hpp \
 			Method.hpp \
