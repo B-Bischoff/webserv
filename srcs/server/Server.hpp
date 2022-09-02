@@ -26,6 +26,8 @@
 #include "VirtualServerSelector.hpp"
 #include "ErrorStatus.hpp"
 #include "ResponseHeader.hpp"
+#include "Parsing.hpp"
+#include "VirtualServConfig.hpp"
 
 class Server {
 private:
