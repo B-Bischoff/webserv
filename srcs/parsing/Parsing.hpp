@@ -15,7 +15,7 @@
 #include <sstream>
 #include <iterator>
 #include <map>
-#include "VirtualServConfig.hpp"
+#include "VirtualServerConfig.hpp"
 #include "Parsing.hpp"
 #include <arpa/inet.h>
 #include <regex>
@@ -37,7 +37,7 @@
 #define WRONG_URL		(std::string)"Wrong URL entered : '"
 #define INVALID_IP		(std::string)"Invalip ip address: '"
 
-class VirtualServConfig;
+class VirtualServerConfig;
 
 class Parsing
 {
@@ -50,28 +50,28 @@ class Parsing
 
 		std::string		removeUselessLine(std::istringstream fileContent);
 		void			parseBlocks(std::string &fileContent);
-		void			fillVirtualServers(std::vector<VirtualServConfig> &vServ);
-		void			assignLine(std::string &line, VirtualServConfig &vServ);
+		void			fillVirtualServers(std::vector<VirtualServerConfig> &vServ);
+		void			assignLine(std::string &line, VirtualServerConfig &vServ);
 		void			checkSyntaxFile(std::string &fileContent);
 		void			removeSemicolon();
 		unsigned int	countArgs(std::string line) const;
 
-		void			setListen(std::istringstream &line, VirtualServConfig &vServ, unsigned int args);
-		void			setServerName(std::string &line, VirtualServConfig &vServ, unsigned int args);
-		void			setRootIndex(std::istringstream &line, VirtualServConfig &vServ, unsigned int args);
-		void			setLogs(std::istringstream &line, VirtualServConfig &vServ, unsigned int args);
-		void			setAutoIndex(std::istringstream &line, VirtualServConfig &vServ, unsigned int args);
-		void			setMethod(std::istringstream &line, VirtualServConfig &vServ, unsigned int args);
-		void			setReturn(std::istringstream &line, VirtualServConfig &vServ, unsigned int args);
-		void			setMaxBodySize(std::istringstream &line, VirtualServConfig &vServ, unsigned int args);
+		void			setListen(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
+		void			setServerName(std::string &line, VirtualServerConfig &vServ, unsigned int args);
+		void			setRootIndex(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
+		void			setLogs(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
+		void			setAutoIndex(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
+		void			setMethod(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
+		void			setReturn(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
+		void			setMaxBodySize(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
 
-		void			setLocation(std::istringstream &line, VirtualServConfig &vServ, unsigned int args);
+		void			setLocation(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
 	public:
 
 		Parsing();
 		~Parsing();
 
-		int	parseConfigFile(char *confPath, std::vector<VirtualServConfig> &vServ);
+		int	parseConfigFile(char *confPath, std::vector<VirtualServerConfig> &vServ);
 };
 
 #endif

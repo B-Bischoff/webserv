@@ -7,31 +7,27 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include "VirtualServerConfig.hpp"
+
 class VirtualServer 
 {
 	private:
 		VirtualServer();
 	
-		const std::string _name;
-		const std::string _ip;
-		const unsigned int _port;
+		const VirtualServerConfig _config;
 
-		int _serverSocket = -1;
+		int _serverSocket;
 		int _addrlen;
 		struct sockaddr_in _address;
-
-		// Add file location
-		// Add allowed methods
-		// Add log file (?)
 
 		void init();
 
 	public:
-		VirtualServer(const std::string& name, const char* ip, const unsigned int& port);
+		VirtualServer(const VirtualServerConfig& config);
 
 		const std::string& getName() const;
 		const std::string& getIp() const;
-		const unsigned int& getPort() const;
+		unsigned int getPort() const;
 		const int& getServerSocket() const;
 };
 

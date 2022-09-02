@@ -20,12 +20,12 @@ static void	printVector(std::vector<std::string> vec)
 }
 
 
-static void	printServer(std::vector<VirtualServConfig> vServ, int size)
+static void	printServer(std::vector<VirtualServerConfig> vServ, int size)
 {
 	for (int i = 0; i < size; i++)
 	{
 		std::cout << "BLOCK_SERVER " << i << std::endl;
-		std::cout  << "Ip:\t\t"  << vServ[i].getListenIp() << ":" << vServ[i].getListenPort() << std::endl;
+		std::cout  << "Ip:\t\t"  << vServ[i].getIp() << ":" << vServ[i].getPort() << std::endl;
 		std::cout << "server_name:\t";
 		printVector(vServ[i].getServerName());
 		std::cout << "access_log:\t";
@@ -57,7 +57,7 @@ unsigned int	Parsing::countArgs(std::string line) const
 	return (i);
 }
 
-void	Parsing::setMaxBodySize(std::istringstream &streamLine, VirtualServConfig &vServ, unsigned int args)
+void	Parsing::setMaxBodySize(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args)
 {
 	std::string		tmp;
 	unsigned int	size;
@@ -70,7 +70,7 @@ void	Parsing::setMaxBodySize(std::istringstream &streamLine, VirtualServConfig &
 	vServ.setMaxBodySize(size);
 }
 
-void	Parsing::setReturn(std::istringstream &streamLine, VirtualServConfig &vServ, unsigned int args)
+void	Parsing::setReturn(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args)
 {
 	const std::regex 			pattern("((http|https)://)(www.)?[a-zA-Z0-9@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)");
 	std::string					tmp;
@@ -93,7 +93,7 @@ void	Parsing::setReturn(std::istringstream &streamLine, VirtualServConfig &vServ
 	vServ.setReturn(node);
 }
 
-void	Parsing::setMethod(std::istringstream &streamLine, VirtualServConfig &vServ, unsigned int args)
+void	Parsing::setMethod(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args)
 {
 	std::string	tmp;
 	streamLine >> tmp;
@@ -113,7 +113,7 @@ void	Parsing::setMethod(std::istringstream &streamLine, VirtualServConfig &vServ
 	}
 }
 
-void	Parsing::setAutoIndex(std::istringstream &streamLine, VirtualServConfig &vServ, unsigned int args)
+void	Parsing::setAutoIndex(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args)
 {
 	std::string	tmp;
 
@@ -125,7 +125,7 @@ void	Parsing::setAutoIndex(std::istringstream &streamLine, VirtualServConfig &vS
 		vServ.setAutoIndex(true);
 }
 
-void	Parsing::setLogs(std::istringstream &streamLine, VirtualServConfig &vServ, unsigned int args)
+void	Parsing::setLogs(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args)
 {
 	std::fstream				file;
 	std::string					tmp;
@@ -150,7 +150,7 @@ void	Parsing::setLogs(std::istringstream &streamLine, VirtualServConfig &vServ, 
 	file.close();
 }
 
-void	Parsing::setRootIndex(std::istringstream &streamLine, VirtualServConfig &vServ, unsigned int args)
+void	Parsing::setRootIndex(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args)
 {
 	std::string		tmp;
 	std::fstream	file;
@@ -169,7 +169,7 @@ void	Parsing::setRootIndex(std::istringstream &streamLine, VirtualServConfig &vS
 	file.close();
 }
 
-void	Parsing::setListen(std::istringstream &streamLine, VirtualServConfig &vServ, unsigned int args)
+void	Parsing::setListen(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args)
 {
 	std::string					tmp;
 	size_t						pos;
@@ -187,11 +187,11 @@ void	Parsing::setListen(std::istringstream &streamLine, VirtualServConfig &vServ
 	port = std::stoi(tmp.substr(tmp.find_first_of(':') + 1));
 	if (port > 65535 || port < 0)
 		throw(LISTEN);
-	vServ.setListenIp(tmp.substr(0, tmp.find_first_of(':')));
-	vServ.setListenPort(tmp.substr(tmp.find_first_of(':') + 1));
+	vServ.setIp(tmp.substr(0, tmp.find_first_of(':')));
+	vServ.setPort(tmp.substr(tmp.find_first_of(':') + 1));
 }
 
-void	Parsing::setServerName(std::string &line, VirtualServConfig &vServ, unsigned int args)
+void	Parsing::setServerName(std::string &line, VirtualServerConfig &vServ, unsigned int args)
 {
 	std::stringstream			tmp;
 	std::vector<std::string>	toPush;
@@ -208,7 +208,7 @@ void	Parsing::setServerName(std::string &line, VirtualServConfig &vServ, unsigne
 	vServ.setServerName(toPush);		
 }
 
-void	Parsing::assignLine(std::string &line, VirtualServConfig &vServ)
+void	Parsing::assignLine(std::string &line, VirtualServerConfig &vServ)
 {
 	std::istringstream	streamLine(line);
 	unsigned int		args = countArgs(line);
@@ -243,10 +243,10 @@ void	Parsing::assignLine(std::string &line, VirtualServConfig &vServ)
 		throw(line);
 }
 
-void	Parsing::fillVirtualServers(std::vector<VirtualServConfig> &vServ)
+void	Parsing::fillVirtualServers(std::vector<VirtualServerConfig> &vServ)
 {
 	std::string			line;
-	VirtualServConfig	newNode;
+	VirtualServerConfig	newNode;
 
 	for (int i = 0; i < _blockNumber; i++)
 	{
@@ -335,7 +335,7 @@ void	Parsing::checkSyntaxFile(std::string &fileContent)
 	}
 }
 
-int	Parsing::parseConfigFile(char *confPath, std::vector<VirtualServConfig> &vServ)
+int	Parsing::parseConfigFile(char *confPath, std::vector<VirtualServerConfig> &vServ)
 {
 	try
 	{
