@@ -3,6 +3,8 @@
 Parsing::Parsing()
 {
 	_blockNumber = 0;
+	_locationBlock = -1;
+	_inLocationBlock = false;
 }
 
 Parsing::~Parsing()
@@ -20,8 +22,10 @@ static void	printVector(std::vector<std::string> vec)
 }
 
 
-static void	printServer(std::vector<VirtualServerConfig> vServ, int size)
+static void	printServer(std::vector<VirtualServerConfig> vServ, int size, std::vector<int> _locationBlock)
 {
+	(void) _locationBlock;
+	// return;
 	for (int i = 0; i < size; i++)
 	{
 		std::cout << "BLOCK_SERVER " << i << std::endl;
@@ -38,8 +42,22 @@ static void	printServer(std::vector<VirtualServerConfig> vServ, int size)
 		printVector(vServ[i].getReturn());
 		std::cout << "methods:\t" << vServ[i].getMethodGet() << " "  << vServ[i].getMethodPost() << " " << vServ[i].getMethodDelete() << std::endl;
 		std::cout << "autoindex:\t" << (vServ[i].getAutoIndex() ? "yes" : "no") << std::endl;
-		std::cout << "body size:\t" << vServ[i].getMaxBodySize() << std::endl;
-		std::cout << "-------------------------------------\n" << std::endl;
+		std::cout << "body size:\t" << vServ[i].getMaxBodySize()  << "\n" << std::endl;
+
+		for (int j = 0; j < _locationBlock[i]; j++)
+		{
+			std::cout << "BLOCK_LOCATION " << j  << " in BLOCK_SERVER " << i << std::endl;
+			std::cout << "location:\t" << "modifier: " << vServ[i].loc[j].getLocationModifier() << " path: " << vServ[i].loc[j].getLocationPath() << std::endl;
+			std::cout << "method:\t\t" << vServ[i].loc[j].getMethodGetLoc() << " "<< vServ[i].loc[j].getMethodPostLoc() << " " << vServ[i].loc[j].getMethodDeleteLoc() << std::endl;
+			std::cout << "autoindex:\t" << (vServ[i].loc[j].getAutoIndexLoc() ? "yes" : "no") << std::endl;
+			std::cout << "index\t\t" << vServ[i].loc[j].getIndexLoc() << std::endl;
+			// std::cout << "root:\t\t" << vServ[i].getRootLoc(j) << std::endl;
+			std::cout << "root:\t\t" << vServ[i].loc[j].getRootLoc() << std::endl;
+			std::cout << "return:\t\t";
+			printVector(vServ[i].loc[j].getReturnLoc());
+			std::cout << std::endl;
+		}
+			std::cout << "-------------------------------------" << std::endl;
 	}
 }
 
@@ -55,6 +73,22 @@ unsigned int	Parsing::countArgs(std::string line) const
 		i++;
 	}
 	return (i);
+}
+
+void	Parsing::setLocation(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args)
+{
+	std::string	tmp;
+
+	streamLine >> tmp;
+	if (args < 3 || args > 4)
+		throw(tmp + " : " + TOO_MUCH_ARGS);
+	if (args == 4)
+	{
+		streamLine >> tmp;
+		vServ.loc[_locationBlock].setLocationModifier(tmp);
+	}
+	streamLine >> tmp;
+	vServ.loc[_locationBlock].setLocationPath(tmp);
 }
 
 void	Parsing::setMaxBodySize(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args)
@@ -90,7 +124,7 @@ void	Parsing::setReturn(std::istringstream &streamLine, VirtualServerConfig &vSe
 		node.push_back(tmp);
 	else
 		throw(WRONG_URL + tmp + "'");
-	vServ.setReturn(node);
+	_inLocationBlock == true ? vServ.loc[_locationBlock].setReturnLoc(node) : vServ.setReturn(node);
 }
 
 void	Parsing::setMethod(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args)
@@ -103,11 +137,11 @@ void	Parsing::setMethod(std::istringstream &streamLine, VirtualServerConfig &vSe
 	{
 		streamLine >> tmp;
 		if (tmp.compare("GET") == 0)
-			vServ.setMethodGet(tmp);
+			_inLocationBlock == true ? vServ.loc[_locationBlock].setMethodGetLoc(tmp) : vServ.setMethodGet(tmp);
 		else if (tmp.compare("POST") == 0)
-			vServ.setMethodPost(tmp);
+			_inLocationBlock == true ? vServ.loc[_locationBlock].setMethodPostLoc(tmp) : vServ.setMethodPost(tmp);
 		else if (tmp.compare("DELETE") == 0)
-			vServ.setMethodDelete(tmp);
+			_inLocationBlock == true ? vServ.loc[_locationBlock].setMethodDeleteLoc(tmp) : vServ.setMethodDelete(tmp);
 		else
 			throw (WRONG_METHOD + tmp + "'");
 	}
@@ -122,7 +156,7 @@ void	Parsing::setAutoIndex(std::istringstream &streamLine, VirtualServerConfig &
 		throw(tmp + " : " + TOO_MUCH_ARGS);
 	streamLine >> tmp;
 	if (tmp.compare("on") == 0)
-		vServ.setAutoIndex(true);
+		_inLocationBlock == true ? vServ.loc[_locationBlock].setAutoIndexLoc(true) : vServ.setAutoIndex(true);
 }
 
 void	Parsing::setLogs(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args)
@@ -163,9 +197,9 @@ void	Parsing::setRootIndex(std::istringstream &streamLine, VirtualServerConfig &
 	if (file.is_open() == false)
 		throw(PATH + tmp + "'");
 	if (streamLine.str().find("index") != std::string::npos)
-		vServ.setIndex(tmp);
+		_inLocationBlock == true ? vServ.loc[_locationBlock].setIndexLoc(tmp) : vServ.setIndex(tmp);
 	else
-		vServ.setRoot(tmp);
+		_inLocationBlock == true ? vServ.loc[_locationBlock].setRootLoc(tmp) : vServ.setRoot(tmp);
 	file.close();
 }
 
@@ -211,13 +245,14 @@ void	Parsing::assignLine(std::string &line, VirtualServerConfig &vServ)
 {
 	std::istringstream	streamLine(line);
 	unsigned int		args = countArgs(line);
+
 	if (line.find("server ") != std::string::npos)
 	{
 		if (args != 2)
 			throw(ERROR_SYNTAX);
 	}
 	else if (line.find("location") != std::string::npos)
-		return;
+		setLocation(streamLine, vServ, args);
 	else if (line.find("listen") != std::string::npos)
 		setListen(streamLine, vServ, args);
 	else if (line.find("server_name") != std::string::npos)
@@ -246,17 +281,26 @@ void	Parsing::fillVirtualServers(std::vector<VirtualServerConfig> &vServ)
 {
 	std::string			line;
 	VirtualServerConfig	newNode;
-
+	LocationBlock		newNodeLoc;
+	std::map <std::string, std::vector <std::string> > tmp;
 	for (int i = 0; i < _blockNumber; i++)
 	{
 		vServ.push_back(newNode);
 		std::istringstream	blockContent(_blocks[i]);
 		while (std::getline(blockContent, line).eof() == false)
 		{
-			if (line.find("location") != std::string::npos)
-				_inLocationBlock == true;
+			if (line.find("}") != std::string::npos)
+				_inLocationBlock = false;
+			else if (line.find("location") != std::string::npos)
+			{
+				_inLocationBlock = true;
+				_locationBlock++;
+				vServ[i].loc.push_back(newNodeLoc);
+			}
 			assignLine(line, vServ[i]);
 		}
+		_numberOfBlocksInEachLoc.push_back(_locationBlock + 1);
+		_locationBlock = -1;
 	}
 }
 
@@ -358,6 +402,6 @@ int	Parsing::parseConfigFile(char *confPath, std::vector<VirtualServerConfig> &v
 		std::cerr << e << std::endl;
 		return (-1);
 	}
-	printServer(vServ, _blockNumber);
+	printServer(vServ, _blockNumber, _numberOfBlocksInEachLoc);
 	return (0);
 }

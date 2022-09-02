@@ -27,6 +27,7 @@ SRCS = 	webserv.cpp \
 		Delete.cpp \
 		ErrorStatus.cpp \
 		Parsing.cpp \
+		LocationBlock.cpp
 
 OBJS = $(addprefix .objects/, $(SRCS:.cpp=.o))
 

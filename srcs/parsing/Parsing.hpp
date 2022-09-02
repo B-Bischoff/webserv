@@ -48,6 +48,8 @@ class Parsing
 		int							_blockNumber;
 		std::vector<int>			_bracketsPos;
 		bool						_inLocationBlock;
+		int							_locationBlock;
+		std::vector<int>			_numberOfBlocksInEachLoc;
 
 		std::string		removeUselessLine(std::istringstream fileContent);
 		void			parseBlocks(std::string &fileContent);
@@ -57,16 +59,16 @@ class Parsing
 		void			removeSemicolon();
 		unsigned int	countArgs(std::string line) const;
 
-		void			setListen(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
-		void			setServerName(std::string &line, VirtualServerConfig &vServ, unsigned int args);
-		void			setRootIndex(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
-		void			setLogs(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
-		void			setAutoIndex(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
-		void			setMethod(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
-		void			setReturn(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
-		void			setMaxBodySize(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
+		void			setListen(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args);
+		void			setServerName(std::string &streamLine, VirtualServerConfig &vServ, unsigned int args);
+		void			setRootIndex(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args);
+		void			setLogs(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args);
+		void			setAutoIndex(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args);
+		void			setMethod(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args);
+		void			setReturn(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args);
+		void			setMaxBodySize(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args);
 
-		void			setLocation(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
+		void			setLocation(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args);
 	public:
 
 		Parsing();
