@@ -1,11 +1,5 @@
 #include "Server.hpp"
 
-Server::Server() : _fdmax(0)
-{
-	serverInit();
-	serverLoop();
-}
-
 Server::Server(const std::vector<VirtualServerConfig>& configList) : _fdmax(0)
 {
 	FD_ZERO(&_master); // Clear master set

@@ -20,7 +20,7 @@ VirtualServerConfig::~VirtualServerConfig()
 	
 }
 
-void	VirtualServerConfig::setListenIp(std::string ip)
+void	VirtualServerConfig::setIp(std::string ip)
 {
 	_vServ["listen"][0] = ip;
 }
@@ -30,7 +30,7 @@ const std::string&	VirtualServerConfig::getIp(void) const
 	return (_vServ.at("listen")[0]);
 }
 
-void	VirtualServerConfig::setListenPort(std::string port)
+void	VirtualServerConfig::setPort(std::string port)
 {
 	_vServ["listen"][1] = port;
 }

@@ -32,10 +32,10 @@ class VirtualServerConfig
 		VirtualServerConfig();
 		~VirtualServerConfig();
 
-		void						setListenIp(std::string ip);
+		void						setIp(std::string ip);
 		const std::string&			getIp(void) const;
 
-		void						setListenPort(std::string ip);
+		void						setPort(std::string ip);
 		unsigned int				getPort(void) const;
 
 		void						setServerName(std::vector<std::string> serverName);

@@ -9,8 +9,8 @@ void addServerConfig(std::vector<VirtualServerConfig>& v, std::string name, std:
 	names.push_back(name);
 
 	conf.setServerName(names);
-	conf.setListenIp(ip);
-	conf.setListenPort(port);
+	conf.setIp(ip);
+	conf.setPort(port);
 
 	v.push_back(conf);
 }

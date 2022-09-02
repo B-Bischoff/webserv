@@ -55,7 +55,6 @@ private:
 	bool isAVirtualServer(const int& fd) const;
 
 public:
-	Server();
 	Server(const std::vector<VirtualServerConfig>& configList);
 
 };

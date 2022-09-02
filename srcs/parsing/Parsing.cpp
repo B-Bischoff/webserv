@@ -187,8 +187,8 @@ void	Parsing::setListen(std::istringstream &streamLine, VirtualServerConfig &vSe
 	port = std::stoi(tmp.substr(tmp.find_first_of(':') + 1));
 	if (port > 65535 || port < 0)
 		throw(LISTEN);
-	vServ.setListenIp(tmp.substr(0, tmp.find_first_of(':')));
-	vServ.setListenPort(tmp.substr(tmp.find_first_of(':') + 1));
+	vServ.setIp(tmp.substr(0, tmp.find_first_of(':')));
+	vServ.setPort(tmp.substr(tmp.find_first_of(':') + 1));
 }
 
 void	Parsing::setServerName(std::string &line, VirtualServerConfig &vServ, unsigned int args)
