@@ -15,14 +15,13 @@
 #include <sstream>
 #include <iterator>
 #include <map>
-#include "VirtualServConfig.hpp"
 #include "Parsing.hpp"
 #include <arpa/inet.h>
 #include <regex>
 
 typedef std::map <std::string, std::vector <std::string> > Serv;
 
-class VirtualServConfig
+class VirtualServerConfig
 {
 	private:
 		Serv				_vServ;
@@ -31,17 +30,17 @@ class VirtualServConfig
 		std::vector<Serv>	_location;
 
 	public:
-		VirtualServConfig();
-		~VirtualServConfig();
+		VirtualServerConfig();
+		~VirtualServerConfig();
 
-		void						setListenIp(std::string ip);
-		std::string					getListenIp(void) const;
+		void						setIp(std::string ip);
+		const std::string&			getIp(void) const;
 
-		void						setListenPort(std::string ip);
-		std::string					getListenPort(void) const;
+		void						setPort(std::string ip);
+		unsigned int				getPort(void) const;
 
 		void						setServerName(std::vector<std::string> serverName);
-		std::vector<std::string>	getServerName(void) const;
+		const std::vector<std::string>&	getServerName(void) const;
 
 		void						setRoot(std::string path);
 		std::string					getRoot(void) const;

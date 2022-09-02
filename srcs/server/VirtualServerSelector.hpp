@@ -22,7 +22,7 @@ class VirtualServerSelector
 		std::vector<VirtualServer> compareToNameAndPort(std::vector<VirtualServer>& servers);
 		int compareToDefault(std::vector<VirtualServer>& servers);
 
-		bool isASpecificIp(const std::string) const;
+		bool isASpecificIp(const std::string ip) const;
 
 	public:
 		VirtualServerSelector(const std::vector<VirtualServer>& servers, const RequestHeader& request);
