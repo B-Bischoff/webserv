@@ -22,6 +22,7 @@ VirtualServConfig::~VirtualServConfig()
 
 void	VirtualServConfig::setListenIp(std::string ip)
 {
+	std::cout << ip << std::endl;
 	_vServ["listen"][0] = ip;
 }
 
@@ -148,4 +149,75 @@ void	VirtualServConfig::setMaxBodySize(unsigned int size)
 unsigned int	VirtualServConfig::getMaxBodySize(void) const
 {
 	return (_client_max_body_size);
+}
+
+void	VirtualServConfig::setAutoIndexLoc(bool value, int locationBlock)
+{
+	_location[locationBlock]["autoindex"].push_back(std::to_string(value));
+}
+
+bool	VirtualServConfig::getAutoIndexLoc(int locationBlock) const
+{
+	return ((_location[locationBlock].at("autoindex").at(0) == "off" ? true : false));
+}
+
+void	VirtualServConfig::setReturnLoc(std::vector<std::string> value, int locationBlock)
+{
+	_location[locationBlock]["return"] = value;
+}
+
+std::vector<std::string>	VirtualServConfig::getReturnLoc(int locationBlock) const
+{
+	return (_location[locationBlock].at("return"));
+}
+
+
+void	VirtualServConfig::setRootLoc(std::string path, int locationBlock)
+{
+	_location[locationBlock]["root"][0] = path;
+}
+
+std::string	VirtualServConfig::getRootLoc(int locationBlock) const
+{
+	return (_location[locationBlock].at("root")[0]);
+}
+
+void	VirtualServConfig::setIndexLoc(std::string path, int locationBlock)
+{
+	_location[locationBlock]["index"][0] = path;
+}
+
+std::string	VirtualServConfig::getIndexLoc(int locationBlock) const
+{
+	return (_location[locationBlock].at("index")[0]);
+}
+
+void	VirtualServConfig::setMethodGetLoc(std::string method, int locationBlock)
+{
+	_location[locationBlock]["method"][0] = method;
+}
+
+std::string	VirtualServConfig::getMethodGetLoc(int locationBlock) const
+{
+	return (_location[locationBlock].at("method")[0]);
+}
+
+void	VirtualServConfig::setMethodPostLoc(std::string method, int locationBlock)
+{
+	_location[locationBlock]["method"][1] = method;
+}
+
+std::string	VirtualServConfig::getMethodPostLoc(int locationBlock) const
+{
+	return (_location[locationBlock].at("method")[1]);
+}
+
+void	VirtualServConfig::setMethodDeleteLoc(std::string method, int locationBlock)
+{
+	_location[locationBlock]["method"][2] = method;
+}
+
+std::string	VirtualServConfig::getMethodDeleteLoc(int locationBlock) const
+{
+	return (_location[locationBlock].at("method")[2]);
 }

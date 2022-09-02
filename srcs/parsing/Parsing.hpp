@@ -47,6 +47,7 @@ class Parsing
 		std::vector<std::string>	_blocks;
 		int							_blockNumber;
 		std::vector<int>			_bracketsPos;
+		bool						_inLocationBlock;
 
 		std::string		removeUselessLine(std::istringstream fileContent);
 		void			parseBlocks(std::string &fileContent);

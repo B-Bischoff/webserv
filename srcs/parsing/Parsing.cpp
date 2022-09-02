@@ -178,7 +178,6 @@ void	Parsing::setListen(std::istringstream &streamLine, VirtualServConfig &vServ
 	streamLine >> tmp;
 	if (args != 2)
 		throw(tmp + " : " + TOO_MUCH_ARGS);
-	
 	if ((pos = streamLine.str().find_first_of(':') == std::string::npos))
 		throw(LISTEN);
 	streamLine >> tmp;
@@ -253,7 +252,11 @@ void	Parsing::fillVirtualServers(std::vector<VirtualServConfig> &vServ)
 		vServ.push_back(newNode);
 		std::istringstream	blockContent(_blocks[i]);
 		while (std::getline(blockContent, line).eof() == false)
+		{
+			if (line.find("location") != std::string::npos)
+				_inLocationBlock == true;
 			assignLine(line, vServ[i]);
+		}
 	}
 }
 
@@ -261,7 +264,6 @@ void	Parsing::removeSemicolon()
 {
 	std::string::iterator	it;
 	std::string::iterator	end;
-	
 	
 	for (int i = 0; i < _blockNumber; i++)
 	{

@@ -25,9 +25,10 @@ typedef std::map <std::string, std::vector <std::string> > Serv;
 class VirtualServConfig
 {
 	private:
-		Serv			_vServ;
-		unsigned int	_client_max_body_size;
-		bool			_autoIndex;
+		Serv				_vServ;
+		unsigned int		_client_max_body_size;
+		bool				_autoIndex;
+		std::vector<Serv>	_location;
 
 	public:
 		VirtualServConfig();
@@ -71,6 +72,27 @@ class VirtualServConfig
 
 		void						setMaxBodySize(unsigned int size);
 		unsigned int				getMaxBodySize(void) const;
+
+		void						setAutoIndexLoc(bool value, int locationBlock);
+		bool						getAutoIndexLoc(int locationBlock) const;
+
+		void						setReturnLoc(std::vector<std::string> value, int locationBlock);
+		std::vector<std::string>	getReturnLoc(int locationBlock) const;
+
+		void						setRootLoc(std::string path, int locationBlock);
+		std::string					getRootLoc(int locationBlock) const;
+
+		void						setIndexLoc(std::string path, int locationBlock);
+		std::string					getIndexLoc(int locationBlock) const;
+
+		void						setMethodGetLoc(std::string method, int locationBlock);
+		std::string					getMethodGetLoc(int locationBlock) const;
+
+		void						setMethodPostLoc(std::string method, int locationBlock);
+		std::string					getMethodPostLoc(int locationBlock) const;
+
+		void						setMethodDeleteLoc(std::string method, int locationBlock);
+		std::string					getMethodDeleteLoc(int locationBlock) const;
 };
 
 #endif
