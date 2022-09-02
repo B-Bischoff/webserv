@@ -16,7 +16,7 @@ Get	&Get::readFile(RequestHeader request)
 	
 	if (ifs.is_open() == false)
 	{
-		std::cout << "throw it" << std::endl;
+		//std::cout << "throw it" << std::endl;
 		throw (ERROR_404);
 	}
 	_path = request.getPath();

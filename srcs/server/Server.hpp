@@ -24,6 +24,7 @@
 #include "ManageRequest.hpp"
 #include "VirtualServer.hpp"
 #include "VirtualServerSelector.hpp"
+#include "VirtualServerConfig.hpp"
 #include "ErrorStatus.hpp"
 #include "ResponseHeader.hpp"
 
@@ -33,13 +34,13 @@ private:
 	std::vector<VirtualServer> _servers;
 
 	int _newSocket;
-	ResponseHeader	header;
+	ResponseHeader	header; // Probably gonna make that variable temporary
 
 	fd_set _master, _readFds;
 	int _fdmax;
 
 	void serverInit();
-	void createVirtualServer(const std::string& name, const char* ip, const unsigned int& port);
+	void createVirtualServer(const VirtualServerConfig& config);
 
 	void serverLoop();
 
@@ -54,6 +55,7 @@ private:
 
 public:
 	Server();
+	Server(const std::vector<VirtualServerConfig>& configList);
 
 };
 

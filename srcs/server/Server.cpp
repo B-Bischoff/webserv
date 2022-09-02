@@ -6,19 +6,29 @@ Server::Server() : _fdmax(0)
 	serverLoop();
 }
 
+Server::Server(const std::vector<VirtualServerConfig>& configList) : _fdmax(0)
+{
+	FD_ZERO(&_master); // Clear master set
+
+	for (int i = 0; i < (int)configList.size(); i++)
+		createVirtualServer(configList[i]);
+
+	serverLoop();
+}
+
 void Server::serverInit()
 {
 	FD_ZERO(&_master); // Clear master set
 
 	// Virtual servers will soon be loaded from config file
-	createVirtualServer("localhost", "0.0.0.0", 8081);
-	createVirtualServer("secondary_server", "127.0.0.1", 8081);
+	//createVirtualServer("localhost", "0.0.0.0", 8081);
+	//createVirtualServer("secondary_server", "127.0.0.1", 8081);
 	//createVirtualServer("third_server", "127.0.0.1", 8080);
 }
 
-void Server::createVirtualServer(const std::string &name, const char* ip, const unsigned int& port)
+void Server::createVirtualServer(const VirtualServerConfig& config)
 {
-	VirtualServer virtualServer(name, ip, port); // Check virtual server creation
+	VirtualServer virtualServer(config); // Check virtual server creation
 
 	_servers.push_back(virtualServer);
 	addFd(virtualServer.getServerSocket(), _master);
@@ -109,7 +119,7 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 {
 		RequestHeader	request;
 
-		std::cout << buffer << std::endl;
+		//std::cout << buffer << std::endl;
 		request.readRequest(buffer);
 
 		// Testing virtual server identification

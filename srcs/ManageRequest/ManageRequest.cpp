@@ -27,7 +27,7 @@ Method ManageRequest::identify(RequestHeader request)
 	catch(const char *e)
 	{
 		ErrorStatus	error;
-		std::cout << "Exception catched" << std::endl;
+		//std::cout << "Exception catched" << std::endl;
 		// std::cout << e.what();
 		return (error.buildError(e));
 	}
