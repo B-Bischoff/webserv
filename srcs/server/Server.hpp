@@ -23,6 +23,7 @@
 #include "Delete.hpp"
 #include "ManageRequest.hpp"
 #include "VirtualServer.hpp"
+#include "VirtualServerSelector.hpp"
 #include "ErrorStatus.hpp"
 #include "ResponseHeader.hpp"
 #include "Parsing.hpp"
@@ -48,8 +49,6 @@ private:
 
 	void acceptConnection(const int& serverSocket);
 	void listenClient(const int& clientFd);
-
-	const VirtualServer& identifyServerFromRequest(const RequestHeader& request) const;
 
 	void processClientRequest(const int& clientFd, std::string& buffer);
 
