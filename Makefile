@@ -10,7 +10,7 @@ VPATH = ./: \
 		srcs/ManageRequest/Method/post/: \
 		srcs/ManageRequest/Method/delete/: \
 		srcs/Status/: \
-		srcs/parsing/:
+		srcs/parsing/: \
 		
 
 SRCS = 	webserv.cpp \
@@ -26,8 +26,7 @@ SRCS = 	webserv.cpp \
 		Post.cpp \
 		Delete.cpp \
 		ErrorStatus.cpp \
-		VirtualServConfig.cpp \
-		Parsing.cpp
+		Parsing.cpp \
 
 OBJS = $(addprefix .objects/, $(SRCS:.cpp=.o))
 
@@ -44,8 +43,7 @@ INCLUDES =	webserv.hpp \
 			Post.hpp \
 			Delete.hpp \
 			ErrorStatus.hpp \
-			VirtualServConfig.hpp \
-			Parsing.hpp
+			Parsing.hpp \
 			
 
 CC = g++
@@ -77,12 +75,12 @@ endif
 all: $(NAME)
 
 $(NAME): $(OBJS) $(INCLUDES) Makefile
-	@$(CC) $(OBJS) ${CFLAGS} -o $@
+	@$(CC) $(OBJS) ${CFLAGS} $(DEBUG_FLAGS) -o $@
 	@echo "$(ERASE)$(GREEN)[CREATED $(NAME)]$(END)"
 
 .objects/%.o:	%.cpp Makefile $(INCLUDES)
 	@mkdir -p .objects
-	@$(CC) $(CFLAGS) ${LINK} -c $< -o $@
+	@$(CC) $(CFLAGS) $(DEBUG_FLAGS) ${LINK} -c $< -o $@
 	@printf "$(ERASE)$(BLUE)[BUILDING]$(END) $@"
 
 clean:

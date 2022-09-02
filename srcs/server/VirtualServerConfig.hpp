@@ -2,15 +2,29 @@
 # define VIRTUAL_SERVER_CONFIG_HPP
 
 #include <iostream>
-#include <map>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <cstring>
+#include <fstream>
+#include <string>
+#include <signal.h>
 #include <vector>
+#include <sstream>
+#include <iterator>
+#include <map>
+#include "Parsing.hpp"
+#include <arpa/inet.h>
+#include <regex>
 
-typedef std::map <std::string, std::vector<std::string>> Serv;
+typedef std::map <std::string, std::vector <std::string> > Serv;
 
 class VirtualServerConfig
 {
 	private:
-		Serv			_vServ;												
+		Serv			_vServ;
 		unsigned int	_client_max_body_size;
 		bool			_autoIndex;
 
@@ -47,6 +61,15 @@ class VirtualServerConfig
 
 		void						setMethodDelete(std::string method);
 		std::string					getMethodDelete(void) const;
+
+		void						setAutoIndex(bool value);
+		bool						getAutoIndex(void) const;
+
+		void						setReturn(std::vector<std::string> value);
+		std::vector<std::string>	getReturn(void) const;
+
+		void						setMaxBodySize(unsigned int size);
+		unsigned int				getMaxBodySize(void) const;
 };
 
 #endif

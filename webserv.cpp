@@ -15,13 +15,23 @@ void addServerConfig(std::vector<VirtualServerConfig>& v, std::string name, std:
 	v.push_back(conf);
 }
 
+#include "Parsing.hpp"
+
 int main(void)
 {
-	//Server Server;
-
 	std::vector<VirtualServerConfig> configList;
+/*
 	addServerConfig(configList, "localhost", "127.0.0.1", "8080");
 	addServerConfig(configList, "random", "0.0.0.0", "8081");
+*/
+	Parsing parsing;
+	char file[] = "nginx.conf";
+
+	if (parsing.parseConfigFile(file, configList) == -1)
+	{
+		std::cerr << "Parsing error" << std::endl;
+		exit(EXIT_FAILURE);
+	}
 
 	Server server(configList);
 
