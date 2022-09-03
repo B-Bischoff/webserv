@@ -15,22 +15,21 @@
 #include <sstream>
 #include <iterator>
 #include <map>
-#include "Parsing.hpp"
 #include <arpa/inet.h>
 #include <regex>
+#include "Parsing.hpp"
 #include "LocationBlock.hpp"
+#include "ABlock.hpp"
 
 class LocationBlock;
 
 typedef std::map <std::string, std::vector <std::string> > Serv;
 
-class VirtualServerConfig
+class VirtualServerConfig : public ABlock
 {
 	private:
-		Serv						_vServ;
-		unsigned int				_client_max_body_size;
-		bool						_autoIndex;
-		std::vector<Serv>			_location;
+		unsigned int		_client_max_body_size;
+		std::vector<Serv>	_location;
 
 	public:
 		std::vector<LocationBlock>	loc;
@@ -46,35 +45,15 @@ class VirtualServerConfig
 		void						setServerName(std::vector<std::string> serverName);
 		const std::vector<std::string>&	getServerName(void) const;
 
-		void						setRoot(std::string path);
-		std::string					getRoot(void) const;
-
-		void						setIndex(std::string path);
-		std::string					getIndex(void) const;
-
 		void						setAccessLog(std::vector<std::string> accessLog);
 		std::vector<std::string>	getAccessLog(void) const;
 
 		void						setErrorLog(std::vector<std::string> errorPage);
 		std::vector<std::string>	getErrorLog(void) const;
 
-		void						setMethodGet(std::string method);
-		std::string					getMethodGet(void) const;
-
-		void						setMethodPost(std::string method);
-		std::string					getMethodPost(void) const;
-
-		void						setMethodDelete(std::string method);
-		std::string					getMethodDelete(void) const;
-
-		void						setAutoIndex(bool value);
-		bool						getAutoIndex(void) const;
-
-		void						setReturn(std::vector<std::string> value);
-		std::vector<std::string>	getReturn(void) const;
-
 		void						setMaxBodySize(unsigned int size);
 		unsigned int				getMaxBodySize(void) const;
+
 };
 
 #endif
