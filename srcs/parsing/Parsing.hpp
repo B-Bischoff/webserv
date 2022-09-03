@@ -30,7 +30,7 @@
 #define	ERROR_SYNTAX	(std::string)"Found unexpected char on server line"
 #define SEMICOLON		(std::string)"Unexpected char after semicolon : '"
 #define	LISTEN			(std::string)"Wrong syntax for listen. Syntax is IPV4:PORT"
-#define PORT			(std::string)"Port range: 0-65535"
+#define PORT			(std::string)"' is an invalid port. Port range: 0-65535"
 #define	PATH			(std::string)"Can't open file : '"
 #define	LOG_LEVEL		(std::string)"Unknown log_level"
 #define	TOO_MUCH_ARGS	(std::string)"too much args for this parameter"
