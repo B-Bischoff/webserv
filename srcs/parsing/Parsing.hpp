@@ -17,14 +17,16 @@
 #include <map>
 #include "VirtualServerConfig.hpp"
 #include "Parsing.hpp"
+#include "Setter.hpp"
+#include "ABlock.hpp"
 #include <arpa/inet.h>
 #include <regex>
 
 #define	MEGABYTE		1000000
 #define OPEN_FILE		(std::string)"Unable to open the file : '"
-#define EMPTY 			(std::string)"Config file is empty"
+#define EMPTY 			(std::string)" is empty"
 #define BRACKETS		(std::string)"Config file isn't closed by brackets properly"
-#define SERVER_NAME		(std::string)"Duplicate server_name"
+#define SERVER_NAME		(std::string)"Duplicate server_name : '"
 #define	ERROR_SYNTAX	(std::string)"Found unexpected char on server line"
 #define SEMICOLON		(std::string)"Unexpected char after semicolon : '"
 #define	LISTEN			(std::string)"Wrong syntax for listen. Syntax is IPV4:PORT"
@@ -36,36 +38,29 @@
 #define WRONG_STATUS	(std::string)"Wrong status entered as redirection. Only accept 301/302, got : '"
 #define WRONG_URL		(std::string)"Wrong URL entered : '"
 #define INVALID_IP		(std::string)"Invalip ip address: '"
+#define NO_SERVER_BLOCK	(std::string)"No server block has been found in the config file"
 
 class VirtualServerConfig;
 
 class Parsing
 {
 	private:
-		std::ifstream				_openFile;
 		std::string					_fileContent;
+		int							_numberOfBlocks;
 		std::vector<std::string>	_blocks;
-		int							_blockNumber;
 		std::vector<int>			_bracketsPos;
+		bool						_inLocationBlock;
+		int							_locationBlock;
+		std::vector<int>			_numberOfBlocksInEachLoc;
 
-		std::string		removeUselessLine(std::istringstream fileContent);
-		void			parseBlocks(std::string &fileContent);
+		void			isFile(char *confPath);
+		void			removeUselessLine(std::istringstream fileContent);
+		void			parseBlocks();
 		void			fillVirtualServers(std::vector<VirtualServerConfig> &vServ);
 		void			assignLine(std::string &line, VirtualServerConfig &vServ);
-		void			checkSyntaxFile(std::string &fileContent);
-		void			removeSemicolon();
-		unsigned int	countArgs(std::string line) const;
+		void			checkSyntaxFile();
+		void			isDuplicateServerName(std::vector<VirtualServerConfig> &vServ);
 
-		void			setListen(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
-		void			setServerName(std::string &line, VirtualServerConfig &vServ, unsigned int args);
-		void			setRootIndex(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
-		void			setLogs(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
-		void			setAutoIndex(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
-		void			setMethod(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
-		void			setReturn(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
-		void			setMaxBodySize(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
-
-		void			setLocation(std::istringstream &line, VirtualServerConfig &vServ, unsigned int args);
 	public:
 
 		Parsing();

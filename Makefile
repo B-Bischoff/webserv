@@ -27,6 +27,9 @@ SRCS = 	webserv.cpp \
 		Delete.cpp \
 		ErrorStatus.cpp \
 		Parsing.cpp \
+		LocationBlock.cpp \
+		Setter.cpp \
+		ABlock.cpp
 
 OBJS = $(addprefix .objects/, $(SRCS:.cpp=.o))
 
@@ -44,6 +47,8 @@ INCLUDES =	webserv.hpp \
 			Delete.hpp \
 			ErrorStatus.hpp \
 			Parsing.hpp \
+			Setter.hpp \
+			ABlock.hpp
 			
 
 CC = g++

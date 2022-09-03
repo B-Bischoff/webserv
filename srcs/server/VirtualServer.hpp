@@ -14,7 +14,7 @@ class VirtualServer
 	private:
 		VirtualServer();
 	
-		const VirtualServerConfig _config;
+		VirtualServerConfig _config; // Removed const, got compilation error
 
 		int _serverSocket;
 		int _addrlen;
