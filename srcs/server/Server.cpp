@@ -98,16 +98,20 @@ void Server::listenClient(const int& clientFd)
 void Server::processClientRequest(const int& clientFd, std::string& buffer)
 {
 		RequestHeader	request;
+		LocationBlock	tmp;
+		int				i;
 
 		//std::cout << buffer << std::endl;
 		request.readRequest(buffer);
 
 		// Testing virtual server identification
 		VirtualServerSelector selector(_servers, request);
-		selector.selectServerFromRequest();
+		i = selector.selectServerFromRequest();
 
 		// Select location block from server and request header
-
+		LocationSelector	select;
+		tmp = select.selectLocationBlock(request.getPath(), this->getVirtualServer(i).getVirtualServerConfig().loc);
+		std::cout << "Path of location Block ----------> " << tmp.getLocationPath() << "Modifier : " << tmp.getLocationModifier() << std::endl;;
 		// Read body from request (recv)
 
 		ManageRequest manager;
@@ -120,4 +124,9 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 bool Server::isAVirtualServer(const int& fd) const
 {
 	return _servers.find(fd) != _servers.end();
+}
+
+VirtualServer	&Server::getVirtualServer(int i)
+{
+	return (_servers.at(i));
 }

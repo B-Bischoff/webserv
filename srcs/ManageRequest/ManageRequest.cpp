@@ -14,6 +14,7 @@
 Method ManageRequest::identify(RequestHeader request)
 {
 	Method empty;
+
 	try
 	{
 		if (request.getMethod() == "GET")

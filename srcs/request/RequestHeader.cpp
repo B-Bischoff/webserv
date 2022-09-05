@@ -24,10 +24,9 @@ void RequestHeader::parseMethodePathAndVersion(std::stringstream& tmp)
 	//std::cout << tmp.str() << std::endl;
 	tmp >> _method;
 	tmp >> _path;
-	if (_path == "/")
-		_path = "/index.html";
+	// if (_path == "/")
+	// 	_path = "/index.html";
 	tmp >> _version;
-	_path = ROOT_PATH + _path;
 }
 // Instead of creating a function for each request (host, connection, ...)
 // we could call a function depending on the request

@@ -55,6 +55,8 @@ private:
 
 public:
 	Server(const std::vector<VirtualServerConfig>& configList);
+	VirtualServer	&getVirtualServer(int i);
+	
 
 };
 

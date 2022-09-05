@@ -19,7 +19,7 @@ Get	&Get::readFile(RequestHeader request)
 		//std::cout << "throw it" << std::endl;
 		throw (ERROR_404);
 	}
-	_path = request.getPath();
+	_path = "./pages" + request.getPath();
 	if (file.empty() == true)
 	{
 		throw (STATUS_204);
