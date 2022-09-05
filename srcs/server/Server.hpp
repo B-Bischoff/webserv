@@ -32,8 +32,7 @@
 
 class Server {
 private:
-	// Might use Map instead of vector to identify virtual servers from their socket 
-	std::vector<VirtualServer> _servers;
+	std::map<int, VirtualServer> _servers;
 
 	int _newSocket;
 	ResponseHeader	header; // Probably gonna make that variable temporary

@@ -1,9 +1,10 @@
 #include "VirtualServerSelector.hpp"
 
-VirtualServerSelector::VirtualServerSelector(const std::vector<VirtualServer>& servers, const RequestHeader& request)
-	: _servers(servers), _request(request), _hostName(""), _port(0)
+VirtualServerSelector::VirtualServerSelector(std::map<int, VirtualServer>& servers, const RequestHeader& request)
+	: _request(request), _hostName(""), _port(0)
 {
 	parsePortAndHost();
+	convertMapToVector(servers);
 }
 
 void VirtualServerSelector::parsePortAndHost()
@@ -26,6 +27,14 @@ void VirtualServerSelector::parsePortAndHost()
 		_port = 80; // Set default port
 
 	std::cout << "Hostname: " << _hostName << " | port: " << _port << std::endl;
+}
+
+void VirtualServerSelector::convertMapToVector(std::map<int, VirtualServer>& servers)
+{
+	for (std::map<int, VirtualServer>::iterator it = servers.begin(); it != servers.end(); it++)
+	{
+		_servers.push_back(it->second);
+	}
 }
 
 int VirtualServerSelector::selectServerFromRequest()
