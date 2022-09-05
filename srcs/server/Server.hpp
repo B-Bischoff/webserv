@@ -40,7 +40,6 @@ private:
 	fd_set _master, _readFds;
 	int _fdmax;
 
-	void serverInit();
 	void createVirtualServer(const VirtualServerConfig& config);
 
 	void serverLoop();

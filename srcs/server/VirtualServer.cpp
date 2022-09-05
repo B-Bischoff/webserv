@@ -21,8 +21,8 @@ void VirtualServer::init()
 	_addrlen = sizeof(_address); // IPV4
 
 	_address.sin_family = AF_INET;
-	_address.sin_addr.s_addr = inet_addr(_config.getIp().c_str());
-	_address.sin_port = htons(_config.getPort());
+	_address.sin_addr.s_addr = inet_addr(_config.getIp().c_str()); // Ip
+	_address.sin_port = htons(_config.getPort()); // Port
 	memset(_address.sin_zero, '\0', sizeof _address.sin_zero);
 
 	// Creating socket file descriptor

@@ -10,16 +10,6 @@ Server::Server(const std::vector<VirtualServerConfig>& configList) : _fdmax(0)
 	serverLoop();
 }
 
-void Server::serverInit()
-{
-	FD_ZERO(&_master); // Clear master set
-
-	// Virtual servers will soon be loaded from config file
-	//createVirtualServer("localhost", "0.0.0.0", 8081);
-	//createVirtualServer("secondary_server", "127.0.0.1", 8081);
-	//createVirtualServer("third_server", "127.0.0.1", 8080);
-}
-
 void Server::createVirtualServer(const VirtualServerConfig& config)
 {
 	VirtualServer virtualServer(config); // Check virtual server creation
@@ -58,18 +48,12 @@ void Server::serverLoop()
 			if (FD_ISSET(i, &_readFds)) // Socket ready to communicate
 			{
 				if (isAVirtualServer(i)) // Incoming connection from new client
-				{
 					acceptConnection(i);
-				}
 				else // Client wants to communicate
-				{
-					// Redirect client request to the correct virtual server
-					// The virtual server depends of the request header (port, servName, ...)
 					listenClient(i);
-				}
 			}
 		}
-    }
+	}
 }
 
 void Server::acceptConnection(const int& serverSocket)
@@ -88,10 +72,12 @@ void Server::acceptConnection(const int& serverSocket)
 
 void Server::listenClient(const int& clientFd)
 {
-
 	std::cout << "client " << clientFd << " wants to communicate" << std::endl;
 	char buffer[30000];
 	int nbytes = recv(clientFd, buffer, sizeof(buffer), 0);
+
+	// Read header
+
 	if (nbytes <= 0) // Client disconnected or recv error
 	{
 		if (nbytes == 0)
@@ -120,6 +106,9 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		VirtualServerSelector selector(_servers, request);
 		selector.selectServerFromRequest();
 
+		// Select location block from sever and request header
+
+		// Read body from request (recv)
 
 		ManageRequest manager;
 		Method dst = manager.identify(request);

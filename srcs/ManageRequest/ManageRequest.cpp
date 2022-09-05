@@ -1,5 +1,16 @@
 #include "ManageRequest.hpp"
 
+/*
+	==== GENERATE RESPONSE ALGO ====
+
+	use default root / path
+	check method (from location block or virtual server)
+	cgi ?
+	search file from location
+
+	return response header (string)
+*/
+
 Method ManageRequest::identify(RequestHeader request)
 {
 	Method empty;

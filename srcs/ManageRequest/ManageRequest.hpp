@@ -15,6 +15,9 @@
 class ManageRequest
 {
 	private:
+		// Virtual server (reference)
+		// Virtual server location block previously choosen (reference)
+		// Request header + body
 		
 	public:
 		ManageRequest();
