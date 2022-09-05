@@ -30,11 +30,13 @@ void	Parsing::fillVirtualServers(std::vector<VirtualServerConfig> &vServ)
 				_inLocationBlock = false;
 			else if (line.find("location") != std::string::npos)
 			{
-				_inLocationBlock = true;
 				_locationBlock++;
 				vServ[i].loc.push_back(newNodeLoc);
+				setter.assignLine(line, vServ[i], _inLocationBlock, _locationBlock);
+				_inLocationBlock = true;
 			}
-			setter.assignLine(line, vServ[i], _inLocationBlock, _locationBlock);
+			else
+				setter.assignLine(line, vServ[i], _inLocationBlock, _locationBlock);
 		}
 		_numberOfBlocksInEachLoc.push_back(_locationBlock + 1);
 		_locationBlock = -1;

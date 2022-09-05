@@ -8,19 +8,24 @@ class VirtualServerConfig;
 class Setter
 {
 	private:
-		bool			_inLocationBlock;
-		int				_locationBlock;
+		bool				_inLocationBlock;
+		int					_locationBlock;
+		unsigned int		_argsCount;
+		std::string			_keyWord;
+		std::istringstream	_streamLine;
+		std::map<std::string, void(Setter::*)(VirtualServerConfig &vServ)> _mapPtr;
 		
-		void			setListen(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args);
-		void			setServerName(std::string &streamLine, VirtualServerConfig &vServ, unsigned int args);
-		void			setRootIndex(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args);
-		void			setLogs(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args);
-		void			setAutoIndex(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args);
-		void			setMethod(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args);
-		void			setReturn(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args);
-		void			setMaxBodySize(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args);
-		void			setLocation(std::istringstream &streamLine, VirtualServerConfig &vServ, unsigned int args);
+		void			setListen(VirtualServerConfig &vServ);
+		void			setServerName(VirtualServerConfig &vServ);
+		void			setRootIndex(VirtualServerConfig &vServ);
+		void			setLogs(VirtualServerConfig &vServ);
+		void			setAutoIndex(VirtualServerConfig &vServ);
+		void			setMethod(VirtualServerConfig &vServ);
+		void			setReturn(VirtualServerConfig &vServ);
+		void			setMaxBodySize(VirtualServerConfig &vServ);
+		void			setLocation(VirtualServerConfig &vServ);
 		unsigned int	countArgs(std::string line) const;
+		void			initPrivateValues(std::string &line, bool inLocationBlock, int locationBlock);
 
 
 	public:
