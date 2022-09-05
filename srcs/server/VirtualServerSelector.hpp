@@ -9,13 +9,14 @@
 class VirtualServerSelector
 {
 	private:
-		const std::vector<VirtualServer>& _servers;
+		std::vector<VirtualServer> _servers;
 		const RequestHeader& _request;
 
 		std::string _hostName;
 		unsigned int _port;
 
 		void parsePortAndHost();
+		void convertMapToVector(std::map<int, VirtualServer>& servers);
 
 		std::vector<VirtualServer> compareToIpAndPort();
 		int compareToNameOrDefault(std::vector<VirtualServer>& servers);
@@ -25,7 +26,7 @@ class VirtualServerSelector
 		bool isASpecificIp(const std::string ip) const;
 
 	public:
-		VirtualServerSelector(const std::vector<VirtualServer>& servers, const RequestHeader& request);
+		VirtualServerSelector(std::map<int, VirtualServer>& servers, const RequestHeader& request);
 
 		int selectServerFromRequest();
 };

@@ -14,7 +14,7 @@ void Server::createVirtualServer(const VirtualServerConfig& config)
 {
 	VirtualServer virtualServer(config); // Check virtual server creation
 
-	_servers.push_back(virtualServer);
+	_servers.insert(std::pair<int, VirtualServer>(virtualServer.getServerSocket(), virtualServer));
 	addFd(virtualServer.getServerSocket(), _master);
 }
 
@@ -106,7 +106,7 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		VirtualServerSelector selector(_servers, request);
 		selector.selectServerFromRequest();
 
-		// Select location block from sever and request header
+		// Select location block from server and request header
 
 		// Read body from request (recv)
 
@@ -119,9 +119,5 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 
 bool Server::isAVirtualServer(const int& fd) const
 {
-	// Might use iterator
-	for (unsigned int i = 0; i < _servers.size(); i++)
-		if (fd == _servers[i].getServerSocket())
-			return true;
-	return false;
+	return _servers.find(fd) != _servers.end();
 }
