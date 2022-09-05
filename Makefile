@@ -11,6 +11,8 @@ VPATH = ./: \
 		srcs/ManageRequest/Method/delete/: \
 		srcs/Status/: \
 		srcs/parsing/: \
+		srcs/server/select/: \
+		srcs/server/config/:
 		
 
 SRCS = 	webserv.cpp \
@@ -29,7 +31,8 @@ SRCS = 	webserv.cpp \
 		Parsing.cpp \
 		LocationBlock.cpp \
 		Setter.cpp \
-		ABlock.cpp
+		ABlock.cpp \
+		LocationSelector.cpp
 
 OBJS = $(addprefix .objects/, $(SRCS:.cpp=.o))
 
@@ -48,7 +51,8 @@ INCLUDES =	webserv.hpp \
 			ErrorStatus.hpp \
 			Parsing.hpp \
 			Setter.hpp \
-			ABlock.hpp
+			ABlock.hpp \
+			LocationSelector.hpp
 			
 
 CC = g++
