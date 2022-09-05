@@ -50,7 +50,6 @@ unsigned int	Setter::countArgs(std::string line) const
 		stream >> line;
 		i++;
 	}
-	std::cout << _keyWord << " " << i << std::endl;
 	if (((_keyWord == "listen" || _keyWord == "index" || _keyWord == "root"
 		|| _keyWord == "autoindex" || _keyWord == "client_max_body_size"
 		|| _keyWord == "server") && i == 2) ||	((_keyWord == "error_log" 

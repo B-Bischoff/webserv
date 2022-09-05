@@ -56,8 +56,9 @@ void	Parsing::parseBlocks()
 	}
 }
 
-void	Parsing::removeUselessLine(std::istringstream fileContent)
+void	Parsing::removeUselessLine()
 {
+	std::istringstream	fileContent(_fileContent);
 	std::string	dst;
 	std::string	line;
 	bool		serverBlock = false;
@@ -154,7 +155,7 @@ int	Parsing::parseConfigFile(char *confPath, std::vector<VirtualServerConfig> &v
 	try
 	{
 		isFile(confPath);
-		removeUselessLine(std::istringstream(_fileContent));
+		removeUselessLine();
 		checkSyntaxFile();
 		parseBlocks();
 		fillVirtualServers(vServ);

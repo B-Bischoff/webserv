@@ -54,7 +54,7 @@ class Parsing
 		std::vector<int>			_numberOfBlocksInEachLoc;
 
 		void			isFile(char *confPath);
-		void			removeUselessLine(std::istringstream fileContent);
+		void			removeUselessLine();
 		void			parseBlocks();
 		void			fillVirtualServers(std::vector<VirtualServerConfig> &vServ);
 		void			assignLine(std::string &line, VirtualServerConfig &vServ);
