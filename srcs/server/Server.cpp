@@ -111,7 +111,7 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		// Select location block from server and request header
 		LocationSelector	select;
 		tmp = select.selectLocationBlock(request.getPath(), this->getVirtualServer(i).getVirtualServerConfig().loc);
-		std::cout << "Path of location Block ----------> " << tmp.getLocationPath() << "Modifier : " << tmp.getLocationModifier() << std::endl;;
+		std::cout << "Path of location Block ----------> " << tmp.getLocationPath() << " Modifier : " << tmp.getLocationModifier() << std::endl;
 		// Read body from request (recv)
 
 		ManageRequest manager;
