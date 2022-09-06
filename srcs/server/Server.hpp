@@ -43,14 +43,13 @@ private:
 
 	void serverLoop();
 
-	void addFd(const int& fd, fd_set& set);
-
 	void acceptConnection(const int& serverSocket);
 	void listenClient(const int& clientFd);
-
 	void processClientRequest(const int& clientFd, std::string& buffer);
 
+	int receiveRequestHeader(const int& cliendFd, std::string& buffer);
 	bool isAVirtualServer(const int& fd) const;
+	void addFd(const int& fd, fd_set& set);
 
 public:
 	Server(const std::vector<VirtualServerConfig>& configList);
