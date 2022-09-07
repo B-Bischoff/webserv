@@ -20,7 +20,6 @@
 #include "Setter.hpp"
 #include "ABlock.hpp"
 #include <arpa/inet.h>
-#include <regex>
 
 #define	MEGABYTE		1000000
 #define OPEN_FILE		(std::string)"Unable to open the file : '"

@@ -16,7 +16,6 @@
 #include <iterator>
 #include <map>
 #include <arpa/inet.h>
-#include <regex>
 #include "Parsing.hpp"
 #include "LocationBlock.hpp"
 #include "ABlock.hpp"

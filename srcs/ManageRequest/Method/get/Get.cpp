@@ -19,7 +19,8 @@ Get	&Get::readFile(RequestHeader request)
 	else
 		_path += request.getField("Path");
 	std::cout << _path<< std::endl;
-	std::ifstream	ifs(_path, std::ios::in);
+	std::ifstream	ifs;
+	ifs.open(_path.c_str(), std::ios::in);
 	std::string		file ((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
 	
 	if (ifs.is_open() == false)

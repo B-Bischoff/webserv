@@ -1,14 +1,5 @@
 #include "RequestHeader.hpp"
 
-RequestHeader::RequestHeader()
-{
-}
-
-RequestHeader::~RequestHeader() 
-{
-
-}
-
 void	RequestHeader::readRequest(std::string& request)
 {
 	std::istringstream tmp(request);
@@ -23,8 +14,12 @@ void	RequestHeader::readRequest(std::string& request)
 	}
 	
 	// Debug: Print map content
-	//for(std::map<std::string, std::string>::iterator it = _fields.begin(); it != _fields.end(); ++it)
-	//	std::cout << it->first << "|" << it->second << "\n";
+	/*
+	std::cout << "------------------" << std::endl;
+	for(std::map<std::string, std::string>::iterator it = _fields.begin(); it != _fields.end(); ++it)
+		std::cout << it->first << "|" << it->second << "\n";
+	std::cout << "------------------" << std::endl;
+	*/
 }
 
 void RequestHeader::parseMethodPathAndVersion(std::string& line)

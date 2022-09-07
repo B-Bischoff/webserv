@@ -76,13 +76,12 @@ void	Setter::setMaxBodySize(VirtualServerConfig &vServ)
 	unsigned int	size;
 
 	_streamLine >> _keyWord;
-	size = std::stoul(_keyWord) * MEGABYTE;
+	size = atol(_keyWord.c_str()) * MEGABYTE;
 	vServ.setMaxBodySize(size);
 }
 
 void	Setter::setReturn(VirtualServerConfig &vServ)
 {
-	const std::regex 			pattern("((http|https)://)(www.)?[a-zA-Z0-9@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)");
 	std::vector<std::string>	node;
 	
 	_streamLine >> _keyWord;
@@ -90,8 +89,6 @@ void	Setter::setReturn(VirtualServerConfig &vServ)
 		throw(WRONG_STATUS + _keyWord + "'");
 	node.push_back(_keyWord);
 	_streamLine >> _keyWord;
-	if (regex_match(_keyWord, pattern) == 0)
-		throw(WRONG_URL + _keyWord + "'");
 	node.push_back(_keyWord);
 	_inLocationBlock == true ? vServ.loc[_locationBlock].setReturn(node) : vServ.setReturn(node);
 }
@@ -165,9 +162,9 @@ void	Setter::setListen(VirtualServerConfig &vServ)
 	_streamLine >> _keyWord;
 	if (inet_addr(_keyWord.substr(0, _keyWord.find_first_of(':')).c_str()) == (unsigned int)-1)
 		throw(INVALID_IP + _keyWord.substr(0, _keyWord.find_first_of(':')) + "'");
-	port = std::stoi(_keyWord.substr(_keyWord.find_first_of(':') + 1));
+	port = atoi(_keyWord.substr(_keyWord.find_first_not_of(':') + 1).c_str());
 	if (port > 65535 || port < 0)
-		throw("'" + std::to_string(port) + PORT);
+		throw("'" + _keyWord + PORT);
 	vServ.setIp(_keyWord.substr(0, _keyWord.find_first_of(':')));
 	vServ.setPort(_keyWord.substr(_keyWord.find_first_of(':') + 1));
 }

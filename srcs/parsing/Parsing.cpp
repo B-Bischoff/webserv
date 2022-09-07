@@ -52,7 +52,11 @@ void	Parsing::parseBlocks()
 		_blocks.push_back(_fileContent.substr(start, _bracketsPos[i] - start));
 		start = _bracketsPos[i];
 		_blocks[i] = _blocks[i].substr(0, _blocks[i].find_last_not_of(" "));
-		_blocks[i].erase(remove(_blocks[i].begin(), _blocks[i].end(), ';'), _blocks[i].end());
+		for (size_t n = 0; n < _blocks[i].length(); n++)
+		{
+			if (_blocks[i][n] == ';')
+				_blocks[i].erase(n, 1);
+		}
 	}
 }
 
@@ -158,6 +162,10 @@ int	Parsing::parseConfigFile(char *confPath, std::vector<VirtualServerConfig> &v
 		removeUselessLine();
 		checkSyntaxFile();
 		parseBlocks();
+		for (int i = 0; i < _numberOfBlocks; i++)
+		{
+			std::cout << _blocks[i] << std::endl;
+		}
 		fillVirtualServers(vServ);
 		isDuplicateServerName(vServ);
 	}

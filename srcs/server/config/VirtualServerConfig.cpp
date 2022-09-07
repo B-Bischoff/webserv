@@ -31,7 +31,7 @@ void	VirtualServerConfig::setPort(std::string port)
 
 unsigned int	VirtualServerConfig::getPort(void) const
 {
-	return std::stoi(_block.at("listen")[1], NULL, 10);
+	return atoi(_block.at("listen")[1].c_str());
 }
 
 void	VirtualServerConfig::setServerName(std::vector<std::string> serverName)
