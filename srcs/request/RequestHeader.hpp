@@ -6,6 +6,7 @@
 #include <sstream>
 #include <unistd.h>
 #include <fstream>
+#include <map>
 #define MAX_BODY_SIZE 30000
 #define ROOT_PATH "./pages"
 
@@ -13,22 +14,15 @@
 class RequestHeader
 {
 	private:
-		std::string	_method;
-		std::string	_path;
-		std::string	_version;
-		std::string _host;
+		std::map<std::string, std::string> _fields;
 
-		void parseMethodePathAndVersion(std::stringstream& tmp);
-		void parseHost(std::stringstream& tmp);
+		void parseMethodPathAndVersion(std::string& line);
+		void parseField(std::string& line);
+
+		void removeWhiteSpaces(std::string& str);
 
 	public:
-		RequestHeader();
-		~RequestHeader();
-
-		std::string		getPath() const;
-		std::string		getMethod() const;
-		std::string		getVersion() const;
-		std::string		getHost() const;
+		const std::string&	getField(const std::string& field) const;
 
 		void			readRequest(std::string& request);
 };

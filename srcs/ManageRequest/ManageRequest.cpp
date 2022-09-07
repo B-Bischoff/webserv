@@ -17,17 +17,17 @@ Method ManageRequest::identify(RequestHeader request)
 
 	try
 	{
-		if (request.getMethod() == "GET")
+		if (request.getField("Method") == "GET")
 		{
 			Get	get;
 			get.readFile(request);
 			return (get);
 		}
-		else if (request.getMethod() == "POST")
+		else if (request.getField("Method") == "POST")
 		{
 
 		}
-		else if (request.getMethod() == "DELETE")
+		else if (request.getField("Method") == "DELETE")
 		{
 
 		}

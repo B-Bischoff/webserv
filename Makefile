@@ -64,9 +64,9 @@ INCLUDES =	webserv.hpp \
 
 CC = g++
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -std=c++98
 
-DEBUG_FLAGS = #-fsanitize=address -g3
+DEBUG_FLAGS = -fsanitize=address -g3
 
 NAME = webserv
 

@@ -6,7 +6,7 @@
 /*   By: brice <brice@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/19 17:07:48 by tarchimb          #+#    #+#             */
-/*   Updated: 2022/08/27 17:18:35 by brice            ###   ########.fr       */
+/*   Updated: 2022/09/07 17:35:10 by brice            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,6 +152,10 @@ std::string	ResponseHeader::get_extension_file(std::string path)
 
 void	ResponseHeader::build_response(Method &method)
 {
+	std::ostringstream convert;
+	convert << method.getSize();
+
 	response_header = protocol + method.getStatus() + "\n" + content_type + get_extension_file(method.getPath()) + "\n" 
-	+ content_length + std::to_string(method.getSize()).c_str() + "\n\n" + method.getBody();
+	+ content_length + convert.str() + "\n\n" + method.getBody();
+
 }
