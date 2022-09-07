@@ -28,6 +28,7 @@
 #include "ErrorStatus.hpp"
 #include "ResponseHeader.hpp"
 #include "Parsing.hpp"
+#include "LocationSelector.hpp"
 
 class Server {
 private:
@@ -53,6 +54,8 @@ private:
 
 public:
 	Server(const std::vector<VirtualServerConfig>& configList);
+	VirtualServer	&getVirtualServer(int i);
+	
 
 };
 

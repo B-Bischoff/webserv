@@ -21,7 +21,6 @@ void	RequestHeader::readRequest(std::string& request)
 	{
 		parseField(line);
 	}
-
 	// for(std::map<std::string, std::string>::iterator it = _fields.begin(); it != _fields.end(); ++it)
 	//	std::cout << it->first << "|" << it->second << "\n";
 }
@@ -29,20 +28,12 @@ void	RequestHeader::readRequest(std::string& request)
 void RequestHeader::parseMethodPathAndVersion(std::string& line)
 {
 	std::stringstream stream;
-	std::string method, path, version;
 
 	stream << line;
 
-	stream >> method;
-	stream >> path;
-	stream >> version;
-
-	if (path == "/")
-		path = "/index.html";
-
-	_fields["Method"] = method;
-	_fields["Path"] = ROOT_PATH + path;
-	_fields["Version"] = version;
+	stream >> _fields["Method"];
+	stream >> _fields["Path"];
+	stream >> _fields["Version"];
 }
 
 void RequestHeader::parseField(std::string& line)

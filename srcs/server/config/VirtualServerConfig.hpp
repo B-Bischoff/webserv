@@ -29,7 +29,6 @@ class VirtualServerConfig : public ABlock
 {
 	private:
 		unsigned int		_client_max_body_size;
-		std::vector<Serv>	_location;
 
 	public:
 		std::vector<LocationBlock>	loc;
