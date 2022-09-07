@@ -14,6 +14,7 @@
 Method ManageRequest::identify(RequestHeader request)
 {
 	Method empty;
+
 	try
 	{
 		if (request.getMethod() == "GET")
@@ -38,13 +39,12 @@ Method ManageRequest::identify(RequestHeader request)
 	catch(const char *e)
 	{
 		ErrorStatus	error;
-		//std::cout << "Exception catched" << std::endl;
-		// std::cout << e.what();
 		return (error.buildError(e));
 	}
 	catch(...)
 	{
-		std::cout << "Unknown Exception catched" << std::endl;
+		ErrorStatus	error;
+		return (error.buildError(STATUS_500));
 	}
 	return (empty);
 }

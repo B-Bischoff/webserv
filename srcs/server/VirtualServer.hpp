@@ -29,6 +29,7 @@ class VirtualServer
 		const std::string& getIp() const;
 		unsigned int getPort() const;
 		const int& getServerSocket() const;
+		VirtualServerConfig	&getVirtualServerConfig();
 };
 
 #endif

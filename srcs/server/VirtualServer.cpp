@@ -68,3 +68,8 @@ const int& VirtualServer::getServerSocket() const
 {
 	return _serverSocket;
 }
+
+VirtualServerConfig	&VirtualServer::getVirtualServerConfig()
+{
+	return (_config);
+}
