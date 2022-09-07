@@ -9,10 +9,13 @@ VPATH = ./: \
 		srcs/ManageRequest/Method/get/: \
 		srcs/ManageRequest/Method/post/: \
 		srcs/ManageRequest/Method/delete/: \
+		srcs/ManageRequest/CGI/: \
+		srcs/ManageRequest/Autoindex/: \
 		srcs/Status/: \
 		srcs/parsing/: \
 		srcs/server/select/: \
-		srcs/server/config/:
+		srcs/server/config/: 
+
 		
 
 SRCS = 	webserv.cpp \
@@ -32,7 +35,9 @@ SRCS = 	webserv.cpp \
 		LocationBlock.cpp \
 		Setter.cpp \
 		ABlock.cpp \
-		LocationSelector.cpp
+		LocationSelector.cpp \
+		CgiHandler.cpp \
+		Autoindex.cpp
 
 OBJS = $(addprefix .objects/, $(SRCS:.cpp=.o))
 
@@ -52,7 +57,9 @@ INCLUDES =	webserv.hpp \
 			Parsing.hpp \
 			Setter.hpp \
 			ABlock.hpp \
-			LocationSelector.hpp
+			LocationSelector.hpp \
+			CgiHandler.hpp \
+			Autoindex.hpp
 			
 
 CC = g++
