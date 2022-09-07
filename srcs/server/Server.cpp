@@ -104,6 +104,7 @@ int Server::receiveRequestHeader(const int& clientFd, std::string& buffer)
 		buffer += temp;
 	} while (nbytes > 0 && buffer.find("\r\n\r\n") == std::string::npos);
 
+	//std::cout << buffer << std::endl;
 	if (buffer.find("\r\n\r\n") != std::string::npos)
 		return 1; // Header successfully received
 	else

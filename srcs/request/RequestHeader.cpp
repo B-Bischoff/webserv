@@ -11,54 +11,53 @@ RequestHeader::~RequestHeader()
 
 void	RequestHeader::readRequest(std::string& request)
 {
-	std::stringstream	tmp;
-	tmp << request;
+	std::istringstream tmp(request);
+	std::string line;
 
-	parseMethodePathAndVersion(tmp);
-	tmp << request; // Go to the next request line
-	parseHost(tmp);
+	std::getline(tmp, line);
+	parseMethodPathAndVersion(line);
+
+	while (std::getline(tmp, line))
+	{
+		parseField(line);
+	}
+
+	// for(std::map<std::string, std::string>::iterator it = _fields.begin(); it != _fields.end(); ++it)
+	//	std::cout << it->first << "|" << it->second << "\n";
 }
 
-void RequestHeader::parseMethodePathAndVersion(std::stringstream& tmp)
+void RequestHeader::parseMethodPathAndVersion(std::string& line)
 {
-	//std::cout << tmp.str() << std::endl;
-	tmp >> _method;
-	tmp >> _path;
-	if (_path == "/")
-		_path = "/index.html";
-	tmp >> _version;
-	_path = ROOT_PATH + _path;
+	std::stringstream stream;
+	std::string method, path, version;
+
+	stream << line;
+
+	stream >> method;
+	stream >> path;
+	stream >> version;
+
+	if (path == "/")
+		path = "/index.html";
+
+	_fields["Method"] = method;
+	_fields["Path"] = ROOT_PATH + path;
+	_fields["Version"] = version;
 }
-// Instead of creating a function for each request (host, connection, ...)
-// we could call a function depending on the request
-void RequestHeader::parseHost(std::stringstream& tmp)
+
+void RequestHeader::parseField(std::string& line)
 {
-	std::string request;
+	std::string key, value;
+	
+	key = line.substr(0, line.find(':'));
+	value = line.substr(line.find(':') + 2, line.length() - 1);
 
-	tmp >> request; 
-	if (request == "Host:")
-		tmp >> _host;
-	else
-		std::cout << "Unexpected request: " << request << std::endl;
+	//std::cout << " Key: " << key << "|Value:" << value << "|" << std::endl;
+
+	_fields[key] = value;
 }
 
-std::string	RequestHeader::getPath() const
+const std::string&	RequestHeader::getField(const std::string& field) const
 {
-	return (_path);
+	return _fields.at(field);
 }
-
-std::string	RequestHeader::getMethod() const
-{
-	return (_method);
-}
-
-std::string	RequestHeader::getVersion() const
-{
-	return (_version);
-}
-
-std::string RequestHeader::getHost() const
-{
-	return (_host);
-}
-
