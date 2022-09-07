@@ -11,53 +11,58 @@ RequestHeader::~RequestHeader()
 
 void	RequestHeader::readRequest(std::string& request)
 {
-	std::stringstream	tmp;
-	tmp << request;
+	std::istringstream tmp(request);
+	std::string line;
 
-	parseMethodePathAndVersion(tmp);
-	tmp << request; // Go to the next request line
-	parseHost(tmp);
+	std::getline(tmp, line);
+	parseMethodPathAndVersion(line);
+
+	while (std::getline(tmp, line))
+	{
+		parseField(line);
+	}
+	
+	// Debug: Print map content
+	//for(std::map<std::string, std::string>::iterator it = _fields.begin(); it != _fields.end(); ++it)
+	//	std::cout << it->first << "|" << it->second << "\n";
 }
 
-void RequestHeader::parseMethodePathAndVersion(std::stringstream& tmp)
+void RequestHeader::parseMethodPathAndVersion(std::string& line)
 {
-	//std::cout << tmp.str() << std::endl;
-	tmp >> _method;
-	tmp >> _path;
-	// if (_path == "/")
-	// 	_path = "/index.html";
-	tmp >> _version;
+	std::stringstream stream;
+
+	stream << line;
+
+	stream >> _fields["Method"];
+	stream >> _fields["Path"];
+	stream >> _fields["Version"];
 }
-// Instead of creating a function for each request (host, connection, ...)
-// we could call a function depending on the request
-void RequestHeader::parseHost(std::stringstream& tmp)
+
+void RequestHeader::parseField(std::string& line)
 {
-	std::string request;
+	std::string key, value;
 
-	tmp >> request; 
-	if (request == "Host:")
-		tmp >> _host;
-	else
-		std::cout << "Unexpected request: " << request << std::endl;
+	removeWhiteSpaces(line);
+
+	if (line.empty())
+		return;
+	
+	key = line.substr(0, line.find(':'));
+	value = line.substr(line.find(':') + 2, line.length() - 1);
+
+	_fields[key] = value;
 }
 
-std::string	RequestHeader::getPath() const
+void RequestHeader::removeWhiteSpaces(std::string& str)
 {
-	return (_path);
+	for (size_t i = 0; i < str.length(); i++)
+	{
+		if (isprint(str[i]) == false)
+			str.erase(i);
+	}
 }
 
-std::string	RequestHeader::getMethod() const
+const std::string&	RequestHeader::getField(const std::string& field) const
 {
-	return (_method);
+	return _fields.at(field);
 }
-
-std::string	RequestHeader::getVersion() const
-{
-	return (_version);
-}
-
-std::string RequestHeader::getHost() const
-{
-	return (_host);
-}
-

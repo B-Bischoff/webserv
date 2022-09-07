@@ -11,11 +11,13 @@ Get::~Get()
 
 Get	&Get::readFile(RequestHeader request)
 {
+	std::cout << "PATH----> '" << request.getField("Path") << "'" << std::endl;
+
 	_path = "./pages";
-	if (request.getPath() == "/")
+	if (request.getField("Path") == "/")
 		_path += "/index.html";
 	else
-		_path += request.getPath();
+		_path += request.getField("Path");
 	std::cout << _path<< std::endl;
 	std::ifstream	ifs(_path, std::ios::in);
 	std::string		file ((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));

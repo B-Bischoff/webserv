@@ -126,10 +126,10 @@ void	Parsing::isFile(char *confPath)
 
 void	Parsing::isDuplicateServerName(std::vector<VirtualServerConfig> &vServ)
 {
-	std::vector<const std::string>::iterator it;
-	std::vector<const std::string>::iterator itNext;
-	std::vector<const std::string>::iterator end;
-	std::vector<const std::string>::iterator endNext;
+	std::vector<std::string>::const_iterator it;
+	std::vector<std::string>::const_iterator itNext;
+	std::vector<std::string>::const_iterator end;
+	std::vector<std::string>::const_iterator endNext;
 
 	for (int i = 0; i < _numberOfBlocks - 1; i++)
 	{

@@ -9,7 +9,7 @@ VirtualServerSelector::VirtualServerSelector(std::map<int, VirtualServer>& serve
 
 void VirtualServerSelector::parsePortAndHost()
 {
-	std::string requestHost = _request.getHost();
+	std::string requestHost = _request.getField("Host");
 
 	if (requestHost.find(':') != std::string::npos)
 	{

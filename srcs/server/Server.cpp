@@ -73,14 +73,13 @@ void Server::acceptConnection(const int& serverSocket)
 void Server::listenClient(const int& clientFd)
 {
 	std::cout << "client " << clientFd << " wants to communicate" << std::endl;
-	char buffer[30000];
-	int nbytes = recv(clientFd, buffer, sizeof(buffer), 0);
 
-	// Read header
+	std::string buf;
+	int receiveReturn = receiveRequestHeader(clientFd, buf);
 
-	if (nbytes <= 0) // Client disconnected or recv error
+	if (receiveReturn <= 0) // Client disconnected or recv error
 	{
-		if (nbytes == 0)
+		if (receiveReturn == 0)
 			std::cout << "Socket: " << clientFd << " disconnected" << std::endl;
 		else
 			perror("recv");
@@ -90,9 +89,26 @@ void Server::listenClient(const int& clientFd)
 	}
 	else
 	{
-		std::string buf = buffer; // Convert char* to string
 		processClientRequest(clientFd, buf);
 	}
+}
+
+int Server::receiveRequestHeader(const int& clientFd, std::string& buffer)
+{
+	int nbytes;
+	char temp;
+
+	do
+	{
+		nbytes = recv(clientFd, &temp, sizeof(temp), 0);
+		buffer += temp;
+	} while (nbytes > 0 && buffer.find("\r\n\r\n") == std::string::npos);
+
+	//std::cout << buffer << std::endl;
+	if (buffer.find("\r\n\r\n") != std::string::npos)
+		return 1; // Header successfully received
+	else
+		return nbytes; // Receive error or client disconnected
 }
 
 void Server::processClientRequest(const int& clientFd, std::string& buffer)
@@ -110,7 +126,7 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 
 		// Select location block from server and request header
 		LocationSelector	select;
-		tmp = select.selectLocationBlock(request.getPath(), this->getVirtualServer(i).getVirtualServerConfig().loc);
+		tmp = select.selectLocationBlock(request.getField("Path"), this->getVirtualServer(i).getVirtualServerConfig().loc);
 		std::cout << "Path of location Block ----------> " << tmp.getLocationPath() << " Modifier : " << tmp.getLocationModifier() << std::endl;
 		// Read body from request (recv)
 
