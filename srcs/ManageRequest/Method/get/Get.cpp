@@ -21,7 +21,7 @@ Get	&Get::readFile(RequestHeader request)
 	std::string		file ((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
 	
 	if (ifs.is_open() == false)
-		throw (ERROR_404);
+		throw (STATUS_404);
 	if (file.empty() == true)
 		throw (STATUS_204);
 	_body = file;
