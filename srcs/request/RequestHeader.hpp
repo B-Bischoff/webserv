@@ -24,6 +24,8 @@ class RequestHeader
 		void parseMethodPathAndVersion(std::string& line);
 		void parseField(std::string& line);
 
+		void removeWhiteSpaces(std::string& str);
+
 	public:
 		RequestHeader();
 		~RequestHeader();
