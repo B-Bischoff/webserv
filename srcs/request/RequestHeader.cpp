@@ -62,7 +62,7 @@ std::string RequestHeader::getField(const std::string& field) const
 	try {
 		return _fields.at(field);
 	}
-	catch (std::out_of_range) {
+	catch (std::out_of_range& e) {
 		std::string empty;
 		return empty;
 	}
