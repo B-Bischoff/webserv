@@ -21,9 +21,7 @@ LocationBlock	LocationSelector::selectLocationBlock(const std::string &path, std
 		if (serverBlock[i].getLocationPath().find(path) != std::string::npos)
 		{
 			if (serverBlock[i].getLocationPath() == path && serverBlock[i].getLocationModifier() == "=")
-			{
 				return (serverBlock[i]);
-			}
 			_locationPaths.push_back(serverBlock[i].getLocationPath());
 			if (serverBlock[i].getLocationPath().size() > maxSize && serverBlock[i].getLocationPath().size() <= path.size())
 			{

@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ResponseHeader.cpp                                 :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: brice <brice@student.42.fr>                +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/08/19 17:07:48 by tarchimb          #+#    #+#             */
-/*   Updated: 2022/09/07 17:35:10 by brice            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "ResponseHeader.hpp"
 
 ResponseHeader::ResponseHeader() : protocol("HTTP/1.1 "), 
@@ -157,5 +145,4 @@ void	ResponseHeader::build_response(Method &method)
 
 	response_header = protocol + method.getStatus() + "\n" + content_type + get_extension_file(method.getPath()) + "\n" 
 	+ content_length + convert.str() + "\n\n" + method.getBody();
-
 }

@@ -16,7 +16,6 @@ class Autoindex
 		std::string					_path;
 		std::vector<std::string>	_directoryInfo;
 		std::string					_tmpBody;
-		int							_biggestSize;
 
 		void	getDirectoryInfo(std::string &directoryName, struct dirent *ent);
 		void	addToBody(std::string &directoryName);

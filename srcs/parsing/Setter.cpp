@@ -142,14 +142,14 @@ void	Setter::setRootIndex(VirtualServerConfig &vServ)
 	std::fstream	file;
 
 	_streamLine >> _keyWord;
-	file.open(_keyWord.c_str(), std::ios::out);
-	if (file.is_open() == false)
-		throw(PATH + _keyWord + "'");
+	// file.open(_keyWord.c_str(), std::ios::out);	//Not sure that needed to check for valid path
+	// if (file.is_open() == false)
+	// 	throw(PATH + _keyWord + "'");
 	if (_streamLine.str().find("index") != std::string::npos)
 		_inLocationBlock == true ? vServ.loc[_locationBlock].setIndex(_keyWord) : vServ.setIndex(_keyWord);
 	else
 		_inLocationBlock == true ? vServ.loc[_locationBlock].setRoot(_keyWord) : vServ.setRoot(_keyWord);
-	file.close();
+	// file.close();
 }
 
 void	Setter::setListen(VirtualServerConfig &vServ)
