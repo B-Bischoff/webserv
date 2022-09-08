@@ -13,10 +13,10 @@ CgiHandler::CgiHandler(RequestHeader &request, VirtualServerConfig &vServ, Locat
 	_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	_env["SERVER_PORT"] = std::to_string(vServ.getPort());
 	_env["REQUEST_METHOD"] = method;
-	if (loc.getRoot() != "")
-		_env["PATH_TRANSLATED"] = loc.getRoot() + request.getField("Path");
+	if (loc.getStringField("root") != "")
+		_env["PATH_TRANSLATED"] = loc.getStringField("root") + request.getField("Path");
 	else
-		_env["PATH_TRANSLATED"] = vServ.getRoot() + request.getField("Path");
+		_env["PATH_TRANSLATED"] = vServ.getStringField("root") + request.getField("Path");
 	_env["PATH_INFO"] = request.getField("Path");
 	_env["SCRIPT_NAME"] = "./cgi-bin/php-cgi";
 	// if (method == "GET" && (it = request.find("QUERY_STRING")) != request.end())

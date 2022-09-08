@@ -34,20 +34,8 @@ class VirtualServerConfig : public ABlock
 		VirtualServerConfig();
 		~VirtualServerConfig();
 
-		void						setIp(std::string ip);
-		const std::string&			getIp(void) const;
-
 		void						setPort(std::string ip);
 		unsigned int				getPort(void) const;
-
-		void						setServerName(std::vector<std::string> serverName);
-		const std::vector<std::string>&	getServerName(void) const;
-
-		void						setAccessLog(std::vector<std::string> accessLog);
-		std::vector<std::string>	getAccessLog(void) const;
-
-		void						setErrorLog(std::vector<std::string> errorPage);
-		std::vector<std::string>	getErrorLog(void) const;
 
 		void						setMaxBodySize(unsigned int size);
 		unsigned int				getMaxBodySize(void) const;

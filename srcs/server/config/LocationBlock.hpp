@@ -13,12 +13,6 @@ class LocationBlock : public ABlock
 	public:
 		LocationBlock();
 		~LocationBlock();
-
-		void						setLocationPath(std::string values);
-		std::string					getLocationPath() const;
-
-		void						setLocationModifier(std::string values);
-		std::string					getLocationModifier() const;
 };
 
 #endif

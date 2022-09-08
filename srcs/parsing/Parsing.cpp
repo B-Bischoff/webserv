@@ -137,13 +137,13 @@ void	Parsing::isDuplicateServerName(std::vector<VirtualServerConfig> &vServ)
 
 	for (int i = 0; i < _numberOfBlocks - 1; i++)
 	{
-		end = vServ[i].getServerName().end();
-		for (it = vServ[i].getServerName().begin(); it != end; it ++)
+		end = vServ[i].getVectorField("server_name").end();
+		for (it = vServ[i].getVectorField("server_name").begin(); it != end; it ++)
 		{
 			for (int j = i + 1; j < _numberOfBlocks; j++)
 			{
-				endNext = vServ[j].getServerName().end();
-				for (itNext = vServ[j].getServerName().begin(); itNext != endNext; itNext++)
+				endNext = vServ[j].getVectorField("server_name").end();
+				for (itNext = vServ[j].getVectorField("server_name").begin(); itNext != endNext; itNext++)
 				{
 					if (*itNext == *it)
 						throw (SERVER_NAME + *it + "'");
@@ -162,10 +162,6 @@ int	Parsing::parseConfigFile(char *confPath, std::vector<VirtualServerConfig> &v
 		removeUselessLine();
 		checkSyntaxFile();
 		parseBlocks();
-		for (int i = 0; i < _numberOfBlocks; i++)
-		{
-			std::cout << _blocks[i] << std::endl;
-		}
 		fillVirtualServers(vServ);
 		isDuplicateServerName(vServ);
 	}
@@ -203,31 +199,31 @@ static void	printServer(std::vector<VirtualServerConfig> &vServ, int size, std::
 	for (int i = 0; i < size; i++)
 	{
 		std::cout << "BLOCK_SERVER " << i << std::endl;
-		std::cout  << "Ip:\t\t"  << vServ[i].getIp() << ":" << vServ[i].getPort() << std::endl;
+		std::cout  << "Ip:\t\t"  << vServ[i].getStringField("ip") << ":" << vServ[i].getPort() << std::endl;
 		std::cout << "server_name:\t";
-		printVector(vServ[i].getServerName());
+		printVector(vServ[i].getVectorField("server_name"));
 		std::cout << "access_log:\t";
-		printVector(vServ[i].getAccessLog());
+		printVector(vServ[i].getVectorField("access_log"));
 		std::cout << "error_log:\t";
-		printVector(vServ[i].getErrorLog());
-		std::cout << "root:\t\t" << vServ[i].getRoot() << std::endl;
-		std::cout << "index\t\t" << vServ[i].getIndex() << std::endl;
+		printVector(vServ[i].getVectorField("error_log"));
+		std::cout << "root:\t\t" << vServ[i].getStringField("root") << std::endl;
+		std::cout << "index\t\t" << vServ[i].getStringField("index") << std::endl;
 		std::cout << "return:\t\t";
-		printVector(vServ[i].getReturn());
-		std::cout << "method:\t\t" << "GET: " << vServ[i].getMethodGet() << " " << "POST: " << vServ[i].getMethodPost() << " " << "DELETE: " << vServ[i].getMethodDelete() << std::endl;
-		std::cout << "autoindex:\t" << (vServ[i].getAutoIndex() ? "yes" : "no") << std::endl;
+		printVector(vServ[i].getVectorField("return"));
+		std::cout << "method:\t\t" << "GET: " << vServ[i].getBoolValue(GET) << " " << "POST: " << vServ[i].getBoolValue(POST) << " " << "DELETE: " << vServ[i].getBoolValue(DELETE) << std::endl;
+		std::cout << "autoindex:\t" << (vServ[i].getBoolValue(AUTOINDEX) ? "yes" : "no") << std::endl;
 		std::cout << "body size:\t" << vServ[i].getMaxBodySize()  << "\n" << std::endl;
 
 		for (int j = 0; j < _locationBlock[i]; j++)
 		{
 			std::cout << "BLOCK_LOCATION " << j  << " in BLOCK_SERVER " << i  << "\n" << std::endl;
-			std::cout << "location:\t" << "modifier: " << vServ[i].loc[j].getLocationModifier() << " path: " << vServ[i].loc[j].getLocationPath() << std::endl;
-			std::cout << "method:\t\t" << "GET: " << vServ[i].loc[j].getMethodGet() << " " << "POST: " << vServ[i].loc[j].getMethodPost() << " " << "DELETE: " << vServ[i].loc[j].getMethodDelete() << std::endl;
-			std::cout << "autoindex:\t" << (vServ[i].loc[j].getAutoIndex() ? "yes" : "no") << std::endl;
-			std::cout << "index\t\t" << vServ[i].loc[j].getIndex() << std::endl;
-			std::cout << "root:\t\t" << vServ[i].loc[j].getRoot() << std::endl;
+			std::cout << "location:\t" << "modifier: " << vServ[i].loc[j].getStringField("location_modifier") << " path: " << vServ[i].loc[j].getStringField("location_path") << std::endl;
+			std::cout << "method:\t\t" << "GET: " << vServ[i].loc[j].getBoolValue(GET) << " " << "POST: " << vServ[i].loc[j].getBoolValue(POST) << " " << "DELETE: " << vServ[i].loc[j].getBoolValue(DELETE) << std::endl;
+			std::cout << "autoindex:\t" << (vServ[i].loc[j].getBoolValue(AUTOINDEX) ? "yes" : "no") << std::endl;
+			std::cout << "index\t\t" << vServ[i].loc[j].getStringField("index") << std::endl;
+			std::cout << "root:\t\t" << vServ[i].loc[j].getStringField("root") << std::endl;
 			std::cout << "return:\t\t";
-			printVector(vServ[i].loc[j].getReturn());
+			printVector(vServ[i].loc[j].getVectorField("return"));
 			std::cout << std::endl;
 		}
 			std::cout << "-------------------------------------" << std::endl;

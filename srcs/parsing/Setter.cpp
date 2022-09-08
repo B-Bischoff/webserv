@@ -65,10 +65,12 @@ void	Setter::setLocation(VirtualServerConfig &vServ)
 	if (_argsCount == 4)
 	{
 		_streamLine >> _keyWord;
-		vServ.loc[_locationBlock].setLocationModifier(_keyWord);
+		vServ.loc[_locationBlock].setStringField(_keyWord, "location_modifier");
+		// vServ.loc[_locationBlock].setLocationModifier(_keyWord);
 	}
 	_streamLine >> _keyWord;
-	vServ.loc[_locationBlock].setLocationPath(_keyWord);
+	// vServ.loc[_locationBlock].setLocationPath(_keyWord);
+	vServ.loc[_locationBlock].setStringField(_keyWord, "location_path");
 }
 
 void	Setter::setMaxBodySize(VirtualServerConfig &vServ)
@@ -90,7 +92,8 @@ void	Setter::setReturn(VirtualServerConfig &vServ)
 	node.push_back(_keyWord);
 	_streamLine >> _keyWord;
 	node.push_back(_keyWord);
-	_inLocationBlock == true ? vServ.loc[_locationBlock].setReturn(node) : vServ.setReturn(node);
+	// _inLocationBlock == true ? vServ.loc[_locationBlock].setReturn(node) : vServ.setReturn(node);
+	_inLocationBlock == true ? vServ.loc[_locationBlock].setVectorField(node, "return") : vServ.setVectorField(node, "return");
 }
 
 void	Setter::setMethod(VirtualServerConfig &vServ)
@@ -99,11 +102,11 @@ void	Setter::setMethod(VirtualServerConfig &vServ)
 	{
 		_streamLine >> _keyWord;
 		if (_keyWord.compare("GET") == 0)
-			_inLocationBlock == true ? vServ.loc[_locationBlock].setMethodGet(true) : vServ.setMethodGet(true);
+			_inLocationBlock == true ? vServ.loc[_locationBlock].setBoolValue(true, GET) : vServ.setBoolValue(true, GET);
 		else if (_keyWord.compare("POST") == 0)
-			_inLocationBlock == true ? vServ.loc[_locationBlock].setMethodPost(true) : vServ.setMethodPost(true);
+			_inLocationBlock == true ? vServ.loc[_locationBlock].setBoolValue(true, POST) : vServ.setBoolValue(true, POST);
 		else if (_keyWord.compare("DELETE") == 0)
-			_inLocationBlock == true ? vServ.loc[_locationBlock].setMethodDelete(true) : vServ.setMethodDelete(true);
+			_inLocationBlock == true ? vServ.loc[_locationBlock].setBoolValue(true, DELETE) : vServ.setBoolValue(true, DELETE);
 		else
 			throw (WRONG_METHOD + _keyWord + "'");
 	}
@@ -113,7 +116,7 @@ void	Setter::setAutoIndex(VirtualServerConfig &vServ)
 {
 	_streamLine >> _keyWord;
 	if (_keyWord.compare("on") == 0)
-		_inLocationBlock == true ? vServ.loc[_locationBlock].setAutoIndex(true) : vServ.setAutoIndex(true);
+		_inLocationBlock == true ? vServ.loc[_locationBlock].setBoolValue(true, AUTOINDEX) : vServ.setBoolValue(true, AUTOINDEX);
 }
 
 void	Setter::setLogs(VirtualServerConfig &vServ)
@@ -131,9 +134,9 @@ void	Setter::setLogs(VirtualServerConfig &vServ)
 		throw(_keyWord + " : " + LOG_LEVEL);
 	node.push_back(_keyWord);
 	if ((_streamLine.str().find("access_log")) != std::string::npos)
-		vServ.setAccessLog(node);
+		vServ.setVectorField(node, "access_log");
 	else
-		vServ.setErrorLog(node);
+		vServ.setVectorField(node, "error_log");
 	file.close();
 }
 
@@ -146,9 +149,9 @@ void	Setter::setRootIndex(VirtualServerConfig &vServ)
 	// if (file.is_open() == false)
 	// 	throw(PATH + _keyWord + "'");
 	if (_streamLine.str().find("index") != std::string::npos)
-		_inLocationBlock == true ? vServ.loc[_locationBlock].setIndex(_keyWord) : vServ.setIndex(_keyWord);
+		_inLocationBlock == true ? vServ.loc[_locationBlock].setStringField(_keyWord, "index") : vServ.setStringField(_keyWord, "index");
 	else
-		_inLocationBlock == true ? vServ.loc[_locationBlock].setRoot(_keyWord) : vServ.setRoot(_keyWord);
+		_inLocationBlock == true ? vServ.loc[_locationBlock].setStringField(_keyWord, "root") : vServ.setStringField(_keyWord, "root");
 	// file.close();
 }
 
@@ -165,7 +168,7 @@ void	Setter::setListen(VirtualServerConfig &vServ)
 	port = atoi(_keyWord.substr(_keyWord.find_first_not_of(':') + 1).c_str());
 	if (port > 65535 || port < 0)
 		throw("'" + _keyWord + PORT);
-	vServ.setIp(_keyWord.substr(0, _keyWord.find_first_of(':')));
+	vServ.setStringField(_keyWord.substr(0, _keyWord.find_first_of(':')), "ip");
 	vServ.setPort(_keyWord.substr(_keyWord.find_first_of(':') + 1));
 }
 
@@ -178,5 +181,5 @@ void	Setter::setServerName(VirtualServerConfig &vServ)
 		_streamLine >> _keyWord;
 		newNode.push_back(_keyWord);
 	}
-	vServ.setServerName(newNode);		
+	vServ.setVectorField(newNode, "server_name");		
 }

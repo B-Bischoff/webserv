@@ -9,7 +9,7 @@ VirtualServer::VirtualServer(const VirtualServerConfig& config)
 	: _config(config), _serverSocket(-1)
 {
 	init(); // Add verification (return, try, ...)
-	std::cout << "Virtual server '" << _config.getServerName()[0] << "' is now listening on: " << _config.getIp();
+	std::cout << "Virtual server '" << _config.getVectorField("server_name")[0] << "' is now listening on: " << _config.getStringField("ip");
 	std::cout << ":" << _config.getPort() << " with fd:" << _serverSocket << std::endl;
 }
 
@@ -21,7 +21,7 @@ void VirtualServer::init()
 	_addrlen = sizeof(_address); // IPV4
 
 	_address.sin_family = AF_INET;
-	_address.sin_addr.s_addr = inet_addr(_config.getIp().c_str()); // Ip
+	_address.sin_addr.s_addr = inet_addr(_config.getStringField("ip").c_str()); // Ip
 	_address.sin_port = htons(_config.getPort()); // Port
 	memset(_address.sin_zero, '\0', sizeof _address.sin_zero);
 
@@ -51,12 +51,12 @@ void VirtualServer::init()
 
 const std::string& VirtualServer::getName() const
 {
-	return (_config.getServerName())[0];
+	return (_config.getVectorField("server_name"))[0];
 }
 
 const std::string& VirtualServer::getIp() const
 {
-	return _config.getIp();
+	return _config.getStringField("ip");
 }
 
 unsigned int VirtualServer::getPort() const
