@@ -9,18 +9,19 @@
 #include "ErrorStatus.hpp"
 #include "webserv.hpp"
 #include <exception>
-
-
+#include "Server.hpp"
+#include "LocationBlock.hpp"
+#include "CgiHandler.hpp"
 
 class ManageRequest
 {
 	private:
-		// Virtual server (reference)
-		// Virtual server location block previously choosen (reference)
-		// Request header + body
+		VirtualServerConfig	&_vServConfig; // Virtual server (reference)
+		LocationBlock		&_locationBlock; // Virtual server location block previously choosen (reference)
+		RequestHeader		&_request;// Request header + body
 		
 	public:
-		ManageRequest();
+		ManageRequest(VirtualServerConfig &vServCongif, LocationBlock &locationBlock, RequestHeader &request);
 		~ManageRequest();
 		
 		Method	identify(RequestHeader request);

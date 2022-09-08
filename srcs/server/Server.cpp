@@ -27,7 +27,6 @@ void Server::addFd(const int &fd, fd_set& set)
 
 void Server::serverLoop()
 {
-	ManageRequest	manager;
 	RequestHeader	req;
 	Get				get;
 	Method			dst;
@@ -127,10 +126,9 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		// Select location block from server and request header
 		LocationSelector	select;
 		tmp = select.selectLocationBlock(request.getField("Path"), this->getVirtualServer(i).getVirtualServerConfig().loc);
-		std::cout << "Path of location Block ----------> " << tmp.getLocationPath() << " Modifier : " << tmp.getLocationModifier() << std::endl;
 		// Read body from request (recv)
 
-		ManageRequest manager;
+		ManageRequest manager(getVirtualServer(i).getVirtualServerConfig(), tmp, request);
 		Method dst = manager.identify(request);
 		header.build_response(dst);
 		if (send(clientFd, header.response_header.c_str(), header.response_header.size(), 0) == -1)

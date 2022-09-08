@@ -5,41 +5,36 @@
 #include <map>
 #include <vector>
 
+#define GET 0
+#define POST 1
+#define DELETE 2
+#define AUTOINDEX 3
+
 typedef std::map <std::string, std::vector <std::string> > Serv;
 
 class ABlock
 {
 	protected:
 		Serv	_block;
+		bool	_methodAutoIndex[4];
 		bool	_autoIndex;
 		bool	_get;
 		bool	_post;
 		bool	_delete;
+		int		_port;
 
 	public:
 		ABlock();
 		~ABlock();
-		
-		void						setMethodGet(bool value);
-		bool						getMethodGet() const;
 
-		void						setMethodPost(bool value);
-		bool						getMethodPost() const;
+		void							setVectorField(const std::vector<std::string> value, std::string field);
+		const std::vector<std::string>	&getVectorField(std::string field) const;
 
-		void						setMethodDelete(bool value);
-		bool						getMethodDelete() const;
+		void							setStringField(const std::string value, std::string field);
+		const std::string				&getStringField(std::string field) const;
 
-		void						setAutoIndex(bool value);
-		bool						getAutoIndex(void) const;
-
-		void						setRoot(std::string path);
-		std::string					getRoot(void) const;
-
-		void						setIndex(std::string path);
-		std::string					getIndex(void) const;
-
-		void						setReturn(std::vector<std::string> value);
-		std::vector<std::string>	getReturn(void) const;
+		void							setBoolValue(bool value, int field);
+		bool							getBoolValue(int field);
 };
 
 #endif

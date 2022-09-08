@@ -1,10 +1,13 @@
 #include "ABlock.hpp"
 
 ABlock::ABlock() : _autoIndex(false), _get(false), _post(false), _delete(false)
+	, _port(8080)
 {
 	_block["index"].push_back("");
 	_block["root"].push_back("");
 	_block["return"].push_back("");
+	_block["location_modifier"].push_back("");
+	_block["location_path"].push_back("");
 }
 
 ABlock::~ABlock()
@@ -12,72 +15,32 @@ ABlock::~ABlock()
 
 }
 
-void	ABlock::setAutoIndex(bool value)
+void	ABlock::setStringField(const std::string value, std::string field)
 {
-	_autoIndex = value;
+	_block[field][0] = value;
 }
 
-bool	ABlock::getAutoIndex() const
+const std::string	&ABlock::getStringField(std::string field) const
 {
-	return (_autoIndex);
+	return (_block.at(field)[0]);
 }
 
-void	ABlock::setMethodGet(bool value)
+void	ABlock::setVectorField(const std::vector<std::string> value, std::string field)
 {
-	_get = value;
+	_block[field] = value;
 }
 
-bool	ABlock::getMethodGet() const
+const std::vector<std::string>	&ABlock::getVectorField(std::string field) const
 {
-	return (_get);
+	return (_block.at(field));
 }
 
-void	ABlock::setMethodPost(bool value)
+void	ABlock::setBoolValue(bool value, int field)
 {
-	_post = value;
+	_methodAutoIndex[field] = value;
 }
 
-bool	ABlock::getMethodPost() const
+bool	ABlock::getBoolValue(int field)
 {
-	return (_post);
-}
-
-void	ABlock::setMethodDelete(bool value)
-{
-	_delete = value;
-}
-
-bool	ABlock::getMethodDelete() const
-{
-	return (_delete);
-}
-
-void	ABlock::setReturn(std::vector<std::string> value)
-{
-	_block["return"] = value;
-}
-
-std::vector<std::string>	ABlock::getReturn() const
-{
-	return (_block.at("return"));
-}
-
-void	ABlock::setRoot(std::string path)
-{
-	_block["root"][0] = path;
-}
-
-std::string	ABlock::getRoot() const
-{
-	return (_block.at("root")[0]);
-}
-
-void	ABlock::setIndex(std::string path)
-{
-	_block["index"][0] = path;
-}
-
-std::string	ABlock::getIndex() const
-{
-	return (_block.at("index")[0]);
+	return (_methodAutoIndex[field]);
 }
