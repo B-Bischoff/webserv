@@ -75,6 +75,7 @@ void Server::listenClient(const int& clientFd)
 
 	std::string buf;
 	int receiveReturn = receiveRequestHeader(clientFd, buf);
+	std::cout << "Request Header: " << buf << std::endl;
 
 	if (receiveReturn <= 0) // Client disconnected or recv error
 	{
@@ -87,27 +88,22 @@ void Server::listenClient(const int& clientFd)
 		FD_CLR(clientFd, &_master);
 	}
 	else
-	{
 		processClientRequest(clientFd, buf);
-	}
 }
 
 int Server::receiveRequestHeader(const int& clientFd, std::string& buffer)
 {
-	int nbytes;
+	int nbytes = 1;
 	char temp;
 
-	do
+	while (nbytes > 0 && buffer.find("\r\n\r\n") == std::string::npos)
 	{
 		nbytes = recv(clientFd, &temp, sizeof(temp), 0);
-		buffer += temp;
-	} while (nbytes > 0 && buffer.find("\r\n\r\n") == std::string::npos);
+		if (nbytes > 0)
+			buffer += temp;
+	}
 
-	//std::cout << buffer << std::endl;
-	if (buffer.find("\r\n\r\n") != std::string::npos)
-		return 1; // Header successfully received
-	else
-		return nbytes; // Receive error or client disconnected
+	return nbytes;
 }
 
 void Server::processClientRequest(const int& clientFd, std::string& buffer)
@@ -116,31 +112,49 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		LocationBlock	tmp;
 		int				i;
 
-		//std::cout << buffer << std::endl;
 		request.readRequest(buffer);
 
-		// Testing virtual server identification
 		VirtualServerSelector selector(_servers, request);
 		i = selector.selectServerFromRequest();
 
-		// Select location block from server and request header
 		LocationSelector	select;
-		tmp = select.selectLocationBlock(request.getField("Path"), this->getVirtualServer(i).getVirtualServerConfig().loc);
-		// Read body from request (recv)
+		tmp = select.selectLocationBlock(request.getField("Path"), _servers.at(i).getVirtualServerConfig().loc);
 
-		ManageRequest manager(getVirtualServer(i).getVirtualServerConfig(), tmp, request);
+		std::string requestBody;
+		if (receiveRequestBody(clientFd, requestBody, request, _servers.at(i).getVirtualServerConfig().getMaxBodySize()) == -1) // Need to replace '30000' by location server max body size
+			perror("Recv body");
+		std::cout << "RequestBody: " << requestBody << std::endl;
+
+		ManageRequest manager(_servers.at(i).getVirtualServerConfig(), tmp, request);
 		Method dst = manager.identify(request);
 		header.build_response(dst);
 		if (send(clientFd, header.response_header.c_str(), header.response_header.size(), 0) == -1)
 			perror("send");
 }
 
+int Server::receiveRequestBody(const int& clientFd, std::string& buffer, const RequestHeader& request, const int& maxSize)
+{
+	char temp;
+	int nbytes = 1;
+	int bytesToRead = atoi(request.getField("Content-Length").c_str());
+
+	if (request.getField("Content-Length").empty() == true) // No body to read
+		return 0;
+	if (bytesToRead > maxSize) // Need to return a specific error code
+		return 0; // Change this by "throw [ERROR_CODE]"
+
+	while (bytesToRead > 0 && nbytes > 0)
+	{
+		nbytes = recv(clientFd, &temp, sizeof(temp), 0);
+		if (nbytes > 0)
+			buffer += temp;
+		bytesToRead -= 1;
+	}
+
+	return nbytes;
+}
+
 bool Server::isAVirtualServer(const int& fd) const
 {
 	return _servers.find(fd) != _servers.end();
-}
-
-VirtualServer	&Server::getVirtualServer(int i)
-{
-	return (_servers.at(i));
 }

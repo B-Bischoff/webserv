@@ -27,7 +27,9 @@ void	Autoindex::getDirectoryInfo(std::string &directoryName, struct dirent *ent)
 	directoryName = (ent->d_type == DT_REG ? directoryName : directoryName + "/");
 	_directoryInfo.push_back(directoryName);
 	_directoryInfo.push_back(stringTime);
-	_directoryInfo.push_back((ent->d_type == DT_REG ? std::to_string(file.st_size) + "\n" : "-\n"));
+	std::stringstream ss;
+	ss << file.st_size;
+	_directoryInfo.push_back((ent->d_type == DT_REG ? ss.str() + "\n" : "-\n"));
 }
 
 void	Autoindex::insertTabChar(std::string &directoryName)

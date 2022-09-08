@@ -10,7 +10,6 @@
 #define MAX_BODY_SIZE 30000
 #define ROOT_PATH "./pages"
 
-
 class RequestHeader
 {
 	private:
@@ -22,9 +21,9 @@ class RequestHeader
 		void removeWhiteSpaces(std::string& str);
 
 	public:
-		const std::string&	getField(const std::string& field) const;
+		std::string getField(const std::string& field) const;
 
-		void			readRequest(std::string& request);
+		void readRequest(std::string& request);
 };
 
 #endif
