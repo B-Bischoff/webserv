@@ -76,6 +76,7 @@ void Server::listenClient(const int& clientFd)
 
 	std::string buf;
 	int receiveReturn = receiveRequestHeader(clientFd, buf);
+	std::cout << buf << std::endl;
 
 	if (receiveReturn <= 0) // Client disconnected or recv error
 	{
@@ -88,9 +89,7 @@ void Server::listenClient(const int& clientFd)
 		FD_CLR(clientFd, &_master);
 	}
 	else
-	{
 		processClientRequest(clientFd, buf);
-	}
 }
 
 int Server::receiveRequestHeader(const int& clientFd, std::string& buffer)
@@ -120,9 +119,16 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		//std::cout << buffer << std::endl;
 		request.readRequest(buffer);
 
-		// Testing virtual server identification
 		VirtualServerSelector selector(_servers, request);
 		i = selector.selectServerFromRequest();
+
+		std::string requestBody;
+		std::cout << "Content length: '" << request.getField("Content-Length") << "'" << std::endl;
+		if (request.getField("Content-Length").empty() == false)
+		{
+			if (receiveRequestBody(clientFd, requestBody, request.getField("Content-Length").length() + 10) == -1)
+				perror("Recv body");
+		}
 
 		// Select location block from server and request header
 		LocationSelector	select;
@@ -135,6 +141,22 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		header.build_response(dst);
 		if (send(clientFd, header.response_header.c_str(), header.response_header.size(), 0) == -1)
 			perror("send");
+}
+
+int Server::receiveRequestBody(const int& clientFd, std::string& buffer, const int& maxSize)
+{
+	int totalRead = 0;
+	int nbytes;
+	char temp;
+
+	do
+	{
+		nbytes = recv(clientFd, &temp, sizeof(temp), 0);
+		totalRead += nbytes;
+		buffer += temp;
+	} while (totalRead < maxSize && nbytes > 0 && buffer.find("\r\n\r\n") == std::string::npos);
+
+	return nbytes; // Receive error or client disconnected
 }
 
 bool Server::isAVirtualServer(const int& fd) const
