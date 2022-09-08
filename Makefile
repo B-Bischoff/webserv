@@ -9,10 +9,13 @@ VPATH = ./: \
 		srcs/ManageRequest/Method/get/: \
 		srcs/ManageRequest/Method/post/: \
 		srcs/ManageRequest/Method/delete/: \
+		srcs/ManageRequest/CGI/: \
+		srcs/ManageRequest/Autoindex/: \
 		srcs/Status/: \
 		srcs/parsing/: \
 		srcs/server/select/: \
-		srcs/server/config/:
+		srcs/server/config/: 
+
 		
 
 SRCS = 	webserv.cpp \
@@ -32,7 +35,9 @@ SRCS = 	webserv.cpp \
 		LocationBlock.cpp \
 		Setter.cpp \
 		ABlock.cpp \
-		LocationSelector.cpp
+		LocationSelector.cpp \
+		Autoindex.cpp
+		#CgiHandler.cpp \
 
 OBJS = $(addprefix .objects/, $(SRCS:.cpp=.o))
 
@@ -52,14 +57,16 @@ INCLUDES =	webserv.hpp \
 			Parsing.hpp \
 			Setter.hpp \
 			ABlock.hpp \
-			LocationSelector.hpp
+			LocationSelector.hpp \
+			Autoindex.hpp
+			#CgiHandler.hpp \	
 			
 
 CC = g++
 
 CFLAGS = -Wall -Wextra -Werror -std=c++98
 
-DEBUG_FLAGS = -fsanitize=address -g3
+DEBUG_FLAGS =# -fsanitize=address -g3
 
 NAME = webserv
 

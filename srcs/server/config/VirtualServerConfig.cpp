@@ -5,8 +5,7 @@ VirtualServerConfig::VirtualServerConfig() : _client_max_body_size(1000000)
 	_block["server_name"].push_back("default");
 	_block["access_log"].push_back("");
 	_block["error_log"].push_back("");
-	_block["listen"].push_back("0.0.0.0");
-	_block["listen"].push_back("8080");
+	_block["ip"].push_back("0.0.0.0");
 }
 
 VirtualServerConfig::~VirtualServerConfig()
@@ -14,54 +13,14 @@ VirtualServerConfig::~VirtualServerConfig()
 	
 }
 
-void	VirtualServerConfig::setIp(std::string ip)
-{
-	_block["listen"][0] = ip;
-}
-
-const std::string&	VirtualServerConfig::getIp(void) const
-{
-	return (_block.at("listen")[0]);
-}
-
 void	VirtualServerConfig::setPort(std::string port)
 {
-	_block["listen"][1] = port;
+	_port = atoi(port.c_str());
 }
 
 unsigned int	VirtualServerConfig::getPort(void) const
 {
-	return atoi(_block.at("listen")[1].c_str());
-}
-
-void	VirtualServerConfig::setServerName(std::vector<std::string> serverName)
-{
-	_block["server_name"] = serverName;
-}
-
-const std::vector<std::string>&	VirtualServerConfig::getServerName(void) const
-{
-	return (_block.at("server_name"));
-}
-
-void	VirtualServerConfig::setAccessLog(std::vector<std::string> accessLog)
-{
-	_block["access_log"] = accessLog;
-}
-
-std::vector<std::string>	VirtualServerConfig::getAccessLog(void) const
-{
-	return (_block.at("access_log"));
-}
-
-void	VirtualServerConfig::setErrorLog(std::vector<std::string> errorLog)
-{
-	_block["error_log"] = errorLog;
-}
-
-std::vector<std::string>	VirtualServerConfig::getErrorLog(void) const
-{
-	return (_block.at("error_log"));
+	return _port;
 }
 
 void	VirtualServerConfig::setMaxBodySize(unsigned int size)

@@ -27,7 +27,6 @@ void Server::addFd(const int &fd, fd_set& set)
 
 void Server::serverLoop()
 {
-	ManageRequest	manager;
 	RequestHeader	req;
 	Get				get;
 	Method			dst;
@@ -119,15 +118,14 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		i = selector.selectServerFromRequest();
 
 		LocationSelector	select;
-		tmp = select.selectLocationBlock(request.getField("Path"), this->getVirtualServer(i).getVirtualServerConfig().loc);
-		std::cout << "Path of location Block ----------> " << tmp.getLocationPath() << " Modifier : " << tmp.getLocationModifier() << std::endl;
+		tmp = select.selectLocationBlock(request.getField("Path"), _servers.at(i).getVirtualServerConfig().loc);
 
 		std::string requestBody;
-		if (receiveRequestBody(clientFd, requestBody, request, 30000) == -1) // Need to replace '30000' by location server max body size
+		if (receiveRequestBody(clientFd, requestBody, request, _servers.at(i).getVirtualServerConfig().getMaxBodySize()) == -1) // Need to replace '30000' by location server max body size
 			perror("Recv body");
-		// std::cout << "RequestBody: " << requestBody << std::endl;
+		std::cout << "RequestBody: " << requestBody << std::endl;
 
-		ManageRequest manager;
+		ManageRequest manager(_servers.at(i).getVirtualServerConfig(), tmp, request);
 		Method dst = manager.identify(request);
 		header.build_response(dst);
 		if (send(clientFd, header.response_header.c_str(), header.response_header.size(), 0) == -1)
@@ -159,9 +157,4 @@ int Server::receiveRequestBody(const int& clientFd, std::string& buffer, const R
 bool Server::isAVirtualServer(const int& fd) const
 {
 	return _servers.find(fd) != _servers.end();
-}
-
-VirtualServer	&Server::getVirtualServer(int i)
-{
-	return (_servers.at(i));
 }

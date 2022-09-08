@@ -14,7 +14,14 @@
 Method ManageRequest::identify(RequestHeader request)
 {
 	Method empty;
+/*
+	std::string	method("GET");
+	CgiHandler	cgi(_request, _vServConfig, _locationBlock, method);
+	std::string	responseCgi = cgi.execCgi();
 
+	std::cout << "Cgi response: " << std::endl;
+	std::cout << responseCgi << std::endl;
+*/
 	try
 	{
 		if (request.getField("Method") == "GET")
@@ -49,9 +56,12 @@ Method ManageRequest::identify(RequestHeader request)
 	return (empty);
 }
 
-ManageRequest::ManageRequest()
+ManageRequest::ManageRequest(VirtualServerConfig &vServCongif, LocationBlock &locationBlock, RequestHeader &request) :
+	_vServConfig(vServCongif), _locationBlock(locationBlock), _request(request)
 {
-
+	(void)_vServConfig;
+	(void)_locationBlock;
+	(void)_request;
 }
 
 ManageRequest::~ManageRequest()

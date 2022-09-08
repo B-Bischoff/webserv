@@ -18,16 +18,14 @@ LocationBlock	LocationSelector::selectLocationBlock(const std::string &path, std
 
 	for (size_t i = 0; i < serverBlock.size(); i++)
 	{
-		if (serverBlock[i].getLocationPath().find(path) != std::string::npos)
+		if (serverBlock[i].getStringField("location_path").find(path) != std::string::npos)
 		{
-			if (serverBlock[i].getLocationPath() == path && serverBlock[i].getLocationModifier() == "=")
-			{
+			if (serverBlock[i].getStringField("location_path") == path && serverBlock[i].getStringField("location_modifier") == "=")
 				return (serverBlock[i]);
-			}
-			_locationPaths.push_back(serverBlock[i].getLocationPath());
-			if (serverBlock[i].getLocationPath().size() > maxSize && serverBlock[i].getLocationPath().size() <= path.size())
+			_locationPaths.push_back(serverBlock[i].getStringField("location_path"));
+			if (serverBlock[i].getStringField("location_path").size() > maxSize && serverBlock[i].getStringField("location_path").size() <= path.size())
 			{
-				maxSize = serverBlock[i].getLocationPath().size();
+				maxSize = serverBlock[i].getStringField("location_path").size();
 				maxSizeIndex = i;
 			}
 		}
