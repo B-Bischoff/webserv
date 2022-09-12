@@ -1,8 +1,11 @@
 #include "ABlock.hpp"
 
-ABlock::ABlock() : _autoIndex(false), _get(false), _post(false), _delete(false)
-	, _port(8080)
+ABlock::ABlock() : _port(8080)
 {
+	_methodAutoIndex[0] = 0;
+	_methodAutoIndex[1] = 0;
+	_methodAutoIndex[2] = 0;
+	_methodAutoIndex[3] = 0;
 	_block["index"].push_back("");
 	_block["root"].push_back("");
 	_block["return"].push_back("");

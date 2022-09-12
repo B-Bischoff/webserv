@@ -1,5 +1,17 @@
 #include "ManageRequest.hpp"
 
+ManageRequest::ManageRequest(VirtualServerConfig &vServCongif, LocationBlock &locationBlock, RequestHeader &request) :
+	_vServConfig(vServCongif), _locationBlock(locationBlock), _request(request)
+{
+	(void)_vServConfig;
+	(void)_locationBlock;
+	(void)_request;
+}
+
+ManageRequest::~ManageRequest()
+{
+
+}
 /*
 	==== GENERATE RESPONSE ALGO ====
 
@@ -11,7 +23,7 @@
 	return response header (string)
 */
 
-Method ManageRequest::identify(RequestHeader request)
+Method ManageRequest::identify(RequestHeader &request)
 {
 	Method empty;
 /*
@@ -56,15 +68,19 @@ Method ManageRequest::identify(RequestHeader request)
 	return (empty);
 }
 
-ManageRequest::ManageRequest(VirtualServerConfig &vServCongif, LocationBlock &locationBlock, RequestHeader &request) :
-	_vServConfig(vServCongif), _locationBlock(locationBlock), _request(request)
+bool	ManageRequest::isValidMethod(std::string method)
 {
-	(void)_vServConfig;
-	(void)_locationBlock;
-	(void)_request;
-}
+	int 	returnMethod;
+	bool	serverPriority = false;
 
-ManageRequest::~ManageRequest()
-{
-
+	if (!_locationBlock.getBoolValue(GET) && !_locationBlock.getBoolValue(POST)
+		&& !_locationBlock.getBoolValue(DELETE))
+		serverPriority = true;
+	method == "GET" ? returnMethod = GET :
+	method == "POST" ? returnMethod = POST :
+	method == "DELETE" ? returnMethod = DELETE :
+ 	returnMethod = -1;
+	if (returnMethod == -1)
+		return (false);
+	return (serverPriority ? _vServConfig.getBoolValue(returnMethod) : _locationBlock.getBoolValue(returnMethod));
 }
