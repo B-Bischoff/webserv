@@ -36,8 +36,8 @@ SRCS = 	webserv.cpp \
 		Setter.cpp \
 		ABlock.cpp \
 		LocationSelector.cpp \
-		CgiHandler.cpp \
 		Autoindex.cpp
+		#CgiHandler.cpp \
 
 OBJS = $(addprefix .objects/, $(SRCS:.cpp=.o))
 
@@ -58,8 +58,8 @@ INCLUDES =	webserv.hpp \
 			Setter.hpp \
 			ABlock.hpp \
 			LocationSelector.hpp \
-			CgiHandler.hpp \
 			Autoindex.hpp
+			#CgiHandler.hpp \	
 			
 
 CC = g++
