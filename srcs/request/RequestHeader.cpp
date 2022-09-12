@@ -57,7 +57,13 @@ void RequestHeader::removeWhiteSpaces(std::string& str)
 	}
 }
 
-const std::string&	RequestHeader::getField(const std::string& field) const
+std::string RequestHeader::getField(const std::string& field) const
 {
-	return _fields.at(field);
+	try {
+		return _fields.at(field);
+	}
+	catch (std::out_of_range& e) {
+		std::string empty;
+		return empty;
+	}
 }

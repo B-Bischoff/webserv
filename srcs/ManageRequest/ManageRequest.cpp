@@ -26,13 +26,14 @@ ManageRequest::~ManageRequest()
 Method ManageRequest::identify(RequestHeader &request)
 {
 	Method empty;
-	// std::string	method("GET");
-	// CgiHandler	cgi(_request, _vServConfig, _locationBlock, method);
-	// std::string	responseCgi = cgi.execCgi();
+/*
+	std::string	method("GET");
+	CgiHandler	cgi(_request, _vServConfig, _locationBlock, method);
+	std::string	responseCgi = cgi.execCgi();
 
-	// std::cout << "Cgi response: " << std::endl;
-	// std::cout << responseCgi << std::endl;
-	std::cout << "\nIs valid method return : " << isValidMethod(request.getField("Method")) << std::endl;
+	std::cout << "Cgi response: " << std::endl;
+	std::cout << responseCgi << std::endl;
+*/
 	try
 	{
 		if (request.getField("Method") == "GET")
