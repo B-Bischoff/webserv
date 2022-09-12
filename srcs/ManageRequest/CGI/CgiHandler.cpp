@@ -14,13 +14,14 @@ CgiHandler::CgiHandler(RequestHeader &request, VirtualServerConfig &vServ, Locat
 	_env["SERVER_PORT"] = std::to_string(vServ.getPort());
 	_env["REQUEST_METHOD"] = method;
 	if (loc.getStringField("root") != "")
-		_env["PATH_TRANSLATED"] = loc.getStringField("root") + request.getField("Path");
+		_env["PATH_TRANSLATED"] = loc.getStringField("root") + request.getField("Path").substr(0, request.getField("Path").find_first_of('?'));
 	else
-		_env["PATH_TRANSLATED"] = vServ.getStringField("root") + request.getField("Path");
-	_env["PATH_INFO"] = request.getField("Path");
-	_env["SCRIPT_NAME"] = "./cgi-bin/php-cgi";
-	// if (method == "GET" && (it = request.find("QUERY_STRING")) != request.end())
-		// _env["QUERY_STRING"] = request.getField("QUERY_STRING");
+		_env["PATH_TRANSLATED"] = vServ.getStringField("root") + request.getField("Path").substr(0, request.getField("Path").find_first_of('?'));
+	_env["PATH_INFO"] = request.getField("Path").substr(0, request.getField("Path").find_first_of('?'));
+	_env["SCRIPT_NAME"] = loc.getStringField("cgi_pass");
+	std::cout << "Path: ================= " << vServ.getStringField("cgi_pass") << std::endl;
+	if (request.getField("Path").find('?') != std::string::npos)
+	_env["QUERY_STRING"] = request.getField("Path").substr(request.getField("Path").find_first_of('?') + 1);
 	// else
 		// _env["QUERY_STRING"] = "";
 	if (method == "POST")
@@ -53,11 +54,14 @@ void	CgiHandler::initCharEnv()
 	if (!_args)
 		throw("malloc args");
 
+	std::cout << "charenv: ==============================\n" << std::endl;
 	for (it = _env.begin(); it != _env.end(); it++)
 	{
 		_charEnv[i] = strdup((it->first + "=" + it->second).c_str());
+		std::cout << _charEnv[i] << std::endl;
 		i++;
 	}
+	std::cout << "charenv: ==============================\n" << std::endl;
 	_charEnv[i] = NULL;
 	_args[0] = (char *)"./cgi-bin/php-cgi";
 	_args[1] = (char *)_env["Path"].c_str();
@@ -67,23 +71,14 @@ void	CgiHandler::initCharEnv()
 std::string	CgiHandler::execCgi()
 {
 	pid_t		pid;
-	int			saveStdin;
-	int			saveStdout;
 	std::string	response;
-
-	saveStdin = dup(STDIN_FILENO);
-	saveStdout = dup(STDOUT_FILENO);
-	initCharEnv();
-
 	FILE	*fIn = tmpfile();
 	FILE	*fOut = tmpfile();
 	long	fdIn = fileno(fIn);
 	long	fdOut = fileno(fOut);
 	int		ret = 1;
 
-	write(fdIn, _body.c_str(), _body.size());
-	lseek(fdIn, 0, SEEK_SET);
-
+	initCharEnv();
 	pid = fork();
 	if (pid == -1)
 		throw("pid");
@@ -91,42 +86,35 @@ std::string	CgiHandler::execCgi()
 	{
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
-		std::cerr << "Args value: " << _args[0] << " " << _args[1] << std::endl;
-		execve(_args[0], _args, _charEnv);
+		execve(_args[0], NULL, _charEnv);
 		throw("execve");
 	}
 	else
 	{
-		char	buffer[1000000] = {0};
+		char	c;
 
-		waitpid(-1, NULL, 0);
+		waitpid(pid, NULL, 0);
 		lseek(fdOut, 0, SEEK_SET);
 
 		ret = 1;
 		while (ret > 0)
 		{
-			memset(buffer, 0, 1000000);
-			ret = read(fdOut, buffer, 1000000 - 1);
-			response += buffer;
+			ret = read(fdOut, &c, 1);
+			response += c;
 		}
 	}
 
-	dup2(saveStdin, STDIN_FILENO);
-	dup2(saveStdout, STDOUT_FILENO);
 	fclose(fIn);
 	fclose(fOut);
 	close(fdIn);
 	close(fdOut);
-	close(saveStdin);
-	close(saveStdout);
-
-	// for (size_t i = 0; _charEnv[i]; i++)
-	// 	delete[] _charEnv[i];
-	// delete[] _charEnv;
-
 	if (!pid)
 		exit(0);
 
+	std::cout << "Cgi response: \n\n" << std::endl;
+	std::cout << "================================" << std::endl;
+	std::cout << response << std::endl;
+	std::cout << "================================" << std::endl;
 	return (response);
 }
 

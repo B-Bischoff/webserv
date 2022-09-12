@@ -8,6 +8,7 @@ ABlock::ABlock() : _autoIndex(false), _get(false), _post(false), _delete(false)
 	_block["return"].push_back("");
 	_block["location_modifier"].push_back("");
 	_block["location_path"].push_back("");
+	_block["cgi_pass"].push_back("");
 }
 
 ABlock::~ABlock()

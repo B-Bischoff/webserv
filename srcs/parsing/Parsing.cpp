@@ -224,6 +224,7 @@ static void	printServer(std::vector<VirtualServerConfig> &vServ, int size, std::
 			std::cout << "root:\t\t" << vServ[i].loc[j].getStringField("root") << std::endl;
 			std::cout << "return:\t\t";
 			printVector(vServ[i].loc[j].getVectorField("return"));
+			std::cout << "cgi_pass:\t\t" << vServ[i].loc[j].getStringField("cgi_pass") << std::endl;
 			std::cout << std::endl;
 		}
 			std::cout << "-------------------------------------" << std::endl;

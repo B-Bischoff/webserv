@@ -13,6 +13,7 @@ Setter::Setter() : _inLocationBlock(false), _locationBlock(-1)
 	_mapPtr["client_max_body_size"] = &Setter::setMaxBodySize;
 	_mapPtr["return"] = &Setter::setReturn;
 	_mapPtr["autoindex"] = &Setter::setAutoIndex;
+	_mapPtr["cgi_pass"] = &Setter::setCgiPass;
 }
 
 Setter::~Setter()
@@ -52,10 +53,11 @@ unsigned int	Setter::countArgs(std::string line) const
 	}
 	if (((_keyWord == "listen" || _keyWord == "index" || _keyWord == "root"
 		|| _keyWord == "autoindex" || _keyWord == "client_max_body_size"
-		|| _keyWord == "server") && i == 2) ||	((_keyWord == "error_log" 
-		|| _keyWord == "access_log" || _keyWord == "return") && i == 3) ||
-		(_keyWord == "methods" && (i >= 2 && i <= 4)) || (_keyWord == "location"
-		&& (i >= 3 && i <= 4)) || (_keyWord == "server_name" && i >= 2))
+		|| _keyWord == "server" || _keyWord == "cgi_pass") && i == 2) ||
+		((_keyWord == "error_log" || _keyWord == "access_log"
+		|| _keyWord == "return") && i == 3) || (_keyWord == "methods" 
+		&& (i >= 2 && i <= 4)) || (_keyWord == "location" && (i >= 3 && i <= 4)) 
+		|| (_keyWord == "server_name" && i >= 2))
 		return (i);
 	throw(_keyWord + " : " + TOO_MUCH_ARGS);
 }
@@ -66,10 +68,8 @@ void	Setter::setLocation(VirtualServerConfig &vServ)
 	{
 		_streamLine >> _keyWord;
 		vServ.loc[_locationBlock].setStringField(_keyWord, "location_modifier");
-		// vServ.loc[_locationBlock].setLocationModifier(_keyWord);
 	}
 	_streamLine >> _keyWord;
-	// vServ.loc[_locationBlock].setLocationPath(_keyWord);
 	vServ.loc[_locationBlock].setStringField(_keyWord, "location_path");
 }
 
@@ -142,17 +142,11 @@ void	Setter::setLogs(VirtualServerConfig &vServ)
 
 void	Setter::setRootIndex(VirtualServerConfig &vServ)
 {
-	std::fstream	file;
-
 	_streamLine >> _keyWord;
-	// file.open(_keyWord.c_str(), std::ios::out);	//Not sure that needed to check for valid path
-	// if (file.is_open() == false)
-	// 	throw(PATH + _keyWord + "'");
 	if (_streamLine.str().find("index") != std::string::npos)
 		_inLocationBlock == true ? vServ.loc[_locationBlock].setStringField(_keyWord, "index") : vServ.setStringField(_keyWord, "index");
 	else
 		_inLocationBlock == true ? vServ.loc[_locationBlock].setStringField(_keyWord, "root") : vServ.setStringField(_keyWord, "root");
-	// file.close();
 }
 
 void	Setter::setListen(VirtualServerConfig &vServ)
@@ -182,4 +176,15 @@ void	Setter::setServerName(VirtualServerConfig &vServ)
 		newNode.push_back(_keyWord);
 	}
 	vServ.setVectorField(newNode, "server_name");		
+}
+
+void	Setter::setCgiPass(VirtualServerConfig &vServ)
+{
+	std::fstream	file;
+	
+	_streamLine >> _keyWord;
+	file.open(_keyWord.c_str(), std::fstream::in);
+	if (file.is_open() == false)
+		throw(PATH + _keyWord + "'");
+	vServ.loc[_locationBlock].setStringField(_keyWord, "cgi_pass");
 }

@@ -24,6 +24,7 @@ class Setter
 		void			setReturn(VirtualServerConfig &vServ);
 		void			setMaxBodySize(VirtualServerConfig &vServ);
 		void			setLocation(VirtualServerConfig &vServ);
+		void			setCgiPass(VirtualServerConfig &vServ);
 		unsigned int	countArgs(std::string line) const;
 		void			initPrivateValues(std::string &line, bool inLocationBlock, int locationBlock);
 
