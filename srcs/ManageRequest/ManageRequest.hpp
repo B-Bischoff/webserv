@@ -20,11 +20,12 @@ class ManageRequest
 		LocationBlock		&_locationBlock; // Virtual server location block previously choosen (reference)
 		RequestHeader		&_request;// Request header + body
 		
+		bool		isValidMethod(std::string method);
 	public:
 		ManageRequest(VirtualServerConfig &vServCongif, LocationBlock &locationBlock, RequestHeader &request);
 		~ManageRequest();
 		
-		Method	identify(RequestHeader request);
+		Method	identify(RequestHeader &request);
 };
 
 #endif
