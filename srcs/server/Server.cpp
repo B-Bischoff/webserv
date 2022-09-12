@@ -130,6 +130,12 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		header.build_response(dst);
 		if (send(clientFd, header.response_header.c_str(), header.response_header.size(), 0) == -1)
 			perror("send");
+
+		if (request.getField("Connection") == "close")
+		{
+			close(clientFd);
+			FD_CLR(clientFd, &_master);
+		}
 }
 
 int Server::receiveRequestBody(const int& clientFd, std::string& buffer, const RequestHeader& request, const int& maxSize)
