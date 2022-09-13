@@ -120,10 +120,19 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		LocationSelector	select;
 		tmp = select.selectLocationBlock(request.getField("Path"), _servers.at(i).getVirtualServerConfig().loc);
 
-		std::string requestBody;
-		if (receiveRequestBody(clientFd, requestBody, request, _servers.at(i).getVirtualServerConfig().getMaxBodySize()) == -1) // Need to replace '30000' by location server max body size
-			perror("Recv body");
-		std::cout << "RequestBody: " << requestBody << std::endl;
+		// NOTE TO SELF:
+		// MERGE THE TWO BELOW METHODS
+		{
+			// Check fragment request here
+			std::string test;
+			if (request.getField("Transfer-Encoding") == "chunked")
+				receiveChunkedRequest(clientFd, test, request, _servers.at(i).getVirtualServerConfig().getMaxBodySize());
+
+			std::string requestBody;
+			if (receiveRequestBody(clientFd, requestBody, request, _servers.at(i).getVirtualServerConfig().getMaxBodySize()) == -1) // Need to replace '30000' by location server max body size
+				perror("Recv body");
+			std::cout << "RequestBody: " << requestBody << std::endl;
+		}
 
 		ManageRequest manager(_servers.at(i).getVirtualServerConfig(), tmp, request);
 		Method dst = manager.identify(request);
@@ -136,6 +145,40 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 			close(clientFd);
 			FD_CLR(clientFd, &_master);
 		}
+}
+
+int Server::receiveChunkedRequest(const int& clientFd, std::string& buffer, const RequestHeader& request, const int& maxSize)
+{
+	int nbyte;
+	char temp;
+	std::string lengthBuffer;
+
+	(void)request;
+	(void)maxSize;
+
+	// Reading chunk length
+	while (lengthBuffer.find("\r\n") == std::string::npos && nbyte > 0)
+	{
+		nbyte = recv(clientFd, &temp, sizeof(temp), 0);
+		lengthBuffer += temp;
+	}
+	// Check nbyte ?
+
+	// Converting chunk length from hexa to decimal
+	int chunkLength;
+	std::stringstream ss(lengthBuffer);
+	ss >> std::hex >> chunkLength;
+	std::cout << "Chunk length " << chunkLength << std::endl;
+
+	while (recv(clientFd, &temp, sizeof(temp), 0))
+	{
+		buffer += temp;
+		if (buffer.find("\r\n\r\n")!=std::string::npos)
+			break;
+	}
+	std::cout << "ENCODED REQUEST: " << buffer << std::endl;
+
+	return nbyte;
 }
 
 int Server::receiveRequestBody(const int& clientFd, std::string& buffer, const RequestHeader& request, const int& maxSize)
