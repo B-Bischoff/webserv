@@ -14,7 +14,8 @@ VPATH = ./: \
 		srcs/Status/: \
 		srcs/parsing/: \
 		srcs/server/select/: \
-		srcs/server/config/: 
+		srcs/server/config/:  \
+		srcs/socket/:
 
 		
 
@@ -36,7 +37,8 @@ SRCS = 	webserv.cpp \
 		Setter.cpp \
 		ABlock.cpp \
 		LocationSelector.cpp \
-		Autoindex.cpp
+		Autoindex.cpp \
+		SocketCommunicator.cpp
 		#CgiHandler.cpp \
 
 OBJS = $(addprefix .objects/, $(SRCS:.cpp=.o))
@@ -58,7 +60,8 @@ INCLUDES =	webserv.hpp \
 			Setter.hpp \
 			ABlock.hpp \
 			LocationSelector.hpp \
-			Autoindex.hpp
+			Autoindex.hpp \
+			SocketCommunicator.hpp
 			#CgiHandler.hpp \	
 			
 

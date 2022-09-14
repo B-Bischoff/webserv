@@ -74,7 +74,8 @@ void Server::listenClient(const int& clientFd)
 	std::cout << "client " << clientFd << " wants to communicate" << std::endl;
 
 	std::string buf;
-	int receiveReturn = receiveRequestHeader(clientFd, buf);
+	//int receiveReturn = receiveRequestHeader(clientFd, buf);
+	int receiveReturn = SocketCommunicator::receiveRequestHeader(clientFd, buf);
 	std::cout << "Request Header: " << buf << std::endl;
 
 	if (receiveReturn <= 0) // Client disconnected or recv error
@@ -91,21 +92,6 @@ void Server::listenClient(const int& clientFd)
 		processClientRequest(clientFd, buf);
 }
 
-int Server::receiveRequestHeader(const int& clientFd, std::string& buffer)
-{
-	int nbytes = 1;
-	char temp;
-
-	while (nbytes > 0 && buffer.find("\r\n\r\n") == std::string::npos)
-	{
-		nbytes = recv(clientFd, &temp, sizeof(temp), 0);
-		if (nbytes > 0)
-			buffer += temp;
-	}
-
-	return nbytes;
-}
-
 void Server::processClientRequest(const int& clientFd, std::string& buffer)
 {
 		RequestHeader	request;
@@ -120,19 +106,14 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		LocationSelector	select;
 		tmp = select.selectLocationBlock(request.getField("Path"), _servers.at(i).getVirtualServerConfig().loc);
 
-		// NOTE TO SELF:
-		// MERGE THE TWO BELOW METHODS
-		{
-			// Check fragment request here
-			std::string test;
-			if (request.getField("Transfer-Encoding") == "chunked")
-				receiveChunkedRequest(clientFd, test, request, _servers.at(i).getVirtualServerConfig().getMaxBodySize());
 
-			std::string requestBody;
-			if (receiveRequestBody(clientFd, requestBody, request, _servers.at(i).getVirtualServerConfig().getMaxBodySize()) == -1) // Need to replace '30000' by location server max body size
-				perror("Recv body");
-			std::cout << "RequestBody: " << requestBody << std::endl;
+		std::string requestBody;
+		if (SocketCommunicator::receiveRequestBody(clientFd, requestBody, request, _servers.at(i).getVirtualServerConfig().getMaxBodySize()) == -1)
+		{
+			std::cout << "[ERROR]SOCKET_COMMUNICATOR" << std::endl;
+			perror("Recv body");
 		}
+		std::cout << "RequestBody: " << requestBody << std::endl;
 
 		ManageRequest manager(_servers.at(i).getVirtualServerConfig(), tmp, request);
 		Method dst = manager.identify(request);
@@ -145,62 +126,6 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 			close(clientFd);
 			FD_CLR(clientFd, &_master);
 		}
-}
-
-int Server::receiveChunkedRequest(const int& clientFd, std::string& buffer, const RequestHeader& request, const int& maxSize)
-{
-	int nbyte;
-	char temp;
-	std::string lengthBuffer;
-
-	(void)request;
-	(void)maxSize;
-
-	// Reading chunk length
-	while (lengthBuffer.find("\r\n") == std::string::npos && nbyte > 0)
-	{
-		nbyte = recv(clientFd, &temp, sizeof(temp), 0);
-		lengthBuffer += temp;
-	}
-	// Check nbyte ?
-
-	// Converting chunk length from hexa to decimal
-	int chunkLength;
-	std::stringstream ss(lengthBuffer);
-	ss >> std::hex >> chunkLength;
-	std::cout << "Chunk length " << chunkLength << std::endl;
-
-	while (recv(clientFd, &temp, sizeof(temp), 0))
-	{
-		buffer += temp;
-		if (buffer.find("\r\n\r\n")!=std::string::npos)
-			break;
-	}
-	std::cout << "ENCODED REQUEST: " << buffer << std::endl;
-
-	return nbyte;
-}
-
-int Server::receiveRequestBody(const int& clientFd, std::string& buffer, const RequestHeader& request, const int& maxSize)
-{
-	char temp;
-	int nbytes = 1;
-	int bytesToRead = atoi(request.getField("Content-Length").c_str());
-
-	if (request.getField("Content-Length").empty() == true) // No body to read
-		return 0;
-	if (bytesToRead > maxSize) // Need to return a specific error code
-		return 0; // Change this by "throw [ERROR_CODE]"
-
-	while (bytesToRead > 0 && nbytes > 0)
-	{
-		nbytes = recv(clientFd, &temp, sizeof(temp), 0);
-		if (nbytes > 0)
-			buffer += temp;
-		bytesToRead -= 1;
-	}
-
-	return nbytes;
 }
 
 bool Server::isAVirtualServer(const int& fd) const
