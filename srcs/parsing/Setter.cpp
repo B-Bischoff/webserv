@@ -84,16 +84,16 @@ void	Setter::setMaxBodySize(VirtualServerConfig &vServ)
 
 void	Setter::setReturn(VirtualServerConfig &vServ)
 {
-	std::vector<std::string>	node;
+	// std::vector<std::string>	node;
 	
 	_streamLine >> _keyWord;
-	if (_keyWord.compare("302") != 0 && _keyWord.compare("301") != 0)
-		throw(WRONG_STATUS + _keyWord + "'");
-	node.push_back(_keyWord);
+	// if (_keyWord.compare("302") != 0 && _keyWord.compare("301") != 0)
+		// throw(WRONG_STATUS + _keyWord + "'");
+	// node.push_back(_keyWord);
 	_streamLine >> _keyWord;
-	node.push_back(_keyWord);
+	// node.push_back(_keyWord);
 	// _inLocationBlock == true ? vServ.loc[_locationBlock].setReturn(node) : vServ.setReturn(node);
-	_inLocationBlock == true ? vServ.loc[_locationBlock].setVectorField(node, "return") : vServ.setVectorField(node, "return");
+	_inLocationBlock == true ? vServ.loc[_locationBlock].setStringField(_keyWord, "return") : vServ.setStringField(_keyWord, "return");
 }
 
 void	Setter::setMethod(VirtualServerConfig &vServ)

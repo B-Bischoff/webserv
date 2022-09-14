@@ -135,14 +135,23 @@ std::string	ResponseHeader::get_extension_file(std::string path)
 		return (dst = "video/3gpp2");
 	else if (path.find(".7z\0", 0) != path.npos)
 		return (dst = "application/x-7z-compressed");
+	else if (path.find(".cpp\0", 0) != path.npos)
+		return (dst = "text/x-c");
 	return (dst = "plain/text");
 }
 
 void	ResponseHeader::build_response(Method &method)
 {
-	std::ostringstream convert;
+	std::ostringstream	convert;
+	std::string			ext;
+	if (method.getAutoindex() == true || method.getRedirect() == true)
+		ext = get_extension_file(".html");
+	else
+		ext = get_extension_file(method.getPath());
 	convert << method.getSize();
 
-	response_header = protocol + method.getStatus() + "\n" + content_type + get_extension_file(method.getPath()) + "\n" 
-	+ content_length + convert.str() + "\n\n" + method.getBody();
+	response_header = protocol + method.getStatus() + "\r\n" + content_type + ext + "\r\n";
+	if (method.getRedirect() == true) 
+		response_header += "Location: " + method.getRedirectPath() + "\r\n";
+	response_header += content_length + convert.str() + "\r\n\r\n" + method.getBody();
 }

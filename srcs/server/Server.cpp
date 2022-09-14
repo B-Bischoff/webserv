@@ -27,10 +27,6 @@ void Server::addFd(const int &fd, fd_set& set)
 
 void Server::serverLoop()
 {
-	RequestHeader	req;
-	Get				get;
-	Method			dst;
-	
     while(1)
     {
 		std::cout << std::endl << "+++++++ Waiting for new connection ++++++++" << std::endl << std::endl;

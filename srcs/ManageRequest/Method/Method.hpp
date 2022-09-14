@@ -15,10 +15,12 @@
 #include <signal.h>
 #include "RequestHeader.hpp"
 
-#define STATUS_404 "404 Not Found"
-#define STATUS_204 "204 No Content"
 #define	STATUS_200 "200 OK"
-#define STATUS_500 "Internal Server Error"
+#define STATUS_204 "204 No Content"
+#define	STATUS_301 "301 Moved Permanently"
+#define STATUS_404 "404 Not Found"
+#define STATUS_405 "405 Method Not Allowed"
+#define STATUS_500 "500 Internal Server Error"
 
 class Method
 {
@@ -29,6 +31,9 @@ class Method
 		std::string	_body;
 		std::string _path;
 		std::string _status;
+		std::string	_redirectPath;
+		bool		_isAutoindex;
+		bool		_redirect;
 
 	public:
 		Method();
@@ -39,6 +44,9 @@ class Method
 		std::string	getBody() const;
 		std::string	getPath() const;
 		std::string	getStatus() const;
+		std::string	getRedirectPath() const;
+		bool		getAutoindex() const;
+		bool		getRedirect() const;
 };
 
 #endif

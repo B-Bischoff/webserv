@@ -17,10 +17,6 @@
 #include "fcntl.h"
 #include "webserv.hpp"
 #include "RequestHeader.hpp"
-#include "Method.hpp"
-#include "Get.hpp"
-#include "Post.hpp"
-#include "Delete.hpp"
 #include "ManageRequest.hpp"
 #include "VirtualServer.hpp"
 #include "VirtualServerSelector.hpp"
@@ -29,6 +25,7 @@
 #include "ResponseHeader.hpp"
 #include "Parsing.hpp"
 #include "LocationSelector.hpp"
+#include "Autoindex.hpp"
 
 class Server {
 private:

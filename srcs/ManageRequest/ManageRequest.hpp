@@ -19,13 +19,22 @@ class ManageRequest
 		VirtualServerConfig	&_vServConfig; // Virtual server (reference)
 		LocationBlock		&_locationBlock; // Virtual server location block previously choosen (reference)
 		RequestHeader		&_request;// Request header + body
+		std::string			_newPath;
+		bool				_autoindex;
+		bool				_redirect;
 		
-		bool		isValidMethod(std::string method);
+		void		initRequest(std::string &method, RequestHeader &request);
+		bool		isValidMethod(std::string &method);
+		void		getRootPath(RequestHeader &request);
+		void		isDirectoryPath();
 	public:
 		ManageRequest(VirtualServerConfig &vServCongif, LocationBlock &locationBlock, RequestHeader &request);
 		~ManageRequest();
 		
-		Method	identify(RequestHeader &request);
+		Method				identify(RequestHeader &request);
+		bool			getAutoindex(void) const;
+		bool			getRedirect(void) const;
+		const	std::string	&getNewPath() const;
 };
 
 #endif

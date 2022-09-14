@@ -14,7 +14,7 @@ class CgiHandler
 		void	initCharEnv();
 
 	public:
-		CgiHandler(RequestHeader &request, VirtualServerConfig &vServ, LocationBlock &loc, std::string &method);
+		CgiHandler(RequestHeader &request, VirtualServerConfig &vServ, LocationBlock &loc, std::string &method, std::string &path);
 		~CgiHandler();
 
 		std::string	execCgi();
