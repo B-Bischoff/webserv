@@ -29,6 +29,7 @@
 #include "ResponseHeader.hpp"
 #include "Parsing.hpp"
 #include "LocationSelector.hpp"
+#include "SocketCommunicator.hpp"
 
 class Server {
 private:
@@ -50,8 +51,10 @@ private:
 
 	int receiveRequestHeader(const int& cliendFd, std::string& buffer);
 	int receiveRequestBody(const int& clientFd, std::string& buffer, const RequestHeader& request, const int& maxSize);
+	int receiveChunkedRequest(const int& clientFd, std::string& buffer, const RequestHeader& request, const int& maxSize);
 	bool isAVirtualServer(const int& fd) const;
 	void addFd(const int& fd, fd_set& set);
+	void removeFd(const int& fd, fd_set& set);
 
 public:
 	Server(const std::vector<VirtualServerConfig>& configList);
