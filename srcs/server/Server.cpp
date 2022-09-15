@@ -25,6 +25,12 @@ void Server::addFd(const int &fd, fd_set& set)
 		_fdmax = fd;
 }
 
+void Server::removeFd(const int &fd, fd_set& set)
+{
+	FD_CLR(fd, &set);
+	close(fd);
+}
+
 void Server::serverLoop()
 {
 	RequestHeader	req;
@@ -74,7 +80,6 @@ void Server::listenClient(const int& clientFd)
 	std::cout << "client " << clientFd << " wants to communicate" << std::endl;
 
 	std::string buf;
-	//int receiveReturn = receiveRequestHeader(clientFd, buf);
 	int receiveReturn = SocketCommunicator::receiveRequestHeader(clientFd, buf);
 	std::cout << "Request Header: " << buf << std::endl;
 
@@ -85,8 +90,7 @@ void Server::listenClient(const int& clientFd)
 		else
 			perror("recv");
 		std::cout << "Socket: " << clientFd << " quit" << std::endl;
-		close(clientFd);
-		FD_CLR(clientFd, &_master);
+		removeFd(clientFd, _master);
 	}
 	else
 		processClientRequest(clientFd, buf);
@@ -110,10 +114,10 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		std::string requestBody;
 		if (SocketCommunicator::receiveRequestBody(clientFd, requestBody, request, _servers.at(i).getVirtualServerConfig().getMaxBodySize()) == -1)
 		{
-			std::cout << "[ERROR]SOCKET_COMMUNICATOR" << std::endl;
-			perror("Recv body");
+			removeFd(clientFd, _master);
+			return;
 		}
-		std::cout << "RequestBody: " << requestBody << std::endl;
+		//std::cout << "=========== RequestBody: ===========" << std::endl << requestBody << std::endl << "============================" << std::endl;
 
 		ManageRequest manager(_servers.at(i).getVirtualServerConfig(), tmp, request);
 		Method dst = manager.identify(request);

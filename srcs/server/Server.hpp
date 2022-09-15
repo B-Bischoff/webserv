@@ -54,6 +54,7 @@ private:
 	int receiveChunkedRequest(const int& clientFd, std::string& buffer, const RequestHeader& request, const int& maxSize);
 	bool isAVirtualServer(const int& fd) const;
 	void addFd(const int& fd, fd_set& set);
+	void removeFd(const int& fd, fd_set& set);
 
 public:
 	Server(const std::vector<VirtualServerConfig>& configList);

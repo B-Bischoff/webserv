@@ -33,7 +33,7 @@ int SocketCommunicator::receiveChunkedRequestBody(const int& socket, std::string
 		chunkLength = receiveChunkLength(socket);
 		if (chunkLength == -1)
 			return -1; // Error occured
-
+			
 		std::cout << "chunkLength: " << chunkLength << std::endl;
 
 		char line[chunkLength + 2]; // "+ 2" stands for "\r\n" at the end
@@ -53,6 +53,7 @@ int SocketCommunicator::receiveChunkedRequestBody(const int& socket, std::string
 			return -1; // Throw specific error code
 
 		totalBytesRead += bytesRead;
+		buffer.erase(buffer.length() - 1);
 	}
 
 	return 0;
@@ -89,7 +90,6 @@ int SocketCommunicator::convertHexaNumberInStrToInt(std::string& str)
 
 int SocketCommunicator::receiveStandardRequestBody(const int& socket, std::string& buffer, const RequestHeader& header, const int& maxSize)
 {
-	std::cout << "===== IN " << std::endl;
 	int bytesToRead = atoi(header.getField("Content-Length").c_str());
 	if (bytesToRead <= 0)
 		return 0;
@@ -106,7 +106,6 @@ int SocketCommunicator::receiveStandardRequestBody(const int& socket, std::strin
 			buffer += temp;
 		bytesToRead -= 1;
 	}
-	std::cout << "===== OUT " << std::endl;
 	
 	return bytesToRead;
 }
