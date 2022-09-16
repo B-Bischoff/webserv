@@ -110,14 +110,13 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		LocationSelector	select;
 		tmp = select.selectLocationBlock(request.getField("Path"), _servers.at(i).getVirtualServerConfig().loc);
 
-
 		std::string requestBody;
 		if (SocketCommunicator::receiveRequestBody(clientFd, requestBody, request, _servers.at(i).getVirtualServerConfig().getMaxBodySize()) == -1)
 		{
 			removeFd(clientFd, _master);
 			return;
 		}
-		//std::cout << "=========== RequestBody: ===========" << std::endl << requestBody << std::endl << "============================" << std::endl;
+		// std::cout << "Request body: " << requestBody << std::endl;
 
 		ManageRequest manager(_servers.at(i).getVirtualServerConfig(), tmp, request);
 		Method dst = manager.identify(request);
