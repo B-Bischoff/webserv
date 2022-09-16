@@ -33,28 +33,27 @@ int SocketCommunicator::receiveChunkedRequestBody(const int& socket, std::string
 		chunkLength = receiveChunkLength(socket);
 		if (chunkLength == -1)
 			return -1; // Error occured
-			
-		std::cout << "chunkLength: " << chunkLength << std::endl;
-
-		char line[chunkLength + 2]; // "+ 2" stands for "\r\n" at the end
 
 		int nbytes = 1;
 		int bytesRead = 0;
-		while (nbytes > 0 && bytesRead < chunkLength)
+		char temp;
+		while (nbytes > 0 && bytesRead < chunkLength + 2) // "+2" is to also read "\r\n" (end of chunk indicator)
 		{
-			nbytes = recv(socket, &line, chunkLength + 2, 0);
-
-			buffer += line;
-			bytesRead += nbytes;
+			nbytes = recv(socket, &temp, 1, 0);
+			if (nbytes > 0)
+			{
+				buffer += temp;
+				bytesRead += nbytes;
+				totalBytesRead += nbytes;
+			}
 		}
 		if (nbytes == -1)
 			return nbytes; // Error occured
-		if (bytesRead > maxSize)
-			return -1; // Throw specific error code
-
-		totalBytesRead += bytesRead;
-		buffer.erase(buffer.length() - 1);
+		buffer.erase(buffer.length() - 2, 2); // Remove "\r\n" (end of chunk indicator)
 	}
+
+	if (totalBytesRead > maxSize)
+		return -1; // Throw specific exception instead of -1
 
 	return 0;
 }
@@ -71,7 +70,6 @@ int SocketCommunicator::receiveChunkLength(const int& socket)
 		if (nbytes > 0)
 			buffer += temp;
 	}
-
 	if (nbytes == -1) // Error occured in recv
 		return nbytes;
 	else
