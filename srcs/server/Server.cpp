@@ -41,8 +41,9 @@ void Server::serverLoop()
     {
 		std::cout << std::endl << "+++++++ Waiting for new connection ++++++++" << std::endl << std::endl;
 
-		_readFds = _master;
-		if (select(_fdmax + 1, &_readFds, NULL, NULL, NULL) == -1)
+		fd_set readFds = _master;
+		fd_set writeFds = createWriteFdSet();
+		if (select(_fdmax + 1, &readFds, &writeFds, NULL, NULL) == -1)
 		{
 			perror("Select");
 			exit(EXIT_FAILURE);
@@ -50,15 +51,34 @@ void Server::serverLoop()
 
 		for (int i = 0; i <= _fdmax; i++)
 		{
-			if (FD_ISSET(i, &_readFds)) // Socket ready to communicate
+			if (FD_ISSET(i, &readFds)) // Socket ready to communicate
 			{
 				if (isAVirtualServer(i)) // Incoming connection from new client
 					acceptConnection(i);
 				else // Client wants to communicate
 					listenClient(i);
 			}
+			if (FD_ISSET(i, &writeFds))
+			{
+				ResponseHeader response = _clientsReponse[i];
+				if (send(i, response.response_header.c_str(), response.response_header.size(), 0) == -1)
+					perror("send");
+				_clientsReponse.erase(i);
+			}
 		}
 	}
+}
+
+fd_set Server::createWriteFdSet() const
+{
+	fd_set writeFds;
+	FD_ZERO(&writeFds);
+
+	std::map<int, ResponseHeader>::const_iterator it;
+	for (it = _clientsReponse.begin(); it != _clientsReponse.end(); it++)
+		FD_SET(it->first, &writeFds);
+
+	return writeFds;
 }
 
 void Server::acceptConnection(const int& serverSocket)
@@ -116,19 +136,21 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 			removeFd(clientFd, _master);
 			return;
 		}
-		// std::cout << "Request body: " << requestBody << std::endl;
+		std::cout << "Request body: " << requestBody << std::endl;
 
 		ManageRequest manager(_servers.at(i).getVirtualServerConfig(), tmp, request);
 		Method dst = manager.identify(request);
 		header.build_response(dst);
-		if (send(clientFd, header.response_header.c_str(), header.response_header.size(), 0) == -1)
-			perror("send");
+		_clientsReponse[clientFd] = header;
+		//if (send(clientFd, header.response_header.c_str(), header.response_header.size(), 0) == -1)
+		//	perror("send");
 
+/*
 		if (request.getField("Connection") == "close")
 		{
 			close(clientFd);
 			FD_CLR(clientFd, &_master);
-		}
+		}*/
 }
 
 bool Server::isAVirtualServer(const int& fd) const
