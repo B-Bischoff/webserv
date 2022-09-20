@@ -2,10 +2,7 @@
 
 VirtualServerConfig::VirtualServerConfig() : _client_max_body_size(1000000)
 {
-	_block["server_name"].push_back("default");
-	_block["access_log"].push_back("");
-	_block["error_log"].push_back("");
-	_block["ip"].push_back("0.0.0.0");
+
 }
 
 VirtualServerConfig::~VirtualServerConfig()
@@ -31,4 +28,9 @@ void	VirtualServerConfig::setMaxBodySize(unsigned int size)
 unsigned int	VirtualServerConfig::getMaxBodySize(void) const
 {
 	return (_client_max_body_size);
+}
+
+void	VirtualServerConfig::setErrorStatus(std::vector<int> values)
+{
+	_errorStatus = values;
 }

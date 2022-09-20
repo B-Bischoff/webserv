@@ -12,6 +12,12 @@ ABlock::ABlock() : _port(8080)
 	_block["location_modifier"].push_back("");
 	_block["location_path"].push_back("");
 	_block["cgi_pass"].push_back("");
+	_block["server_name"].push_back("default");
+	_block["access_log"].push_back("");
+	_block["error_log"].push_back("");
+	_block["ip"].push_back("0.0.0.0");
+	_block["error_path"].push_back("");
+	_block["upload"].push_back("");
 }
 
 ABlock::~ABlock()

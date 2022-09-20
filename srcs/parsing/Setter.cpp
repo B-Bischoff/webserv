@@ -14,6 +14,8 @@ Setter::Setter() : _inLocationBlock(false), _locationBlock(-1)
 	_mapPtr["return"] = &Setter::setReturn;
 	_mapPtr["autoindex"] = &Setter::setAutoIndex;
 	_mapPtr["cgi_pass"] = &Setter::setCgiPass;
+	_mapPtr["error_page"] = &Setter::setErrorPage;
+	_mapPtr["upload"] = &Setter::setUploadPath;
 }
 
 Setter::~Setter()
@@ -52,12 +54,13 @@ unsigned int	Setter::countArgs(std::string line) const
 		i++;
 	}
 	if (((_keyWord == "listen" || _keyWord == "index" || _keyWord == "root"
-		|| _keyWord == "autoindex" || _keyWord == "client_max_body_size"
-		|| _keyWord == "server" || _keyWord == "cgi_pass") && i == 2) ||
-		((_keyWord == "error_log" || _keyWord == "access_log"
-		|| _keyWord == "return") && i == 3) || (_keyWord == "methods" 
-		&& (i >= 2 && i <= 4)) || (_keyWord == "location" && (i >= 3 && i <= 4)) 
-		|| (_keyWord == "server_name" && i >= 2))
+		|| _keyWord == "autoindex" ||  _keyWord == "upload" || 
+		_keyWord == "client_max_body_size" || _keyWord == "server" 
+		|| _keyWord == "cgi_pass") && i == 2) || ((_keyWord == "error_log" 
+		|| _keyWord == "access_log" || _keyWord == "return") && i == 3) 
+		|| (_keyWord == "methods" && (i >= 2 && i <= 4)) 
+		|| (_keyWord == "location" && (i >= 3 && i <= 4)) 
+		|| (_keyWord == "server_name" && i >= 2) || _keyWord == "error_page")
 		return (i);
 	throw(_keyWord + " : " + TOO_MUCH_ARGS);
 }
@@ -84,15 +87,8 @@ void	Setter::setMaxBodySize(VirtualServerConfig &vServ)
 
 void	Setter::setReturn(VirtualServerConfig &vServ)
 {
-	// std::vector<std::string>	node;
-	
 	_streamLine >> _keyWord;
-	// if (_keyWord.compare("302") != 0 && _keyWord.compare("301") != 0)
-		// throw(WRONG_STATUS + _keyWord + "'");
-	// node.push_back(_keyWord);
 	_streamLine >> _keyWord;
-	// node.push_back(_keyWord);
-	// _inLocationBlock == true ? vServ.loc[_locationBlock].setReturn(node) : vServ.setReturn(node);
 	_inLocationBlock == true ? vServ.loc[_locationBlock].setStringField(_keyWord, "return") : vServ.setStringField(_keyWord, "return");
 }
 
@@ -187,4 +183,28 @@ void	Setter::setCgiPass(VirtualServerConfig &vServ)
 	if (file.is_open() == false)
 		throw(PATH + _keyWord + "'");
 	vServ.loc[_locationBlock].setStringField(_keyWord, "cgi_pass");
+}
+
+void	Setter::setErrorPage(VirtualServerConfig &vServ)
+{
+	std::vector<int> tmp;
+
+	_streamLine >> _keyWord;
+	vServ.setStringField(_keyWord, "error_path");
+	while (_streamLine.eof() == false)
+	{
+		_streamLine >> _keyWord;
+		tmp.push_back(atoi(_keyWord.c_str()));
+	}
+	vServ.setErrorStatus(tmp);
+}
+
+void	Setter::setUploadPath(VirtualServerConfig &vServ)
+{
+	struct stat info;
+	_streamLine >> _keyWord;
+	std::cout << _keyWord << std::endl;
+	if (stat(_keyWord.c_str(), &info) != 0 )
+		throw(DIRECTORY + _keyWord + "'");
+	vServ.setStringField(_keyWord, "upload");
 }

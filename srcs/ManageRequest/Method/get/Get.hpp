@@ -1,22 +1,23 @@
 #ifndef GET_HPP
 # define GET_HPP
 
-#include "Server.hpp"
+#include "Method.hpp"
 #include "Autoindex.hpp"
-#include "ManageRequest.hpp"
 
-class ManageRequest;
+class RequestConfig;
+
 class Get : public Method
 {
 	private:
-		void	buildAutoindex();
-		void	buildRedirect();
-		void	readFile(RequestHeader &request);
+
+		void	autoindex(const std::string &rootPath);
+		void	redirect(const std::string &redirectUrl);
 		
 	public:
-		Get(ManageRequest &manageRequest, const std::string &redirectPath, RequestHeader &request);
 		~Get();
-		Get();
+
+		Get(RequestConfig &requestConfig);
+		void	readFile(RequestHeader &request);
 
 };
 

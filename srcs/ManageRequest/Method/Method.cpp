@@ -2,9 +2,6 @@
 
 Method::Method(RequestHeader request)
 {
-	_isAutoindex = false;
-	_redirect = false;
-	_redirectPath = "";
 	(void)request;
 }
 
@@ -38,17 +35,7 @@ std::string	Method::getStatus() const
 	return (this->_status);
 }
 
-bool	Method::getAutoindex() const
+RequestConfig	&Method::getConf()
 {
-	return (this->_isAutoindex);
-}
-
-bool	Method::getRedirect() const
-{
-	return (this->_redirect);
-}
-
-std::string	Method::getRedirectPath() const
-{
-	return (this->_redirectPath);
+	return (this->_requestConfig);
 }

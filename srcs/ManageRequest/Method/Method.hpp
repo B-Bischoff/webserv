@@ -13,6 +13,8 @@
 #include <fstream>
 #include <string>
 #include <signal.h>
+
+#include "RequestConfig.hpp"
 #include "RequestHeader.hpp"
 
 #define	STATUS_200 "200 OK"
@@ -27,13 +29,11 @@ class Method
 	private:
 	
 	protected:
-		int			_size;
-		std::string	_body;
-		std::string _path;
-		std::string _status;
-		std::string	_redirectPath;
-		bool		_isAutoindex;
-		bool		_redirect;
+		int				_size;
+		std::string		_body;
+		std::string 	_path;
+		std::string 	_status;
+		RequestConfig	_requestConfig;
 
 	public:
 		Method();
@@ -44,9 +44,8 @@ class Method
 		std::string	getBody() const;
 		std::string	getPath() const;
 		std::string	getStatus() const;
-		std::string	getRedirectPath() const;
-		bool		getAutoindex() const;
-		bool		getRedirect() const;
+		RequestConfig	&getConf();
+
 };
 
 #endif

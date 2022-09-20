@@ -13,7 +13,6 @@
 #include <signal.h>
 #include "Method.hpp"
 
-
 class ErrorStatus : public Method
 {
 	private:
