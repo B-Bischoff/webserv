@@ -105,7 +105,7 @@ int SocketCommunicator::receiveStandardRequestBody(const int& socket, std::strin
 		bytesToRead -= 1;
 	}
 	
-	return bytesToRead;
+	return nbytes;
 }
 
 bool SocketCommunicator::isChunkedRequest(const RequestHeader& header)

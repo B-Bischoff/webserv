@@ -41,6 +41,8 @@ void Server::serverLoop()
     {
 		std::cout << std::endl << "+++++++ Waiting for new connection ++++++++" << std::endl << std::endl;
 
+		std::cout << "Response ready: " << _clientsReponse.size() << std::endl;
+
 		fd_set readFds = _master;
 		fd_set writeFds = createWriteFdSet();
 		if (select(_fdmax + 1, &readFds, &writeFds, NULL, NULL) == -1)
@@ -60,10 +62,13 @@ void Server::serverLoop()
 			}
 			if (FD_ISSET(i, &writeFds))
 			{
-				ResponseHeader response = _clientsReponse[i];
+				std::cout << "Client " << i << " ready to receive response" << std::endl;
+				const ResponseHeader& response = _clientsReponse[i];
 				if (send(i, response.response_header.c_str(), response.response_header.size(), 0) == -1)
 					perror("send");
 				_clientsReponse.erase(i);
+				if (response.closeAfterSend == true)
+					removeFd(i, _master);
 			}
 		}
 	}
@@ -133,6 +138,7 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		std::string requestBody;
 		if (SocketCommunicator::receiveRequestBody(clientFd, requestBody, request, _servers.at(i).getVirtualServerConfig().getMaxBodySize()) == -1)
 		{
+			std::cout << "Recv (request body) error" << std::endl;
 			removeFd(clientFd, _master);
 			return;
 		}
@@ -141,12 +147,16 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		ManageRequest manager(_servers.at(i).getVirtualServerConfig(), tmp, request);
 		Method dst = manager.identify(request);
 		header.build_response(dst);
+
+		if (request.getField("Connection") == "close")
+			header.closeAfterSend = true;
+
 		_clientsReponse[clientFd] = header;
+
 		//if (send(clientFd, header.response_header.c_str(), header.response_header.size(), 0) == -1)
 		//	perror("send");
 
 /*
-		if (request.getField("Connection") == "close")
 		{
 			close(clientFd);
 			FD_CLR(clientFd, &_master);

@@ -18,6 +18,7 @@ VirtualServer::VirtualServer(const VirtualServerConfig& config)
 // ---------------------------------------------------
 void VirtualServer::init()
 {
+	memset(&_addrlen, 0, sizeof(_addrlen));
 	_addrlen = sizeof(_address); // IPV4
 
 	_address.sin_family = AF_INET;
@@ -42,7 +43,7 @@ void VirtualServer::init()
 
 	if (bind(_serverSocket, (struct sockaddr *)&_address, sizeof(_address)) < 0)
 		perror("In bind");
-	if (listen(_serverSocket, 10) < 0)
+	if (listen(_serverSocket, 50) < 0)
 	{
 		perror("In listen");
 		exit(EXIT_FAILURE);

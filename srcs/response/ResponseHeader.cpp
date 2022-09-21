@@ -1,7 +1,7 @@
 #include "ResponseHeader.hpp"
 
 ResponseHeader::ResponseHeader() : protocol("HTTP/1.1 "), 
-	content_type("Content-Type: "), content_length("Content-Length: ") {}
+	content_type("Content-Type: "), content_length("Content-Length: "), closeAfterSend(false) {}
 
 ResponseHeader::~ResponseHeader() {}
 
