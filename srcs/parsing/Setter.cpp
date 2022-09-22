@@ -201,10 +201,10 @@ void	Setter::setErrorPage(VirtualServerConfig &vServ)
 
 void	Setter::setUploadPath(VirtualServerConfig &vServ)
 {
+	std::cout << _streamLine.str() << std::endl;
 	struct stat info;
 	_streamLine >> _keyWord;
-	std::cout << _keyWord << std::endl;
 	if (stat(_keyWord.c_str(), &info) != 0 )
 		throw(DIRECTORY + _keyWord + "'");
-	vServ.setStringField(_keyWord, "upload");
+	vServ.loc[_locationBlock].setStringField(_keyWord, "upload");
 }

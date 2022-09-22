@@ -1,12 +1,15 @@
 #ifndef AUTOINDEX_HPP
 # define AUTOINDEX_HPP
 
-#include "webserv.hpp"
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <iomanip>
 #include <time.h> 
+#include <vector>
+#include <string>
+#include <sstream>
+#include "Method.hpp"
 
 class Autoindex
 {

@@ -114,7 +114,7 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		}
 		// std::cout << "Request body: " << requestBody << std::endl;
 
-		ManageRequest manager(_servers.at(i).getVirtualServerConfig(), tmp, request);
+		ManageRequest manager(_servers.at(i).getVirtualServerConfig(), tmp, request, requestBody);
 		Method dst = manager.identify(request);
 		header.build_response(dst);
 		if (send(clientFd, header.response_header.c_str(), header.response_header.size(), 0) == -1)

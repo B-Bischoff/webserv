@@ -1,7 +1,7 @@
 #include "ManageRequest.hpp"
 
-ManageRequest::ManageRequest(VirtualServerConfig &vServCongif, LocationBlock &locationBlock, RequestHeader &request) :
-	_vServConfig(vServCongif), _locationBlock(locationBlock), _request(request)
+ManageRequest::ManageRequest(VirtualServerConfig &vServCongif, LocationBlock &locationBlock, RequestHeader &request, std::string &body) :
+	_vServConfig(vServCongif), _locationBlock(locationBlock), _request(request), _body(body)
 {
 	(void)_vServConfig;
 	(void)_locationBlock;
@@ -25,17 +25,37 @@ ManageRequest::~ManageRequest()
 
 Method ManageRequest::identify(RequestHeader &request)
 {
-	Method empty;
-	std::string	method(request.getField("Method"));
+	Method index;
 	RequestConfig requestConfig(_locationBlock, _vServConfig, request);
+	std::string	body;
 
 	try
 	{
-		if (method == "GET")
+		if (requestConfig.getValidMethod() == false)
+			throw(STATUS_405);
+		else if (requestConfig.getRedirect() == true)
+			return (index.redirect(requestConfig.getRedirectPath()));
+		else if (requestConfig.getAutoindex() == true)
+			return (index.autoindex(requestConfig.getRootPath()));
+		else if (requestConfig.getCgi() == true)
 		{
-			Get	get(requestConfig.getRequestConfig());
-			get.readFile(request);
-			return (get);
+			CgiHandler cgi(request, _vServConfig, _locationBlock, requestConfig.getMethod(), requestConfig.getRootPath(), _body);
+			body = cgi.execCgi();
+		}
+		if (requestConfig.getMethod() == "GET")
+		{
+			Get	get;
+			return (get.exec(requestConfig, body));
+		}
+		else if (requestConfig.getMethod() == "POST")
+		{
+			Post post;
+			return (post.exec(requestConfig, _body, atoi(request.getField("Content-Length").c_str())));
+		}
+		else
+		{
+			Delete	del;
+			return (del.exec(requestConfig, body));
 		}
 	}
 	catch(const char *e)
@@ -48,7 +68,7 @@ Method ManageRequest::identify(RequestHeader &request)
 		ErrorStatus	error;
 		return (error.buildError(STATUS_500));
 	}
-	return (empty);
+	return (index);
 }
 
 

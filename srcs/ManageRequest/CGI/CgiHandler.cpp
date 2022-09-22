@@ -1,8 +1,9 @@
 #include "CgiHandler.hpp"
 
-CgiHandler::CgiHandler(RequestHeader &request, VirtualServerConfig &vServ, LocationBlock &loc, std::string &method, std::string &path)
+CgiHandler::CgiHandler(RequestHeader &request, VirtualServerConfig &vServ, LocationBlock &loc, const std::string &method, const std::string &path, std::string &body)
 {
 	(void)vServ;
+	_body = body;
 	_env["SERVER_SOFTWARE"] = "Webserv/1.1";
 	_env["SERVER_NAME"] = request.getField("Host").substr(0, request.getField("Host").find_first_of(':'));
 	_env["GATEWAY_INTERFACE"] = "PHP/8.1.9";
@@ -18,6 +19,8 @@ CgiHandler::CgiHandler(RequestHeader &request, VirtualServerConfig &vServ, Locat
 		_env["QUERY_STRING"] = request.getField("Path").substr(request.getField("Path").find_first_of('?') + 1);
 	if (method == "POST")
 	{
+		if (request.getField("Content-Length") == "")
+			throw (STATUS_411);
 		_env["CONTENT_LENGTH"] = request.getField("Content-Length");
 		_env["CONTENT_TYPE"] = request.getField("Content-Type");
 	}
@@ -34,7 +37,7 @@ CgiHandler::CgiHandler(RequestHeader &request, VirtualServerConfig &vServ, Locat
 
 void	CgiHandler::initCharEnv()
 {
-	std::map<std::string, std::string>::iterator	it;
+	std::map<std::string, std::string>::iterator	it = _env.begin();
 	int												i = 0;
 	_charEnv = new char*[_env.size() + 1];
 	if (!_charEnv)
@@ -42,13 +45,14 @@ void	CgiHandler::initCharEnv()
 	_args = new char*[3];
 	if (!_args)
 		throw("malloc args");
-
-	for (it = _env.end(); it != _env.begin(); it--)
+	while (it != _env.end())
 	{
 		_charEnv[i] = strdup((it->first + "=" + it->second).c_str());
 		std::cout << _charEnv[i] << std::endl;
 		i++;
+		it++;
 	}
+	std::cout << "end of initCharEnv" << std::endl;
 	_charEnv[i] = NULL;
 	_args[0] = (char *)"./cgi-bin/php-cgi";
 	_args[1] = (char *)_env["Path"].c_str();
@@ -59,12 +63,18 @@ std::string	CgiHandler::execCgi()
 {
 	pid_t		pid;
 	std::string	response;
+	int			saveStdin;
+	int			saveStdout;
 	FILE	*fIn = tmpfile();
 	FILE	*fOut = tmpfile();
 	long	fdIn = fileno(fIn);
 	long	fdOut = fileno(fOut);
 	int		ret = 1;
 
+	saveStdin = dup(STDIN_FILENO);
+	saveStdout = dup(STDOUT_FILENO);
+	write(fdIn, _body.c_str(), _body.size());
+	lseek(fdIn, 0, SEEK_SET);
 	initCharEnv();
 	pid = fork();
 	if (pid == -1)
@@ -90,11 +100,14 @@ std::string	CgiHandler::execCgi()
 			response += c;
 		}
 	}
-
+	dup2(saveStdin, STDIN_FILENO);
+	dup2(saveStdout, STDOUT_FILENO);
 	fclose(fIn);
 	fclose(fOut);
 	close(fdIn);
 	close(fdOut);
+	close(saveStdin);
+	close(saveStdout);
 	if (!pid)
 		exit(0);
 

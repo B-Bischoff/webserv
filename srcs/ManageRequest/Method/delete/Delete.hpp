@@ -11,6 +11,7 @@ class Delete : public Method
 		Delete();
 		~Delete();
 
+		Method	exec(RequestConfig &config, const std::string &body);
 };
 
 #endif

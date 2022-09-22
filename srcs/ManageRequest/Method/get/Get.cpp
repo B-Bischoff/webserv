@@ -5,50 +5,33 @@ Get::~Get()
 
 }
 
-Get::Get(RequestConfig &config)
+Get::Get()
 {
-	_requestConfig = config;
+
 }
 
-void	Get::readFile(RequestHeader &request)
+Method	Get::exec(RequestConfig &config, const std::string &body)
 {
-	(void)request;
 	std::ifstream	ifs;
 
-	if (_requestConfig.getValidMethod() == false)
-		throw(STATUS_405);
-	else if (_requestConfig.getRedirect() == true)
-		return (redirect(_requestConfig.getRedirectPath()));
-	else if (_requestConfig.getAutoindex() == true)
-		return (autoindex(_requestConfig.getRootPath()));
-	ifs.open(_requestConfig.getRootPath(), std::ios::in);
-	std::string		file ((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
+	ifs.open(config.getRootPath(), std::ios::in);
 		
 	if (ifs.is_open() == false)
 		throw (STATUS_404);
-	if (file.empty() == true)
-		throw (STATUS_204);
-	_body = file;
+	if (config.getCgi() == false)
+	{
+		std::string		file ((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
+		if (file.empty() == true)
+			throw (STATUS_204);
+		_body = file;
+	}
+	else
+	{
+		if (body.empty() == true)
+			throw (STATUS_204);
+		_body = body;
+	}
 	_size = _body.size();
 	_status = STATUS_200;
-}
-
-void	Get::autoindex(const std::string &rootPath)
-{
-	Autoindex	autoindex(rootPath);
-
-	_body = autoindex.buildAutoindex();
-	_size = _body.size();
-	_status = STATUS_200;
-}
-
-void	Get::redirect(const std::string &redirectUrl)
-{
-	_body = "<html>\n<head>\n<title>Redirection en cours</title\n<meta";
-	_body += "http-equiv=\"refresh\" content=\"5; URL=";
-	_body += redirectUrl;
-   	_body += "\">\n</head>\n<body>\nRedirection vers ";
-	_body += redirectUrl +  " dans 5 secondes.\n</body>\n</html>";
-	_size = _body.size();
-	_status = STATUS_301;
+	return (*this);
 }
