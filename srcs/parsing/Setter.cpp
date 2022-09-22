@@ -201,7 +201,6 @@ void	Setter::setErrorPage(VirtualServerConfig &vServ)
 
 void	Setter::setUploadPath(VirtualServerConfig &vServ)
 {
-	std::cout << _streamLine.str() << std::endl;
 	struct stat info;
 	_streamLine >> _keyWord;
 	if (stat(_keyWord.c_str(), &info) != 0 )
