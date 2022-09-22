@@ -152,15 +152,6 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 			header.closeAfterSend = true;
 
 		_clientsReponse[clientFd] = header;
-
-		//if (send(clientFd, header.response_header.c_str(), header.response_header.size(), 0) == -1)
-		//	perror("send");
-
-/*
-		{
-			close(clientFd);
-			FD_CLR(clientFd, &_master);
-		}*/
 }
 
 bool Server::isAVirtualServer(const int& fd) const
