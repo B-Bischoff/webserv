@@ -33,8 +33,10 @@ private:
 	int _newSocket;
 	ResponseHeader	header; // Probably gonna make that variable temporary
 
-	fd_set _master, _readFds;
+	fd_set _master;
 	int _fdmax;
+
+	std::map<int, ResponseHeader> _clientsReponse;
 
 	void createVirtualServer(const VirtualServerConfig& config);
 
@@ -44,12 +46,10 @@ private:
 	void listenClient(const int& clientFd);
 	void processClientRequest(const int& clientFd, std::string& buffer);
 
-	int receiveRequestHeader(const int& cliendFd, std::string& buffer);
-	int receiveRequestBody(const int& clientFd, std::string& buffer, const RequestHeader& request, const int& maxSize);
-	int receiveChunkedRequest(const int& clientFd, std::string& buffer, const RequestHeader& request, const int& maxSize);
 	bool isAVirtualServer(const int& fd) const;
 	void addFd(const int& fd, fd_set& set);
 	void removeFd(const int& fd, fd_set& set);
+	fd_set createWriteFdSet() const;
 
 public:
 	Server(const std::vector<VirtualServerConfig>& configList);

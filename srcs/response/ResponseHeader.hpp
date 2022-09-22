@@ -19,6 +19,7 @@ class ResponseHeader
 	public:
 		std::string	response_header;
 		int		content_size;
+		bool closeAfterSend;
 		ResponseHeader();
 		~ResponseHeader();
 		void	build_response(Method &method);
