@@ -61,7 +61,8 @@ void	Post::createFile(const std::string &body, const std::string &fileName, cons
 	if (pos != std::string::npos)
 	{
 		pos += 4;
-		file.open(path + fileName, std::ofstream::out | std::ofstream::app);
+		std::string outfile = path + fileName;
+		file.open(outfile.c_str(), std::ofstream::out | std::ofstream::app);
 		if (file.is_open() == false)
 		{
 			perror("open file: ");

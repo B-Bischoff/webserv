@@ -15,7 +15,7 @@ Method	Delete::exec(RequestConfig &config, const std::string &body)
 	(void)body;
 	std::ifstream	ifs;
 
-	ifs.open(config.getRootPath(), std::ios::in);
+	ifs.open(config.getRootPath().c_str(), std::ios::in);
 	if (ifs.is_open() == false)
 		throw (STATUS_404);
 	if (config.getRootPath().find("/uploads/") == std::string::npos)

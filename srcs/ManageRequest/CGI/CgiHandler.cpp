@@ -83,7 +83,7 @@ std::string	CgiHandler::execCgi()
 	{
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
-		execve(_args[0], NULL, _charEnv);
+		execve(_args[0], _args, _charEnv);
 		throw("execve");
 	}
 	else

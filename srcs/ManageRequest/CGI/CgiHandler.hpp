@@ -2,6 +2,8 @@
 # define CGI_HANDLER_HPP
 
 #include "webserv.hpp"
+#include <sys/wait.h>
+#include <sys/types.h>
 
 class CgiHandler
 {
