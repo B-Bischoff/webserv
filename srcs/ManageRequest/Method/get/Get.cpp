@@ -1,34 +1,37 @@
 #include "Get.hpp"
 
-Get::Get()
-{
-}
-
 Get::~Get()
 {
 
 }
 
-Get	&Get::readFile(RequestHeader request)
+Get::Get()
 {
-	std::cout << "PATH----> '" << request.getField("Path") << "'" << std::endl;
 
-	_path = "./pages";
-	if (request.getField("Path") == "/")
-		_path += "/index.html";
-	else
-		_path += request.getField("Path");
-	std::cout << _path<< std::endl;
+}
+
+Method	Get::exec(RequestConfig &config, const std::string &body)
+{
 	std::ifstream	ifs;
-	ifs.open(_path.c_str(), std::ios::in);
-	std::string		file ((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
-	
+
+	ifs.open(config.getRootPath(), std::ios::in);
+		
 	if (ifs.is_open() == false)
 		throw (STATUS_404);
-	if (file.empty() == true)
-		throw (STATUS_204);
-	_body = file;
-	_size = file.size();
+	if (config.getCgi() == false)
+	{
+		std::string		file ((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
+		if (file.empty() == true)
+			throw (STATUS_204);
+		_body = file;
+	}
+	else
+	{
+		if (body.empty() == true)
+			throw (STATUS_204);
+		_body = body;
+	}
+	_size = _body.size();
 	_status = STATUS_200;
 	return (*this);
 }

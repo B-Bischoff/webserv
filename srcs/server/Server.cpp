@@ -33,10 +33,6 @@ void Server::removeFd(const int &fd, fd_set& set)
 
 void Server::serverLoop()
 {
-	RequestHeader	req;
-	Get				get;
-	Method			dst;
-	
     while(1)
     {
 		std::cout << std::endl << "+++++++ Waiting for new connection ++++++++" << std::endl << std::endl;
@@ -144,7 +140,7 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		}
 		std::cout << "Request body: " << requestBody << std::endl;
 
-		ManageRequest manager(_servers.at(i).getVirtualServerConfig(), tmp, request);
+		ManageRequest manager(_servers.at(i).getVirtualServerConfig(), tmp, request, requestBody);
 		Method dst = manager.identify(request);
 		header.build_response(dst);
 

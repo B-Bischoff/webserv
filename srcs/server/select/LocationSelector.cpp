@@ -18,7 +18,7 @@ LocationBlock	LocationSelector::selectLocationBlock(const std::string &path, std
 
 	for (size_t i = 0; i < serverBlock.size(); i++)
 	{
-		if (serverBlock[i].getStringField("location_path").find(path) != std::string::npos)
+		if (path.find(serverBlock[i].getStringField("location_path")) != std::string::npos)
 		{
 			if (serverBlock[i].getStringField("location_path") == path && serverBlock[i].getStringField("location_modifier") == "=")
 				return (serverBlock[i]);

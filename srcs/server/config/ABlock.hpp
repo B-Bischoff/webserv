@@ -5,10 +5,7 @@
 #include <map>
 #include <vector>
 
-#define GET 0
-#define POST 1
-#define DELETE 2
-#define AUTOINDEX 3
+enum boolValue {GET, POST, DELETE, AUTOINDEX};
 
 typedef std::map <std::string, std::vector <std::string> > Serv;
 
@@ -16,12 +13,8 @@ class ABlock
 {
 	protected:
 		Serv	_block;
-		bool	_methodAutoIndex[4];
-		bool	_autoIndex;
-		bool	_get;
-		bool	_post;
-		bool	_delete;
 		int		_port;
+		bool	_methodAutoIndex[4];
 
 	public:
 		ABlock();

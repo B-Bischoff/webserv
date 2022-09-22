@@ -2,6 +2,8 @@
 # define SETTER_HPP
 
 #include "Parsing.hpp"
+#include <sys/types.h>
+#include <sys/stat.h>
 
 class VirtualServerConfig;
 
@@ -24,6 +26,9 @@ class Setter
 		void			setReturn(VirtualServerConfig &vServ);
 		void			setMaxBodySize(VirtualServerConfig &vServ);
 		void			setLocation(VirtualServerConfig &vServ);
+		void			setCgiPass(VirtualServerConfig &vServ);
+		void			setErrorPage(VirtualServerConfig &vServ);
+		void			setUploadPath(VirtualServerConfig &vServ);
 		unsigned int	countArgs(std::string line) const;
 		void			initPrivateValues(std::string &line, bool inLocationBlock, int locationBlock);
 

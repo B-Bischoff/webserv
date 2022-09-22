@@ -14,12 +14,12 @@ void	RequestHeader::readRequest(std::string& request)
 	}
 	
 	// Debug: Print map content
-	/*
+	// /*
 	std::cout << "------------------" << std::endl;
 	for(std::map<std::string, std::string>::iterator it = _fields.begin(); it != _fields.end(); ++it)
 		std::cout << it->first << "|" << it->second << "\n";
 	std::cout << "------------------" << std::endl;
-	*/
+	// */
 }
 
 void RequestHeader::parseMethodPathAndVersion(std::string& line)

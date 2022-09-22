@@ -3,15 +3,17 @@
 
 #include "Method.hpp"
 
-class Get : public Method
+class RequestConfig;
+
+class Get : public virtual Method
 {
 	private:
-
+		
 	public:
 		Get();
 		~Get();
 
-		Get	&readFile(RequestHeader request);
+		Method	exec(RequestConfig &config, const std::string &body);
 };
 
 #endif

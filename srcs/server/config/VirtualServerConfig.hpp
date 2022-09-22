@@ -28,6 +28,7 @@ class VirtualServerConfig : public ABlock
 {
 	private:
 		unsigned int		_client_max_body_size;
+		std::vector<int>	_errorStatus;
 
 	public:
 		std::vector<LocationBlock>	loc;
@@ -39,6 +40,9 @@ class VirtualServerConfig : public ABlock
 
 		void						setMaxBodySize(unsigned int size);
 		unsigned int				getMaxBodySize(void) const;
+
+		void						setErrorStatus(std::vector<int> values);
+	
 
 };
 

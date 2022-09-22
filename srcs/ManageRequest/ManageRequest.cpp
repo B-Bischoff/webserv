@@ -1,5 +1,17 @@
 #include "ManageRequest.hpp"
 
+ManageRequest::ManageRequest(VirtualServerConfig &vServCongif, LocationBlock &locationBlock, RequestHeader &request, std::string &body) :
+	_vServConfig(vServCongif), _locationBlock(locationBlock), _request(request), _body(body)
+{
+	(void)_vServConfig;
+	(void)_locationBlock;
+	(void)_request;
+}
+
+ManageRequest::~ManageRequest()
+{
+
+}
 /*
 	==== GENERATE RESPONSE ALGO ====
 
@@ -11,36 +23,39 @@
 	return response header (string)
 */
 
-Method ManageRequest::identify(RequestHeader request)
+Method ManageRequest::identify(RequestHeader &request)
 {
-	Method empty;
-/*
-	std::string	method("GET");
-	CgiHandler	cgi(_request, _vServConfig, _locationBlock, method);
-	std::string	responseCgi = cgi.execCgi();
+	Method index;
+	RequestConfig requestConfig(_locationBlock, _vServConfig, request);
+	std::string	body;
 
-	std::cout << "Cgi response: " << std::endl;
-	std::cout << responseCgi << std::endl;
-*/
 	try
 	{
-		if (request.getField("Method") == "GET")
+		if (requestConfig.getValidMethod() == false)
+			throw(STATUS_405);
+		else if (requestConfig.getRedirect() == true)
+			return (index.redirect(requestConfig.getRedirectPath()));
+		else if (requestConfig.getAutoindex() == true)
+			return (index.autoindex(requestConfig.getRootPath()));
+		else if (requestConfig.getCgi() == true)
+		{
+			CgiHandler cgi(request, _vServConfig, _locationBlock, requestConfig.getMethod(), requestConfig.getRootPath(), _body);
+			body = cgi.execCgi();
+		}
+		if (requestConfig.getMethod() == "GET")
 		{
 			Get	get;
-			get.readFile(request);
-			return (get);
+			return (get.exec(requestConfig, body));
 		}
-		else if (request.getField("Method") == "POST")
+		else if (requestConfig.getMethod() == "POST")
 		{
-
-		}
-		else if (request.getField("Method") == "DELETE")
-		{
-
+			Post post;
+			return (post.exec(requestConfig, _body, atoi(request.getField("Content-Length").c_str())));
 		}
 		else
 		{
-
+			Delete	del;
+			return (del.exec(requestConfig, body));
 		}
 	}
 	catch(const char *e)
@@ -53,18 +68,8 @@ Method ManageRequest::identify(RequestHeader request)
 		ErrorStatus	error;
 		return (error.buildError(STATUS_500));
 	}
-	return (empty);
+	return (index);
 }
 
-ManageRequest::ManageRequest(VirtualServerConfig &vServCongif, LocationBlock &locationBlock, RequestHeader &request) :
-	_vServConfig(vServCongif), _locationBlock(locationBlock), _request(request)
-{
-	(void)_vServConfig;
-	(void)_locationBlock;
-	(void)_request;
-}
 
-ManageRequest::~ManageRequest()
-{
 
-}

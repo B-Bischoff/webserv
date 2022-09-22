@@ -209,7 +209,7 @@ static void	printServer(std::vector<VirtualServerConfig> &vServ, int size, std::
 		std::cout << "root:\t\t" << vServ[i].getStringField("root") << std::endl;
 		std::cout << "index\t\t" << vServ[i].getStringField("index") << std::endl;
 		std::cout << "return:\t\t";
-		printVector(vServ[i].getVectorField("return"));
+		// printVector(vServ[i].getVectorField("return"));
 		std::cout << "method:\t\t" << "GET: " << vServ[i].getBoolValue(GET) << " " << "POST: " << vServ[i].getBoolValue(POST) << " " << "DELETE: " << vServ[i].getBoolValue(DELETE) << std::endl;
 		std::cout << "autoindex:\t" << (vServ[i].getBoolValue(AUTOINDEX) ? "yes" : "no") << std::endl;
 		std::cout << "body size:\t" << vServ[i].getMaxBodySize()  << "\n" << std::endl;
@@ -223,7 +223,9 @@ static void	printServer(std::vector<VirtualServerConfig> &vServ, int size, std::
 			std::cout << "index\t\t" << vServ[i].loc[j].getStringField("index") << std::endl;
 			std::cout << "root:\t\t" << vServ[i].loc[j].getStringField("root") << std::endl;
 			std::cout << "return:\t\t";
-			printVector(vServ[i].loc[j].getVectorField("return"));
+			// printVector(vServ[i].loc[j].getVectorField("return"));
+			std::cout << "cgi_pass:\t\t" << vServ[i].loc[j].getStringField("cgi_pass") << std::endl;
+			std::cout << "upload:\t\t" << vServ[i].loc[j].getStringField("upload") << std::endl;
 			std::cout << std::endl;
 		}
 			std::cout << "-------------------------------------" << std::endl;

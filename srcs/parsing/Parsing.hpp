@@ -38,6 +38,7 @@
 #define WRONG_URL		(std::string)"Wrong URL entered : '"
 #define INVALID_IP		(std::string)"Invalip ip address: '"
 #define NO_SERVER_BLOCK	(std::string)"No server block has been found in the config file"
+#define DIRECTORY		(std::string)"Upload file path doesn't exist's '"
 
 class VirtualServerConfig;
 
