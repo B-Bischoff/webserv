@@ -42,6 +42,8 @@ class VirtualServerConfig : public ABlock
 		unsigned int				getMaxBodySize(void) const;
 
 		void						setErrorStatus(std::vector<int> values);
+
+		std::vector<int>			getErrorStatus(void) const;
 	
 
 };

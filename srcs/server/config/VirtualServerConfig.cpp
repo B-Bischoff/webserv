@@ -34,3 +34,8 @@ void	VirtualServerConfig::setErrorStatus(std::vector<int> values)
 {
 	_errorStatus = values;
 }
+
+std::vector<int>	VirtualServerConfig::getErrorStatus(void) const
+{
+	return (_errorStatus);
+}

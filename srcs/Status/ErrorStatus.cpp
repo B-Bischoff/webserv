@@ -2,7 +2,7 @@
 
 ErrorStatus::ErrorStatus()
 {
-	_body = "<div id=\"main\">\n\t<div class=\"fof\">\n\t\t<h1></h1>\n\t</div>\n</div>";
+
 }
 
 ErrorStatus::~ErrorStatus()
@@ -10,104 +10,52 @@ ErrorStatus::~ErrorStatus()
 	
 }
 
-ErrorStatus	&ErrorStatus::buildError(std::string error)
+ErrorStatus	&ErrorStatus::buildError(std::string error, VirtualServerConfig &vServ)
 {
-	_body.insert(41, error);
+	std::string		path;
+	if ((findStatus(vServ.getErrorStatus(), atoi(error.c_str())) == false)
+		|| ((path = buildErrorPath(vServ.getStringField("error_path"), error)) == ""))
+	{
+		_body = "<div id=\"main\">\n\t<div class=\"fof\">\n\t\t<h1></h1>\n\t</div>\n</div>";
+		_body.insert(41, error);
+	}
+	else
+		_body = getErrorPage(path);
 	_size = _body.size();
 	_status = error;
 	return (*this);
 }
 
-// std::string	getValueStatus(std::string status, int statusValue)
-// {
-// 100	Continue
-// 101	Switching Protocols
-// 102	Processing
-// 103	Early Hints
-// 200	OK
-// 201	Created
-// 202	Accepted
-// 203	Non-Authoritative Information
-// 204	No Content
-// 205	Reset Content
-// 206	Partial Content
-// 207	Multi-Status
-// 208	Already Reported
-// 210	Content Different
-// 226	IM Used
-// 300	Multiple Choices
-// 301	Moved Permanently
-// 302	Found
-// 303	See Other
-// 304	Not Modified
-// 305	Use Proxy
-// 306	Switch Proxy
-// 307	Temporary Redirect
-// 308	Permanent Redirect
-// 310	Too many Redirects
-// 400	Bad Request
-// 401	Unauthorized
-// 402	Payment Required
-// 403	Forbidden
-// 404	Not Found
-// 405	Method Not Allowed
-// 406	Not Acceptable
-// 407	Proxy Authentication Required
-// 408	Request Time-out
-// 409	Conflict
-// 410	Gone
-// 411	Length Required
-// 412	Precondition Failed
-// 413	Request Entity Too Large
-// 414	Request-URI Too Long
-// 415	Unsupported Media Type
-// 416	Requested range unsatisfiable
-// 417	Expectation failed
-// 418	I’m a teapot
-// 421	Bad mapping / Misdirected Request
-// 422	Unprocessable entity
-// 423	Locked
-// 424	Method failure
-// 425	Too Early
-// 426	Upgrade Required
-// 428	Precondition Required
-// 429	Too Many Requests
-// 431	Request Header Fields Too Large
-// 449	Retry With
-// 450	Blocked by Windows Parental Controls
-// 451	Unavailable For Legal Reasons
-// 456	Unrecoverable Error
-// 444	No Response
-// 495	SSL Certificate Error
-// 496	SSL Certificate Required
-// 497	HTTP Request Sent to HTTPS Port
-// 498	Token expired/invalid
-// 499	Client Closed Request
-// 500	Internal Server Error
-// 501	Not Implemented
-// 502	Bad Gateway
-// 503	Service Unavailable
-// 504	Gateway Time-out
-// 505	HTTP Version not supported
-// 506	Variant Also Negotiates
-// 507	Insufficient storage
-// 508	Loop detected
-// 509	Bandwidth Limit Exceeded
-// 510	Not extended
-// 511	Network authentication required
-// 520	Unknown Error
-// 521	Web Server Is Down
-// 522	Connection Timed Out
-// 523	Origin Is Unreachable
-// 524	A Timeout Occurred
-// 525	SSL Handshake Failed
-// 526	Invalid SSL Certificate
-// 527	Railgun Error
+bool	ErrorStatus::findStatus(const std::vector<int> &status, int statusCode)
+{
+	for (std::vector<int>::const_iterator it = status.begin(); it != status.end(); it++)
+	{
+		if (*it == statusCode)
+			return (true);
+	}
+	return (false);
+}
 
-// }
+std::string	ErrorStatus::buildErrorPath(std::string path, const std::string &error)
+{
+	std::fstream	ifs;
+
+	path += error.substr(0, error.find_first_of(' '));
+	path += ".html";
+	ifs.open(path.c_str(), std::ios::in);
+	if (ifs.is_open() == false)
+		return ("");
+	ifs.close();
+	return (path);
+}
 
 
-// void	Method::updateStatus(Method method, int statusValue)
-// {
+std::string	ErrorStatus::getErrorPage(std::string path)
+{
+	std::ifstream	ifs;
+	std::string		file;
 
-// }
+	ifs.open(path.c_str(), std::ios::in);
+	file = std::string((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
+	return (file);
+}

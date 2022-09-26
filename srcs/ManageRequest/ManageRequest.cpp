@@ -61,12 +61,12 @@ Method ManageRequest::identify(RequestHeader &request)
 	catch(const char *e)
 	{
 		ErrorStatus	error;
-		return (error.buildError(e));
+		return (error.buildError(e, _vServConfig));
 	}
 	catch(...)
 	{
 		ErrorStatus	error;
-		return (error.buildError(STATUS_500));
+		return (error.buildError(STATUS_500, _vServConfig));
 	}
 	return (index);
 }
