@@ -18,7 +18,7 @@ void	Parsing::fillVirtualServers(std::vector<VirtualServerConfig> &vServ)
 	std::string			line;
 	VirtualServerConfig	newNode;
 	LocationBlock		newNodeLoc;
-	Setter				setter;
+	InitBlocks			setter;
 
 	for (int i = 0; i < _numberOfBlocks; i++)
 	{

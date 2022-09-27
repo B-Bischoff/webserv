@@ -1,31 +1,31 @@
-#include "Setter.hpp"
+#include "InitBlocks.hpp"
 
-Setter::Setter() : _inLocationBlock(false), _locationBlock(-1)
+InitBlocks::InitBlocks() : _inLocationBlock(false), _locationBlock(-1)
 {
-	_mapPtr["listen"] = &Setter::setListen;
-	_mapPtr["methods"] = &Setter::setMethod;
-	_mapPtr["server_name"] = &Setter::setServerName;
-	_mapPtr["error_log"] = &Setter::setLogs;
-	_mapPtr["access_log"] = &Setter::setLogs;
-	_mapPtr["location"] = &Setter::setLocation;
-	_mapPtr["index"] = &Setter::setRootIndex;
-	_mapPtr["root"] = &Setter::setRootIndex;
-	_mapPtr["client_max_body_size"] = &Setter::setMaxBodySize;
-	_mapPtr["return"] = &Setter::setReturn;
-	_mapPtr["autoindex"] = &Setter::setAutoIndex;
-	_mapPtr["cgi_pass"] = &Setter::setCgiPass;
-	_mapPtr["error_page"] = &Setter::setErrorPage;
-	_mapPtr["upload"] = &Setter::setUploadPath;
+	_mapPtr["listen"] = &InitBlocks::setListen;
+	_mapPtr["methods"] = &InitBlocks::setMethod;
+	_mapPtr["server_name"] = &InitBlocks::setServerName;
+	_mapPtr["error_log"] = &InitBlocks::setLogs;
+	_mapPtr["access_log"] = &InitBlocks::setLogs;
+	_mapPtr["location"] = &InitBlocks::setLocation;
+	_mapPtr["index"] = &InitBlocks::setRootIndex;
+	_mapPtr["root"] = &InitBlocks::setRootIndex;
+	_mapPtr["client_max_body_size"] = &InitBlocks::setMaxBodySize;
+	_mapPtr["return"] = &InitBlocks::setReturn;
+	_mapPtr["autoindex"] = &InitBlocks::setAutoIndex;
+	_mapPtr["cgi_pass"] = &InitBlocks::setCgiPass;
+	_mapPtr["error_page"] = &InitBlocks::setErrorPage;
+	_mapPtr["upload"] = &InitBlocks::setUploadPath;
 }
 
-Setter::~Setter()
+InitBlocks::~InitBlocks()
 {
 
 }
 
-void	Setter::assignLine(std::string &line, VirtualServerConfig &vServ, bool inLocationBlock, int locationBlock)
+void	InitBlocks::assignLine(std::string &line, VirtualServerConfig &vServ, bool inLocationBlock, int locationBlock)
 {
-	std::map<std::string, void(Setter::*)(VirtualServerConfig &vServ)>::iterator it;
+	std::map<std::string, void(InitBlocks::*)(VirtualServerConfig &vServ)>::iterator it;
 
 	initPrivateValues(line, inLocationBlock, locationBlock);
 	it = _mapPtr.find(_keyWord);
@@ -34,7 +34,7 @@ void	Setter::assignLine(std::string &line, VirtualServerConfig &vServ, bool inLo
 	_streamLine.clear();
 }
 
-void	Setter::initPrivateValues(std::string &line, bool inLocationBlock, int locationBlock)
+void	InitBlocks::initPrivateValues(std::string &line, bool inLocationBlock, int locationBlock)
 {
 	_streamLine.str(line);
 	_streamLine >> _keyWord;
@@ -43,7 +43,7 @@ void	Setter::initPrivateValues(std::string &line, bool inLocationBlock, int loca
 	_locationBlock = locationBlock;
 }
 
-unsigned int	Setter::countArgs(std::string line) const
+unsigned int	InitBlocks::countArgs(std::string line) const
 {
 	std::istringstream	stream(line);
 	unsigned int	i = 0;
@@ -65,7 +65,7 @@ unsigned int	Setter::countArgs(std::string line) const
 	throw(_keyWord + " : " + TOO_MUCH_ARGS);
 }
 
-void	Setter::setLocation(VirtualServerConfig &vServ)
+void	InitBlocks::setLocation(VirtualServerConfig &vServ)
 {
 	if (_argsCount == 4)
 	{
@@ -76,7 +76,7 @@ void	Setter::setLocation(VirtualServerConfig &vServ)
 	vServ.loc[_locationBlock].setStringField(_keyWord, "location_path");
 }
 
-void	Setter::setMaxBodySize(VirtualServerConfig &vServ)
+void	InitBlocks::setMaxBodySize(VirtualServerConfig &vServ)
 {
 	unsigned int	size;
 
@@ -85,14 +85,14 @@ void	Setter::setMaxBodySize(VirtualServerConfig &vServ)
 	vServ.setMaxBodySize(size);
 }
 
-void	Setter::setReturn(VirtualServerConfig &vServ)
+void	InitBlocks::setReturn(VirtualServerConfig &vServ)
 {
 	_streamLine >> _keyWord;
 	_streamLine >> _keyWord;
 	_inLocationBlock == true ? vServ.loc[_locationBlock].setStringField(_keyWord, "return") : vServ.setStringField(_keyWord, "return");
 }
 
-void	Setter::setMethod(VirtualServerConfig &vServ)
+void	InitBlocks::setMethod(VirtualServerConfig &vServ)
 {
 	while (_streamLine.eof() == false)
 	{
@@ -108,14 +108,14 @@ void	Setter::setMethod(VirtualServerConfig &vServ)
 	}
 }
 
-void	Setter::setAutoIndex(VirtualServerConfig &vServ)
+void	InitBlocks::setAutoIndex(VirtualServerConfig &vServ)
 {
 	_streamLine >> _keyWord;
 	if (_keyWord.compare("on") == 0)
 		_inLocationBlock == true ? vServ.loc[_locationBlock].setBoolValue(true, AUTOINDEX) : vServ.setBoolValue(true, AUTOINDEX);
 }
 
-void	Setter::setLogs(VirtualServerConfig &vServ)
+void	InitBlocks::setLogs(VirtualServerConfig &vServ)
 {
 	std::fstream				file;
 	std::vector<std::string>	node;
@@ -136,7 +136,7 @@ void	Setter::setLogs(VirtualServerConfig &vServ)
 	file.close();
 }
 
-void	Setter::setRootIndex(VirtualServerConfig &vServ)
+void	InitBlocks::setRootIndex(VirtualServerConfig &vServ)
 {
 	_streamLine >> _keyWord;
 	if (_streamLine.str().find("index") != std::string::npos)
@@ -145,7 +145,7 @@ void	Setter::setRootIndex(VirtualServerConfig &vServ)
 		_inLocationBlock == true ? vServ.loc[_locationBlock].setStringField(_keyWord, "root") : vServ.setStringField(_keyWord, "root");
 }
 
-void	Setter::setListen(VirtualServerConfig &vServ)
+void	InitBlocks::setListen(VirtualServerConfig &vServ)
 {
 	size_t						pos;
 	int							port;
@@ -162,7 +162,7 @@ void	Setter::setListen(VirtualServerConfig &vServ)
 	vServ.setPort(_keyWord.substr(_keyWord.find_first_of(':') + 1));
 }
 
-void	Setter::setServerName(VirtualServerConfig &vServ)
+void	InitBlocks::setServerName(VirtualServerConfig &vServ)
 {
 	std::vector<std::string>	newNode;
 
@@ -174,7 +174,7 @@ void	Setter::setServerName(VirtualServerConfig &vServ)
 	vServ.setVectorField(newNode, "server_name");		
 }
 
-void	Setter::setCgiPass(VirtualServerConfig &vServ)
+void	InitBlocks::setCgiPass(VirtualServerConfig &vServ)
 {
 	std::fstream	file;
 	
@@ -185,7 +185,7 @@ void	Setter::setCgiPass(VirtualServerConfig &vServ)
 	vServ.loc[_locationBlock].setStringField(_keyWord, "cgi_pass");
 }
 
-void	Setter::setErrorPage(VirtualServerConfig &vServ)
+void	InitBlocks::setErrorPage(VirtualServerConfig &vServ)
 {
 	std::vector<int> tmp;
 
@@ -199,7 +199,7 @@ void	Setter::setErrorPage(VirtualServerConfig &vServ)
 	vServ.setErrorStatus(tmp);
 }
 
-void	Setter::setUploadPath(VirtualServerConfig &vServ)
+void	InitBlocks::setUploadPath(VirtualServerConfig &vServ)
 {
 	struct stat info;
 	_streamLine >> _keyWord;
