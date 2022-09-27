@@ -21,8 +21,9 @@ LocationBlock	LocationSelector::selectLocationBlock(const std::string &path, std
 				maxSizeIndex = i;
 			}
 		}
-		if (locationPath.find('*') != std::string::npos)
+		if (path.find(locationPath) != std::string::npos && locationPath.find('*') != std::string::npos)
 		{
+			std::cout << "help " << std::endl;
 			if (locationPath.find('*') == 0)
 			{
 				if (endingWildcard(path, locationPath) == 0)

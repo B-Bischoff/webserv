@@ -130,25 +130,16 @@ void	Parsing::isFile(char *confPath)
 
 void	Parsing::isDuplicateServerName(std::vector<VirtualServerConfig> &vServ)
 {
-	std::vector<std::string>::const_iterator it;
-	std::vector<std::string>::const_iterator itNext;
-	std::vector<std::string>::const_iterator end;
-	std::vector<std::string>::const_iterator endNext;
+	std::vector<std::string>	vect;
 
-	for (int i = 0; i < _numberOfBlocks - 1; i++)
+	for (int i = 0; i < _numberOfBlocks; i++)
 	{
-		end = vServ[i].getVectorField("server_name").end();
-		for (it = vServ[i].getVectorField("server_name").begin(); it != end; it ++)
+		for (size_t j = 0; j < vServ[i].getVectorField("server_name").size(); j++)
 		{
-			for (int j = i + 1; j < _numberOfBlocks; j++)
-			{
-				endNext = vServ[j].getVectorField("server_name").end();
-				for (itNext = vServ[j].getVectorField("server_name").begin(); itNext != endNext; itNext++)
-				{
-					if (*itNext == *it)
-						throw (SERVER_NAME + *it + "'");
-				}
-			}
+			if (std::find(vect.begin(), vect.end(), vServ[i].getVectorField("server_name")[j]) != vect.end())
+				throw (SERVER_NAME + vServ[i].getVectorField("server_name")[j] + "'");
+			else
+				vect.push_back(vServ[i].getVectorField("server_name")[j]);
 		}
 	}
 }
