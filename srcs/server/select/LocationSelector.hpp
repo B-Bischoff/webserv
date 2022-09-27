@@ -8,9 +8,9 @@ class LocationSelector
 	private:
 		std::vector<std::string>	_locationPaths;
 	public:
-		LocationSelector();
-		~LocationSelector();
 		LocationBlock	selectLocationBlock(const std::string &path, std::vector<LocationBlock> &serverBlock);
+		int				endingWildcard(const std::string &path, std::string locationPath);
+		int				startingWildcard(const std::string &path, std::string locationPath);
 };
 
 #endif
