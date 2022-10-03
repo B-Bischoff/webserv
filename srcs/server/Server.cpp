@@ -123,7 +123,7 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		LocationBlock	tmp;
 		int				i;
 
-		request.readRequest(buffer);
+		request.parseRequestHeader(buffer);
 
 		VirtualServerSelector selector(_servers, request);
 		i = selector.selectServerFromRequest();
@@ -139,6 +139,7 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 			return;
 		}
 		std::cout << "Request body: " << requestBody << std::endl;
+		request.parseRequestBody(requestBody);
 
 		ManageRequest manager(_servers.at(i).getVirtualServerConfig(), tmp, request, requestBody);
 		Method dst = manager.identify(request);
