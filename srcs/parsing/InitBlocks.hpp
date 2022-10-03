@@ -1,5 +1,5 @@
-#ifndef SETTER_HPP
-# define SETTER_HPP
+#ifndef INIT_BLOCKS_HPP
+# define INIT_BLOCKS_HPP
 
 #include "Parsing.hpp"
 #include <sys/types.h>
@@ -7,7 +7,7 @@
 
 class VirtualServerConfig;
 
-class Setter
+class InitBlocks
 {
 	private:
 		bool				_inLocationBlock;
@@ -15,7 +15,7 @@ class Setter
 		unsigned int		_argsCount;
 		std::string			_keyWord;
 		std::istringstream	_streamLine;
-		std::map<std::string, void(Setter::*)(VirtualServerConfig &vServ)> _mapPtr;
+		std::map<std::string, void(InitBlocks::*)(VirtualServerConfig &vServ)> _mapPtr;
 		
 		void			setListen(VirtualServerConfig &vServ);
 		void			setServerName(VirtualServerConfig &vServ);
@@ -34,8 +34,8 @@ class Setter
 
 
 	public:
-		Setter();
-		~Setter();
+		InitBlocks();
+		~InitBlocks();
 
 		void	assignLine(std::string &line, VirtualServerConfig &vServ, bool inLocationBlock, int locationBlock);
 };
