@@ -17,10 +17,16 @@ int SocketCommunicator::receiveRequestHeader(const int& socket, std::string& buf
 
 int SocketCommunicator::receiveRequestBody(const int& socket, std::string& buffer, const RequestHeader& header, const int& maxSize)
 {
+	int retValue;
 	if (isChunkedRequest(header))
-		return receiveChunkedRequestBody(socket, buffer, maxSize);
+		retValue = receiveChunkedRequestBody(socket, buffer, maxSize);
 	else
-		return receiveStandardRequestBody(socket, buffer, header, maxSize);;
+		retValue = receiveStandardRequestBody(socket, buffer, header, maxSize);;
+
+	if (header.getField("Content-Type").find("boundary") != std::string::npos)
+		parseBody(buffer, header);
+	
+	return retValue;
 }
 
 int SocketCommunicator::receiveChunkedRequestBody(const int& socket, std::string& buffer, const int& maxSize)
@@ -106,6 +112,94 @@ int SocketCommunicator::receiveStandardRequestBody(const int& socket, std::strin
 	}
 	
 	return nbytes;
+}
+
+void SocketCommunicator::parseBody(std::string& buffer, const RequestHeader& header)
+{
+	std::cout << "============= BODY PARSING =============" << std::endl;
+
+	// Getting boundary
+	std::string contentTypeField = header.getField("Content-Type");
+	int boundaryStart = contentTypeField.find("=") + 1; // +1 is used to get rid of the '='
+	std::string boundary = contentTypeField.substr(boundaryStart, contentTypeField.length());
+
+	std::cout << "boundary: " << boundary << std::endl;
+
+	std::istringstream ss(buffer);
+	std::string line;
+
+	std::getline(ss, line); // Skip entry boundary
+
+
+	bool parseMetadata = true;
+	while (std::getline(ss, line))
+	{
+		line += '\n';
+
+		if (parseMetadata)
+		{
+		
+			if (line == "\r\n") // Body starts
+			{
+				parseMetadata = false;
+				break;
+			}
+
+			std::string key;
+			std::string value;
+			int i = 0;
+
+			while (line[i] != ':')
+				key += line[i++];
+			i += 2; // Jump space
+			while (line[i] != ';' && line[i] != '\r')
+				value += line[i++];
+			
+			std::cout << "Key:" << key << "|Value:" << value << "|" << std::endl;
+
+			if (line[i] == '\r')
+			{
+				parseMetadata = false;
+				break;
+			}
+
+			i += 2;
+			key.clear();
+			value.clear();
+
+			// Read additionnal metadatas
+			while (line[i] != '\r')
+			{
+				while (line[i] != '=')
+					key += line[i++];
+				i += 2;
+				while (line[i] != '"')
+					value += line[i++];
+				i++;
+				if (line[i] != '\r')
+					i += 2;
+				std::cout << "Key:" << key << "|Value:" << value << "|" << std::endl;
+				key.clear();
+				value.clear();
+			}
+			parseMetadata = false;
+		}
+		else
+		{
+			std::string bodyContent;
+			while (std::getline(ss, line) && line.find(boundary) == std::string::npos)
+			{
+				if (line != "\r")
+					bodyContent += line + '\n';
+			}
+			std::cout << "body content>>" << bodyContent << "<<" << std::endl;
+			parseMetadata = true;
+		}
+	}
+
+
+
+	std::cout << "============= BODY PARSING END =============" << std::endl;
 }
 
 bool SocketCommunicator::isChunkedRequest(const RequestHeader& header)

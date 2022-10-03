@@ -14,9 +14,17 @@
 	
 	is a link to another nifty site
 
-	<form method="post">
+	<form method="post" enctype="multipart/form-data">
+		<div>
+		  <label for="file">Sélectionner le fichier à envoyer</label>
+		  <input type="file" id="file" name="file" multiple>
+		</div>
 		<p><input type="text" name="pseudo"/></p>
+		<div>
+		  <button>Envoyer</button>
+		</div>
 	</form>
+	   
 	
 	<H1>This is a Header</H1>
 	
