@@ -22,9 +22,6 @@ int SocketCommunicator::receiveRequestBody(const int& socket, std::string& buffe
 		retValue = receiveChunkedRequestBody(socket, buffer, maxSize);
 	else
 		retValue = receiveStandardRequestBody(socket, buffer, header, maxSize);;
-
-	//if (header.getField("Content-Type").find("boundary") != std::string::npos)
-	//	parseBody(buffer, header);
 	
 	return retValue;
 }
