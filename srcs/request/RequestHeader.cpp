@@ -56,15 +56,12 @@ void RequestHeader::parseRequestBody(std::string& body)
 
 void RequestHeader::parseMultipartEnctype(std::string& body)
 {
-	std::cout << "============= BODY PARSING =============" << std::endl;
-
 	const std::string boundary = parseBoundary();
 
 	std::istringstream ss(body);
 	std::string line;
 
 	std::getline(ss, line); // Skip entry boundary
-
 
 	bool parseMetadata = true;
 	_body.push_back(BodyData());
@@ -85,18 +82,17 @@ void RequestHeader::parseMultipartEnctype(std::string& body)
 	}
 	_body.pop_back(); // Remove last unused body data added
 
-	std::cout << "============= BODY PARSING RECAP =============" << std::endl;
 	
+	// Debug: Print body content
 	for (int i = 0; i < (int)_body.size(); i++)
 	{
+		std::cout << "data: " << i << " meta-datas" << std::endl;
 		for(std::map<std::string, std::string>::iterator it = _body[i].metadata.begin(); it != _body[i].metadata.end(); ++it)
 			std::cout << it->first << "|" << it->second << "\n";
-		std::cout << "------------------" << std::endl;
+		std::cout << "data: " << i << " content" << std::endl;
 		std::cout << _body[i].content << std::endl;
-
 	}
-
-	std::cout << "============= BODY PARSING END =============" << std::endl;
+	
 }
 
 const std::string RequestHeader::parseBoundary()
@@ -120,7 +116,6 @@ bool RequestHeader::parseMetadatas(const std::string& line)
 	while (line[i] != ';' && line[i] != '\r')
 		value += line[i++];
 	
-	std::cout << "Key:" << key << "|Value:" << value << "|" << std::endl;
 	_body[_body.size() - 1].metadata[key] = value;
 
 	if (line[i] == '\r') // no more metadata to read
@@ -143,7 +138,6 @@ bool RequestHeader::parseMetadatas(const std::string& line)
 		i++;
 		if (line[i] != '\r')
 			i += 2;
-		std::cout << "Key:" << key << "|Value:" << value << "|" << std::endl;
 		_body[_body.size() - 1].metadata[key] = value;
 		key.clear();
 		value.clear();
@@ -160,7 +154,6 @@ std::string RequestHeader::parseBodyContent(std::istringstream& ss, const std::s
 		if (line != "\r")
 			bodyContent += line + '\n';
 	}
-	std::cout << "body content>>" << bodyContent << "<<" << std::endl;
 	return bodyContent;
 }
 

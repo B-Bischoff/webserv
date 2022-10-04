@@ -119,36 +119,36 @@ void Server::listenClient(const int& clientFd)
 
 void Server::processClientRequest(const int& clientFd, std::string& buffer)
 {
-		RequestHeader	request;
-		LocationBlock	tmp;
-		int				i;
+	RequestHeader	request;
+	LocationBlock	tmp;
+	int				i;
 
-		request.parseRequestHeader(buffer);
+	request.parseRequestHeader(buffer);
 
-		VirtualServerSelector selector(_servers, request);
-		i = selector.selectServerFromRequest();
+	VirtualServerSelector selector(_servers, request);
+	i = selector.selectServerFromRequest();
 
-		LocationSelector	select;
-		tmp = select.selectLocationBlock(request.getField("Path"), _servers.at(i).getVirtualServerConfig().loc);
+	LocationSelector	select;
+	tmp = select.selectLocationBlock(request.getField("Path"), _servers.at(i).getVirtualServerConfig().loc);
 
-		std::string requestBody;
-		if (SocketCommunicator::receiveRequestBody(clientFd, requestBody, request, _servers.at(i).getVirtualServerConfig().getMaxBodySize()) == -1)
-		{
-			std::cout << "Recv (request body) error" << std::endl;
-			removeFd(clientFd, _master);
-			return;
-		}
-		std::cout << "Request body: " << requestBody << std::endl;
-		request.parseRequestBody(requestBody);
+	std::string requestBody;
+	if (SocketCommunicator::receiveRequestBody(clientFd, requestBody, request, _servers.at(i).getVirtualServerConfig().getMaxBodySize()) == -1)
+	{
+		std::cout << "Recv (request body) error" << std::endl;
+		removeFd(clientFd, _master);
+		return;
+	}
+	std::cout << "Request body: " << requestBody << std::endl;
+	request.parseRequestBody(requestBody);
 
-		ManageRequest manager(_servers.at(i).getVirtualServerConfig(), tmp, request, requestBody);
-		Method dst = manager.identify(request);
-		header.build_response(dst);
+	ManageRequest manager(_servers.at(i).getVirtualServerConfig(), tmp, request, requestBody);
+	Method dst = manager.identify(request);
+	header.build_response(dst);
 
-		if (request.getField("Connection") == "close")
-			header.closeAfterSend = true;
+	if (request.getField("Connection") == "close")
+		header.closeAfterSend = true;
 
-		_clientsReponse[clientFd] = header;
+	_clientsReponse[clientFd] = header;
 }
 
 bool Server::isAVirtualServer(const int& fd) const
