@@ -12,6 +12,7 @@ CgiHandler::CgiHandler(RequestHeader &request, VirtualServerConfig &vServ, Locat
 	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	_env["SERVER_PORT"] = request.getField("Host").substr(request.getField("Host").find_first_of(':') + 1);
 	_env["REQUEST_METHOD"] = method;
+	// _env["PATH_INFO"] = "/pages/coucou.php";
 	_env["PATH_INFO"] = request.getField("Path").substr(0, request.getField("Path").find_first_of('?'));
 	_env["PATH_TRANSLATED"] = path.substr(0, path.find_first_of('?'));
 	_env["SCRIPT_NAME"] = loc.getStringField("cgi_pass");
@@ -54,7 +55,8 @@ void	CgiHandler::initCharEnv()
 	}
 	std::cout << "end of initCharEnv" << std::endl;
 	_charEnv[i] = NULL;
-	_args[0] = (char *)"./cgi-bin/php-cgi";
+	_args[0] = (char *)_env.at("SCRIPT_NAME").c_str();
+	// _args[0] = (char *)"./cgi-bin/php-cgi";
 	_args[1] = (char *)_env["Path"].c_str();
 	_args[2] = NULL;
 }

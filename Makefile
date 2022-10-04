@@ -35,7 +35,7 @@ SRCS = 	webserv.cpp \
 		ErrorStatus.cpp \
 		Parsing.cpp \
 		LocationBlock.cpp \
-		Setter.cpp \
+		InitBlocks.cpp \
 		ABlock.cpp \
 		LocationSelector.cpp \
 		Autoindex.cpp \
@@ -59,7 +59,7 @@ INCLUDES =	webserv.hpp \
 			Delete.hpp \
 			ErrorStatus.hpp \
 			Parsing.hpp \
-			Setter.hpp \
+			InitBlocks.hpp \
 			ABlock.hpp \
 			LocationSelector.hpp \
 			Autoindex.hpp \
