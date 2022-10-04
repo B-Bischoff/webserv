@@ -28,6 +28,8 @@ class VirtualServerSelector
 	public:
 		VirtualServerSelector(std::map<int, VirtualServer>& servers, const RequestHeader& request);
 
+		static bool compareWildcard(const std::string& source, const std::string& target);
+
 		int selectServerFromRequest();
 };
 

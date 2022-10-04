@@ -25,7 +25,7 @@ class VirtualServer
 	public:
 		VirtualServer(const VirtualServerConfig& config);
 
-		const std::string& getName() const;
+		const std::vector<std::string>& getNames() const;
 		const std::string& getIp() const;
 		unsigned int getPort() const;
 		const int& getServerSocket() const;

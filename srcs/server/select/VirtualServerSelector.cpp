@@ -46,7 +46,7 @@ int VirtualServerSelector::selectServerFromRequest()
 	if (matchingServers.size() == 1) // Found
 	{
 		std::cout << "EXACT IP AND PORT" << std::endl;
-		std::cout << matchingServers[0].getName() << " " << matchingServers[0].getIp()<<":"<<matchingServers[0].getPort()<<std::endl;
+		std::cout << matchingServers[0].getNames()[0] << " " << matchingServers[0].getIp()<<":"<<matchingServers[0].getPort()<<std::endl;
 		return matchingServers[0].getServerSocket();
 	}
 
@@ -83,7 +83,7 @@ int VirtualServerSelector::compareToNameOrDefault(std::vector<VirtualServer>& se
 	matchingServers = compareToNameAndPort(servers);
 	if (matchingServers.size() > 0) // Cannot be greater than 1 because servers can't have the exact same name
 	{
-		std::cout << matchingServers[0].getName() << " " << matchingServers[0].getIp()<<":"<<matchingServers[0].getPort()<<std::endl;
+		std::cout << matchingServers[0].getNames()[0] << " " << matchingServers[0].getIp()<<":"<<matchingServers[0].getPort()<<std::endl;
 		return matchingServers[0].getServerSocket();
 	}
 	
@@ -101,7 +101,7 @@ std::vector<VirtualServer> VirtualServerSelector::compareToNameAndPort(std::vect
 	{
 		if (_servers[i].getIp() == "0.0.0.0") // Don't evalute default IP
 			continue;
-		if (_hostName == servers[i].getName() && _port == servers[i].getPort())
+		if (_hostName == servers[i].getNames()[0] && _port == servers[i].getPort())
 		{
 			std::cout << "SERVER NAME" << std::endl;
 			matchingServers.push_back(servers[i]);
@@ -130,14 +130,63 @@ int VirtualServerSelector::compareToDefault(std::vector<VirtualServer>& servers)
 			}
 			if (servers[i].getIp() != "0.0.0.0" && !isASpecificIp(_hostName))
 			{
-				std::cout << servers[i].getName() << " " << servers[i].getIp()<<":"<<servers[i].getPort()<<std::endl;
+				std::cout << servers[i].getNames()[0] << " " << servers[i].getIp()<<":"<<servers[i].getPort()<<std::endl;
 				return servers[i].getServerSocket();
 			}
 		}
 	}
 
-	std::cout << servers[serverIndex].getName() << " " << servers[serverIndex].getIp()<<":"<<servers[serverIndex].getPort()<<std::endl;
+	std::cout << servers[serverIndex].getNames()[0] << " " << servers[serverIndex].getIp()<<":"<<servers[serverIndex].getPort()<<std::endl;
 	return defaultServerSocket;
+}
+
+bool VirtualServerSelector::compareWildcard(const std::string& reference, const std::string& target)
+{
+	std::vector<std::string> splittedReference;
+	if (reference.find_first_not_of('*') == std::string::npos) // reference only contains '*'
+		return true;
+	int i = reference.find_first_not_of('*');
+	while (i < static_cast<int>(reference.length()))
+	{
+		std::string str;
+		int end;
+		if (reference.find('*', i) == std::string::npos)
+			end = reference.length();
+		else
+			end = reference.find('*', i);
+		str = reference.substr(i, end - i);
+		if (str.empty() == false) // consecutive wildcards can create empty str
+			splittedReference.push_back(str);
+		i = end + 1;
+	}
+	for (int i = 0; i < (int)splittedReference.size(); i++)
+		std::cout << "-->" << splittedReference[i] << std::endl;
+	
+	bool startsWithWildcard = reference[0] == '*';
+	bool endsWithWildcard = reference[reference.length() - 1] == '*';
+	if (startsWithWildcard == false)
+	{
+		std::string str = target.substr(0, splittedReference[0].length());
+		if (str != splittedReference[0])
+			return false;
+	}
+	if (endsWithWildcard == false)
+	{
+		const std::string& str = splittedReference[splittedReference.size() - 1];
+		if (target.find(str.c_str(), target.length() - str.length(), str.length()) == std::string::npos)
+			return false;
+	}
+
+	int previousMatch = 0;
+	for (int i = 0; i < (int)splittedReference.size(); i++)
+	{
+		if (target.find(splittedReference[i], previousMatch) != std::string::npos)
+			previousMatch = target.find(splittedReference[i], previousMatch) + splittedReference[i].length();
+		else
+			return false;
+	}
+
+	return true;
 }
 
 bool VirtualServerSelector::isASpecificIp(const std::string ip) const
