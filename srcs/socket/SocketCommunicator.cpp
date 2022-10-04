@@ -17,10 +17,13 @@ int SocketCommunicator::receiveRequestHeader(const int& socket, std::string& buf
 
 int SocketCommunicator::receiveRequestBody(const int& socket, std::string& buffer, const RequestHeader& header, const int& maxSize)
 {
+	int retValue;
 	if (isChunkedRequest(header))
-		return receiveChunkedRequestBody(socket, buffer, maxSize);
+		retValue = receiveChunkedRequestBody(socket, buffer, maxSize);
 	else
-		return receiveStandardRequestBody(socket, buffer, header, maxSize);;
+		retValue = receiveStandardRequestBody(socket, buffer, header, maxSize);;
+	
+	return retValue;
 }
 
 int SocketCommunicator::receiveChunkedRequestBody(const int& socket, std::string& buffer, const int& maxSize)
