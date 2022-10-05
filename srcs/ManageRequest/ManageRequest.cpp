@@ -27,7 +27,7 @@ Method ManageRequest::identify(RequestHeader &request)
 {
 	Method index;
 	RequestConfig requestConfig(_locationBlock, _vServConfig, request);
-	std::string	body;
+	std::string	cgiResult;
 
 	try
 	{
@@ -40,22 +40,22 @@ Method ManageRequest::identify(RequestHeader &request)
 		else if (requestConfig.getCgi() == true)
 		{
 			CgiHandler cgi(request, _vServConfig, _locationBlock, requestConfig.getMethod(), requestConfig.getRootPath(), _body);
-			body = cgi.execCgi();
+			cgiResult = cgi.execCgi();
 		}
 		if (requestConfig.getMethod() == "GET")
 		{
 			Get	get;
-			return (get.exec(requestConfig, body));
+			return (get.exec(requestConfig, cgiResult));
 		}
 		else if (requestConfig.getMethod() == "POST")
 		{
 			Post post;
-			return (post.exec(requestConfig, _body, atoi(request.getField("Content-Length").c_str())));
+			return (post.exec(requestConfig, _request.getBodydata()));
 		}
 		else
 		{
 			Delete	del;
-			return (del.exec(requestConfig, body));
+			return (del.exec(requestConfig, cgiResult));
 		}
 	}
 	catch(const char *e)
