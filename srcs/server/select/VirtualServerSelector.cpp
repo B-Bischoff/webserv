@@ -55,7 +55,7 @@ int VirtualServerSelector::selectServerFromRequest()
 		serverList = _servers;
 	else
 		serverList = matchingServers;
-	
+
 	int nameComparisonReturn = compareToName(serverList);
 	
 	if (nameComparisonReturn != 0)
@@ -73,9 +73,7 @@ std::vector<VirtualServer> VirtualServerSelector::compareToIpAndPort()
 		if (_servers[i].getIp() == "0.0.0.0") // Don't evalute default IP
 			continue;
 		if (_hostName == _servers[i].getIp() && _port == _servers[i].getPort())
-		{
 			matchingServers.push_back(_servers[i]);
-		}
 	}
 
 	return matchingServers;
@@ -161,6 +159,8 @@ int VirtualServerSelector::compareToDefault(std::vector<VirtualServer>& servers)
 				std::cout << servers[i].getNames()[0] << " " << servers[i].getIp()<<":"<<servers[i].getPort()<<std::endl;
 				return servers[i].getServerSocket();
 			}
+			if (servers[i].getIp() == _hostName)
+				return servers[i].getServerSocket();
 		}
 	}
 
