@@ -50,9 +50,9 @@ void VirtualServer::init()
 	}
 }
 
-const std::string& VirtualServer::getName() const
+const std::vector<std::string>& VirtualServer::getNames() const
 {
-	return (_config.getVectorField("server_name"))[0];
+	return _config.getVectorField("server_name");
 }
 
 const std::string& VirtualServer::getIp() const

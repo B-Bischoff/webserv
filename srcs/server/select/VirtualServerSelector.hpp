@@ -19,14 +19,17 @@ class VirtualServerSelector
 		void convertMapToVector(std::map<int, VirtualServer>& servers);
 
 		std::vector<VirtualServer> compareToIpAndPort();
-		int compareToNameOrDefault(std::vector<VirtualServer>& servers);
-		std::vector<VirtualServer> compareToNameAndPort(std::vector<VirtualServer>& servers);
+		int compareToName(std::vector<VirtualServer>& servers);
+		int compareToExactName(std::vector<VirtualServer>& servers);
+		int compareToWildcardsName(std::vector<VirtualServer>& servers);
 		int compareToDefault(std::vector<VirtualServer>& servers);
 
 		bool isASpecificIp(const std::string ip) const;
 
 	public:
 		VirtualServerSelector(std::map<int, VirtualServer>& servers, const RequestHeader& request);
+
+		static bool compareWildcard(const std::string& source, const std::string& target);
 
 		int selectServerFromRequest();
 };
