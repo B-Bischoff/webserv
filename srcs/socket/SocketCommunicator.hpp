@@ -15,8 +15,6 @@ private:
 	static int receiveChunkLength(const int& socket);
 	static int convertHexaNumberInStrToInt(std::string& str);
 
-	static void parseBody(std::string& buffer, const RequestHeader& header);
-
 	static bool isChunkedRequest(const RequestHeader& header);
 
 public:
