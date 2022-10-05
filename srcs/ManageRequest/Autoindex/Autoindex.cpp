@@ -19,8 +19,9 @@ void	Autoindex::getDirectoryInfo(std::string &directoryName, struct dirent *ent)
 	struct stat	file;
 	struct tm	*timeInfo;
 	std::string	stringTime;
+	std::string	fullPath = _path + directoryName;
 
-	stat(directoryName.c_str(), &file);
+	stat(fullPath.c_str(), &file);
 	time(&rawTime);
 	timeInfo = localtime(&rawTime);
 	stringTime = asctime(timeInfo);
@@ -29,6 +30,7 @@ void	Autoindex::getDirectoryInfo(std::string &directoryName, struct dirent *ent)
 	_directoryInfo.push_back(stringTime);
 	std::stringstream ss;
 	ss << file.st_size;
+	std::cout << file.st_size << std::endl;
 	_directoryInfo.push_back((ent->d_type == DT_REG ? ss.str() + "\n" : "-\n"));
 }
 
