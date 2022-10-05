@@ -4,6 +4,7 @@ VirtualServerSelector::VirtualServerSelector(std::map<int, VirtualServer>& serve
 	: _request(request), _hostName(""), _port(0)
 {
 	parsePortAndHost();
+	_hostName = "france.fr.com";
 	convertMapToVector(servers);
 }
 
@@ -50,13 +51,18 @@ int VirtualServerSelector::selectServerFromRequest()
 		return matchingServers[0].getServerSocket();
 	}
 
+	std::vector<VirtualServer> serverList;
 	if (matchingServers.size() == 0) // Find from all possible servers
-	{
-		std::vector<VirtualServer> allServers = _servers;
-		return compareToNameOrDefault(allServers);
-	}
+		serverList = _servers;
 	else
-		return compareToNameOrDefault(matchingServers);
+		serverList = matchingServers;
+	
+	int nameComparisonReturn = compareToName(serverList);
+	
+	if (nameComparisonReturn != 0)
+		return nameComparisonReturn;
+
+	return compareToDefault(serverList);
 }
 
 std::vector<VirtualServer> VirtualServerSelector::compareToIpAndPort()
@@ -76,40 +82,63 @@ std::vector<VirtualServer> VirtualServerSelector::compareToIpAndPort()
 	return matchingServers;
 }
 
-int VirtualServerSelector::compareToNameOrDefault(std::vector<VirtualServer>& servers)
+int VirtualServerSelector::compareToName(std::vector<VirtualServer>& servers)
 {
-	std::vector<VirtualServer> matchingServers;
-
-	matchingServers = compareToNameAndPort(servers);
-	if (matchingServers.size() > 0) // Cannot be greater than 1 because servers can't have the exact same name
+	int exactNameReturn = compareToExactName(servers);
+	if (exactNameReturn != 0)
 	{
-		std::cout << matchingServers[0].getNames()[0] << " " << matchingServers[0].getIp()<<":"<<matchingServers[0].getPort()<<std::endl;
-		return matchingServers[0].getServerSocket();
+		std::cout << "Found by exact name" << std::endl;
+		return exactNameReturn;
 	}
-	
-	// To do: research with weird syntax (wildcards and stuff ...)
-	// HERE
 
-	return compareToDefault(servers);
+	int wildcardsNameReturn = compareToWildcardsName(servers);
+	if (wildcardsNameReturn != 0)
+	{
+		std::cout << "Found by wildcards" << std::endl;
+		return wildcardsNameReturn;
+	}
+
+	return 0;
 }
 
-std::vector<VirtualServer> VirtualServerSelector::compareToNameAndPort(std::vector<VirtualServer>& servers)
+int VirtualServerSelector::compareToExactName(std::vector<VirtualServer>& servers)
 {
-	std::vector<VirtualServer> matchingServers;
-
 	for (int i = 0; i < static_cast<int>(servers.size()); i++)
 	{
 		if (_servers[i].getIp() == "0.0.0.0") // Don't evalute default IP
 			continue;
-		if (_hostName == servers[i].getNames()[0] && _port == servers[i].getPort())
+		
+		if (_port == servers[i].getPort())
 		{
-			std::cout << "SERVER NAME" << std::endl;
-			matchingServers.push_back(servers[i]);
-			break;
+			for (int j = 0; j < static_cast<int>(_servers[i].getNames().size()); j++)
+			{
+				if (_hostName == servers[i].getNames()[j])
+				{
+					std::cout << "SERVER NAME" << std::endl;
+					return servers[i].getServerSocket();
+				}
+			}
 		}
 	}
 
-	return matchingServers;
+	return 0;
+}
+
+int VirtualServerSelector::compareToWildcardsName(std::vector<VirtualServer>& servers)
+{
+	for (int i = 0; i < static_cast<int>(servers.size()); i++)
+	{
+		for (int j = 0; j < static_cast<int>(servers[i].getNames().size()); j++)
+		{
+			if (servers[i].getNames()[j].find("*") != std::string::npos)
+			{
+				if (compareWildcard(servers[i].getNames()[j], _hostName) == true)	
+					return servers[i].getServerSocket();
+			}
+		}
+	}
+
+	return 0;
 }
 
 int VirtualServerSelector::compareToDefault(std::vector<VirtualServer>& servers)
@@ -159,9 +188,7 @@ bool VirtualServerSelector::compareWildcard(const std::string& reference, const 
 			splittedReference.push_back(str);
 		i = end + 1;
 	}
-	for (int i = 0; i < (int)splittedReference.size(); i++)
-		std::cout << "-->" << splittedReference[i] << std::endl;
-	
+
 	bool startsWithWildcard = reference[0] == '*';
 	bool endsWithWildcard = reference[reference.length() - 1] == '*';
 	if (startsWithWildcard == false)
