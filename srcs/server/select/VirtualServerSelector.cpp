@@ -4,7 +4,6 @@ VirtualServerSelector::VirtualServerSelector(std::map<int, VirtualServer>& serve
 	: _request(request), _hostName(""), _port(0)
 {
 	parsePortAndHost();
-	_hostName = "france.fr.com";
 	convertMapToVector(servers);
 }
 
