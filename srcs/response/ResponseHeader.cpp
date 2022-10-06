@@ -8,7 +8,6 @@ ResponseHeader::~ResponseHeader() {}
 std::string	ResponseHeader::get_extension_file(std::string path)
 {
 	std::string	dst;
-	
 	if (path.find(".html\0", 0) != path.npos || path.empty() == true)
 		return (dst = "text/html");
 	else if (path.find(".png\0", 0) != path.npos)
@@ -149,7 +148,7 @@ void	ResponseHeader::build_response(Method &method)
 	if (method.getConf().getAutoindex() == true || method.getConf().getRedirect() == true)
 		ext = get_extension_file(".html");
 	else
-		ext = get_extension_file(method.getConf().getRootPath());
+		ext = get_extension_file(method.getPath());
 	convert << method.getSize();
 
 	response_header = protocol + method.getStatus() + "\r\n" + content_type + ext + "\r\n";
