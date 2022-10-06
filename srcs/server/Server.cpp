@@ -143,6 +143,7 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 
 	ManageRequest manager(_servers.at(i).getVirtualServerConfig(), tmp, request, requestBody);
 	Method dst = manager.identify(request);
+
 	header.build_response(dst);
 
 	if (request.getField("Connection") == "close")

@@ -33,5 +33,6 @@ Method	Get::exec(RequestConfig &config, const std::string &body)
 	}
 	_size = _body.size();
 	_status = STATUS_200;
+	_path = config.getRootPath();
 	return (*this);
 }
