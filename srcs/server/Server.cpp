@@ -102,7 +102,7 @@ void Server::listenClient(const int& clientFd)
 
 	std::string buf;
 	int receiveReturn = SocketCommunicator::receiveRequestHeader(clientFd, buf);
-	std::cout << "Request Header: " << buf << std::endl;
+	// std::cout << "Request Header: " << buf << std::endl;
 
 	if (receiveReturn <= 0) // Client disconnected or recv error
 	{
@@ -138,7 +138,7 @@ void Server::processClientRequest(const int& clientFd, std::string& buffer)
 		removeFd(clientFd, _master);
 		return;
 	}
-	std::cout << "Request body: " << requestBody << std::endl;
+	// std::cout << "Request body: " << requestBody << std::endl;
 	request.parseRequestBody(requestBody);
 
 	ManageRequest manager(_servers.at(i).getVirtualServerConfig(), tmp, request, requestBody);

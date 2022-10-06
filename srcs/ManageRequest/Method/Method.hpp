@@ -27,6 +27,7 @@
 #define STATUS_405 "405 Method Not Allowed"
 #define STATUS_411 "411 Length Required"
 #define STATUS_500 "500 Internal Server Error"
+#define	STATUS_NO_FILENAME "No filename found during upload"
 
 class Method
 {
