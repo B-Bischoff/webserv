@@ -36,7 +36,8 @@ Method ManageRequest::identify(RequestHeader &request)
 		else if (requestConfig.getRedirect() == true)
 			return (index.redirect(requestConfig.getRedirectPath()));
 		else if (requestConfig.getAutoindex() == true)
-			return (index.autoindex(requestConfig.getRootPath()));
+			return (index.autoindex(_locationBlock.getStringField("root") != ""
+			? _locationBlock.getStringField("root") : _vServConfig.getStringField("root"), requestConfig.getRootPath()));
 		else if (requestConfig.getCgi() == true)
 		{
 			CgiHandler cgi(request, _vServConfig, _locationBlock, requestConfig.getMethod(), requestConfig.getRootPath(), _body);
