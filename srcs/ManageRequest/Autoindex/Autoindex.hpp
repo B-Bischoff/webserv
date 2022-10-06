@@ -19,13 +19,14 @@ class Autoindex
 		std::string					_path;
 		std::vector<std::string>	_directoryInfo;
 		std::string					_tmpBody;
+		std::string					_webPath;
 
 		void	getDirectoryInfo(std::string &directoryName, struct dirent *ent);
 		void	addToBody(std::string &directoryName);
 		void	insertTabChar(std::string &directoryName);
 
 	public:
-		Autoindex(std::string path);
+		Autoindex(std::string rootPath, std::string fullPath);
 		~Autoindex();
 		std::string	buildAutoindex();
 };
