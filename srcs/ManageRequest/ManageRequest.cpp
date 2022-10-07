@@ -28,7 +28,6 @@ Method ManageRequest::identify(RequestHeader &request)
 	Method index;
 	RequestConfig requestConfig(_locationBlock, _vServConfig, request);
 	std::string	cgiResult;
-
 	try
 	{
 		if (requestConfig.getValidMethod() == false)

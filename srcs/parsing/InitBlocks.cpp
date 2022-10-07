@@ -201,9 +201,6 @@ void	InitBlocks::setErrorPage(VirtualServerConfig &vServ)
 
 void	InitBlocks::setUploadPath(VirtualServerConfig &vServ)
 {
-	struct stat info;
 	_streamLine >> _keyWord;
-	if (stat(_keyWord.c_str(), &info) != 0 )
-		throw(DIRECTORY + _keyWord + "'");
 	vServ.loc[_locationBlock].setStringField(_keyWord, "upload");
 }

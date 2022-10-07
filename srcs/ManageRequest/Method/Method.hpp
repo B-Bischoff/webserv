@@ -22,6 +22,7 @@
 #define STATUS_201 "201 Created"
 #define STATUS_204 "204 No Content"
 #define	STATUS_301 "301 Moved Permanently"
+#define STATUS_400 "400 Bad Request"
 #define STATUS_403 "403 Forbidden"
 #define STATUS_404 "404 Not Found"
 #define STATUS_405 "405 Method Not Allowed"
