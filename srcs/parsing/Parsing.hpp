@@ -21,7 +21,6 @@
 #include "ABlock.hpp"
 #include <arpa/inet.h>
 
-#define	MEGABYTE		1000000
 #define OPEN_FILE		(std::string)"Unable to open the file : '"
 #define EMPTY 			(std::string)" is empty"
 #define BRACKETS		(std::string)"Config file isn't closed by brackets properly"

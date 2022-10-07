@@ -81,7 +81,7 @@ void	InitBlocks::setMaxBodySize(VirtualServerConfig &vServ)
 	unsigned int	size;
 
 	_streamLine >> _keyWord;
-	size = atol(_keyWord.c_str()) * MEGABYTE;
+	size = atol(_keyWord.c_str());
 	vServ.setMaxBodySize(size);
 }
 
