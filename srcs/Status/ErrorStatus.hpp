@@ -22,6 +22,7 @@ class ErrorStatus : public Method
 		~ErrorStatus();
 
 		ErrorStatus	&buildError(std::string error, VirtualServerConfig &vServ);
+		ErrorStatus	&buildError(std::string error);
 		bool		findStatus(const std::vector<int> &status, int status_code);
 		std::string	buildErrorPath(std::string path, const std::string &error);
 		std::string	getErrorPage(std::string path);

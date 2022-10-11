@@ -1,11 +1,11 @@
 #include "Method.hpp"
 
-Method::Method(RequestHeader request)
+Method::Method(RequestHeader request) : _closeAfterSend(false)
 {
 	(void)request;
 }
 
-Method::Method()
+Method::Method() : _closeAfterSend(false)
 {
 
 }
@@ -60,4 +60,14 @@ Method	&Method::redirect(const std::string &redirectUrl)
 	_size = _body.size();
 	_status = STATUS_301;
 	return (*this);
+}
+
+bool	Method::getCloseAfterSend() const
+{
+	return _closeAfterSend;
+}
+
+void	Method::setCloseAfterSend(const bool& value)
+{
+	_closeAfterSend = value;
 }

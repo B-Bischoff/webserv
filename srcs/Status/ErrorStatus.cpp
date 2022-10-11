@@ -26,6 +26,15 @@ ErrorStatus	&ErrorStatus::buildError(std::string error, VirtualServerConfig &vSe
 	return (*this);
 }
 
+ErrorStatus &ErrorStatus::buildError(std::string error)
+{
+	_body = "<div id=\"main\">\n\t<div class=\"fof\">\n\t\t<h1></h1>\n\t</div>\n</div>";
+	_body.insert(41, error);
+	_size = _body.size();
+	_status = error;
+	return (*this);
+}
+
 bool	ErrorStatus::findStatus(const std::vector<int> &status, int statusCode)
 {
 	for (std::vector<int>::const_iterator it = status.begin(); it != status.end(); it++)

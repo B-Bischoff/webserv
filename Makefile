@@ -46,6 +46,7 @@ SRCS = 	webserv.cpp \
 OBJS = $(addprefix .objects/, $(SRCS:.cpp=.o))
 
 INCLUDES =	webserv.hpp \
+			StatusCode.hpp \
 			ResponseHeader.hpp \
 			Server.hpp \
 			VirtualServer.hpp \

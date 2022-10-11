@@ -31,6 +31,9 @@ void RequestHeader::parseMethodPathAndVersion(std::string& line)
 	stream >> _fields["Method"];
 	stream >> _fields["Path"];
 	stream >> _fields["Version"];
+
+	if (_fields["Version"] != "HTTP/1.1")
+		throw (STATUS_505);
 }
 
 void RequestHeader::parseField(std::string& line)

@@ -92,7 +92,7 @@ int SocketCommunicator::convertHexaNumberInStrToInt(std::string& str)
 int SocketCommunicator::receiveStandardRequestBody(const int& socket, std::string& buffer, const RequestHeader& header, const int& maxSize)
 {
 	int bytesToRead = atoi(header.getField("Content-Length").c_str());
-	if (bytesToRead <= 0)
+	if (bytesToRead <= 0) // Need to throw error 411 (Lenth required) if content-length is not found
 		return 0;
 	if (bytesToRead > maxSize) // Need to throw a specific error code
 		return 0; // Change this by "throw [ERROR_CODE]"
@@ -115,4 +115,3 @@ bool SocketCommunicator::isChunkedRequest(const RequestHeader& header)
 {
 	return (header.getField("Transfer-Encoding") == "chunked");
 }
-

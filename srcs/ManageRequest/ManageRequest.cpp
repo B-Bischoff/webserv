@@ -29,44 +29,31 @@ Method ManageRequest::identify(RequestHeader &request)
 	RequestConfig requestConfig(_locationBlock, _vServConfig, request);
 	std::string	body;
 
-	try
+	if (requestConfig.getValidMethod() == false)
+		throw(STATUS_405);
+	else if (requestConfig.getRedirect() == true)
+		return (index.redirect(requestConfig.getRedirectPath()));
+	else if (requestConfig.getAutoindex() == true)
+		return (index.autoindex(requestConfig.getRootPath()));
+	else if (requestConfig.getCgi() == true)
 	{
-		if (requestConfig.getValidMethod() == false)
-			throw(STATUS_405);
-		else if (requestConfig.getRedirect() == true)
-			return (index.redirect(requestConfig.getRedirectPath()));
-		else if (requestConfig.getAutoindex() == true)
-			return (index.autoindex(requestConfig.getRootPath()));
-		else if (requestConfig.getCgi() == true)
-		{
-			CgiHandler cgi(request, _vServConfig, _locationBlock, requestConfig.getMethod(), requestConfig.getRootPath(), _body);
-			body = cgi.execCgi();
-		}
-		if (requestConfig.getMethod() == "GET")
-		{
-			Get	get;
-			return (get.exec(requestConfig, body));
-		}
-		else if (requestConfig.getMethod() == "POST")
-		{
-			Post post;
-			return (post.exec(requestConfig, _body, atoi(request.getField("Content-Length").c_str())));
-		}
-		else
-		{
-			Delete	del;
-			return (del.exec(requestConfig, body));
-		}
+		CgiHandler cgi(request, _vServConfig, _locationBlock, requestConfig.getMethod(), requestConfig.getRootPath(), _body);
+		body = cgi.execCgi();
 	}
-	catch(const char *e)
+	if (requestConfig.getMethod() == "GET")
 	{
-		ErrorStatus	error;
-		return (error.buildError(e, _vServConfig));
+		Get	get;
+		return (get.exec(requestConfig, body));
 	}
-	catch(...)
+	else if (requestConfig.getMethod() == "POST")
 	{
-		ErrorStatus	error;
-		return (error.buildError(STATUS_500, _vServConfig));
+		Post post;
+		return (post.exec(requestConfig, _body, atoi(request.getField("Content-Length").c_str())));
+	}
+	else
+	{
+		Delete	del;
+		return (del.exec(requestConfig, body));
 	}
 	return (index);
 }

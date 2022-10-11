@@ -26,17 +26,24 @@
 #include "LocationSelector.hpp"
 #include "SocketCommunicator.hpp"
 
+struct Client {
+	RequestHeader request;
+	ResponseHeader response;
+	bool needToReceiveBody;
+	int virtualServerId;
+	std::string body; // To delete
+};
+
 class Server {
 private:
 	std::map<int, VirtualServer> _servers;
 
 	int _newSocket;
-	ResponseHeader	header; // Probably gonna make that variable temporary
 
 	fd_set _master;
 	int _fdmax;
 
-	std::map<int, ResponseHeader> _clientsReponse;
+	std::map<int, Client> _clients;
 
 	void createVirtualServer(const VirtualServerConfig& config);
 
@@ -44,8 +51,12 @@ private:
 
 	void acceptConnection(const int& serverSocket);
 	void listenClient(const int& clientFd);
-	void processClientRequest(const int& clientFd, std::string& buffer);
+	int listenHeader(const int& clientFd);
+	void listenBody(const int& clientFd);
+	const Method processClientRequest(const int& clientFd);
+	void createClientResponse(const int& clientFd, Method& method);
 
+	bool needToReceiveBody(const RequestHeader& request) const;
 	bool isAVirtualServer(const int& fd) const;
 	void addFd(const int& fd, fd_set& set);
 	void removeFd(const int& fd, fd_set& set);
