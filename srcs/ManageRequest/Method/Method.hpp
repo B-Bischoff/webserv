@@ -42,7 +42,7 @@ class Method
 		std::string	getPath() const;
 		std::string	getStatus() const;
 		RequestConfig	&getConf();
-		Method	&autoindex(const std::string &rootPath);
+		Method	&autoindex(const std::string &rootPath, const std::string &fullPath);
 		Method	&redirect(const std::string &redirectUrl);
 		bool	getCloseAfterSend() const;
 		void		setCloseAfterSend(const bool& value);

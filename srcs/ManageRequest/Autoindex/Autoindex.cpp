@@ -1,10 +1,11 @@
 #include "Autoindex.hpp"
 
-Autoindex::Autoindex(std::string path) : _path(path)
+Autoindex::Autoindex(std::string rootPath, std::string fullPath) : _path(fullPath)
 {
+	_webPath = fullPath.substr(rootPath.length());
 	_headBody = "<html>\n<head><title>Index of ";
-	_headBody += path;
-	_headBody += "</title><head>\n<body>\n<h1>Index of " + path + "</h1><hr><pre>\n";
+	_headBody += _webPath;
+	_headBody += "</title><head>\n<body>\n<h1>Index of " + _webPath + "</h1><hr><pre>\n";
 	_endBody = "</pre><hr></body>\n</html>";
 }
 
@@ -19,8 +20,9 @@ void	Autoindex::getDirectoryInfo(std::string &directoryName, struct dirent *ent)
 	struct stat	file;
 	struct tm	*timeInfo;
 	std::string	stringTime;
+	std::string	fullPath = _path + directoryName;
 
-	stat(directoryName.c_str(), &file);
+	stat(fullPath.c_str(), &file);
 	time(&rawTime);
 	timeInfo = localtime(&rawTime);
 	stringTime = asctime(timeInfo);
@@ -70,7 +72,7 @@ std::string	Autoindex::buildAutoindex()
   		while ((ent = readdir (dir)) != NULL)
 		{
 			directoryName = ent->d_name;
-			if (directoryName[0] != '.' || (directoryName[0] == '.' && directoryName[1] == '.'))
+			if (directoryName[0] != '.' || (directoryName[0] == '.' && directoryName[1] == '.' && _webPath != "/"))
 			{
 				getDirectoryInfo(directoryName, ent);
 				addToBody(directoryName);

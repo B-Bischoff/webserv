@@ -37,6 +37,7 @@ class RequestHeader
 
 	public:
 		std::string getField(const std::string& field) const;
+		const std::vector<BodyData>	&getBodydata();
 
 		void parseRequestHeader(std::string& header);
 		void parseRequestBody(std::string& body);

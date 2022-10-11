@@ -87,14 +87,14 @@ void RequestHeader::parseMultipartEnctype(std::string& body)
 
 	
 	// Debug: Print body content
-	for (int i = 0; i < (int)_body.size(); i++)
-	{
-		std::cout << "data: " << i << " meta-datas" << std::endl;
-		for(std::map<std::string, std::string>::iterator it = _body[i].metadata.begin(); it != _body[i].metadata.end(); ++it)
-			std::cout << it->first << "|" << it->second << "\n";
-		std::cout << "data: " << i << " content" << std::endl;
-		std::cout << _body[i].content << std::endl;
-	}
+	// for (int i = 0; i < (int)_body.size(); i++)
+	// {
+	// 	std::cout << "data: " << i << " meta-datas" << std::endl;
+	// 	for(std::map<std::string, std::string>::iterator it = _body[i].metadata.begin(); it != _body[i].metadata.end(); ++it)
+	// 		std::cout << it->first << "|" << it->second << "\n";
+	// 	std::cout << "data: " << i << " content" << std::endl;
+	// 	std::cout << _body[i].content << std::endl;
+	// }
 	
 }
 
@@ -178,4 +178,9 @@ void RequestHeader::removeWhiteSpaces(std::string& str)
 		if (isprint(str[i]) == false)
 			str.erase(i);
 	}
+}
+
+const std::vector<BodyData>	 &RequestHeader::getBodydata()
+{
+	return (_body);
 }

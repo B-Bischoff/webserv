@@ -61,8 +61,10 @@ void Server::serverLoop()
 				std::cout << "Client " << i << " ready to receive response" << std::endl;
 				const ResponseHeader& response = _clients[i].response;
 				// Make a send all method in SocketCommunicator
+				std::cout << response.response_header << std::endl;
 				if (send(i, response.response_header.c_str(), response.response_header.size(), 0) == -1)
 				{
+					std::cout << "Send error" << std::endl;
 					removeFd(i, _master);
 					return;
 				}
@@ -128,7 +130,7 @@ void Server::listenClient(const int& clientFd)
 		}
 	}
 
-	Method method = processClientRequest(clientFd);
+	method = processClientRequest(clientFd);
 
 	createClientResponse(clientFd, method);
 }
@@ -196,17 +198,16 @@ const Method Server::processClientRequest(const int& clientFd)
 	try {
 		ManageRequest manager(config, locationBlock, client.request, client.body);
 		dst = manager.identify(client.request);
-		return dst;
 	}
 	catch(const char *e)
 	{
 		ErrorStatus error;
 		dst = error.buildError(e, config);
-		return dst;
 	}
 
 	dst.setCloseAfterSend(client.request.getField("Connection") == "close");
 
+	std::cout << dst.getBody() << std::endl;
 	return dst;
 }
 

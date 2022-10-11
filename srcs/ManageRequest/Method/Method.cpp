@@ -40,9 +40,9 @@ RequestConfig	&Method::getConf()
 	return (this->_requestConfig);
 }
 
-Method	&Method::autoindex(const std::string &rootPath)
+Method	&Method::autoindex(const std::string &rootPath, const std::string &fullPath)
 {
-	Autoindex	autoindex(rootPath);
+	Autoindex	autoindex(rootPath, fullPath);
 
 	_body = autoindex.buildAutoindex();
 	_size = _body.size();
