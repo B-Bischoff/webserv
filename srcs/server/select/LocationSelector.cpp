@@ -3,6 +3,7 @@
 LocationBlock	LocationSelector::selectLocationBlock(const std::string &path, std::vector<LocationBlock> &serverBlock)
 {
 	std::vector<std::string>	validPaths;
+	std::vector<std::string>	locationPaths;
 	size_t						maxSize = 0;
 	int							maxSizeIndex = 0;
 	std::string					locationPath;
@@ -14,7 +15,7 @@ LocationBlock	LocationSelector::selectLocationBlock(const std::string &path, std
 		{
 			if (locationPath == path && serverBlock[i].getStringField("location_modifier") == "=")
 				return (serverBlock[i]);
-			_locationPaths.push_back(locationPath);
+			locationPaths.push_back(locationPath);
 			if (locationPath.size() > maxSize)
 			{
 				maxSize = locationPath.size();

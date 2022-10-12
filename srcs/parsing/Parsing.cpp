@@ -120,6 +120,8 @@ void	Parsing::checkSyntaxFile()
 		if (_fileContent[i] == ';' && _fileContent[i + 1] != '\n')
 			throw(SEMICOLON + _fileContent[i + 1] + "'");
 	}
+	if (server || loc)
+		throw(BRACKETS);
 }
 
 void	Parsing::isFile(char *confPath)

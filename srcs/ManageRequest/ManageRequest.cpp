@@ -1,32 +1,19 @@
 #include "ManageRequest.hpp"
 
-ManageRequest::ManageRequest(VirtualServerConfig &vServCongif, LocationBlock &locationBlock, RequestHeader &request, std::string &body) :
-	_vServConfig(vServCongif), _locationBlock(locationBlock), _request(request), _body(body)
+ManageRequest::ManageRequest(Client &client) : _client(client)
 {
-	(void)_vServConfig;
-	(void)_locationBlock;
-	(void)_request;
+
 }
 
 ManageRequest::~ManageRequest()
 {
 
 }
-/*
-	==== GENERATE RESPONSE ALGO ====
 
-	use default root / path
-	check method (from location block or virtual server)
-	cgi ?
-	search file from location
-
-	return response header (string)
-*/
-
-Method ManageRequest::identify(RequestHeader &request)
+Method ManageRequest::identify()
 {
 	Method index;
-	RequestConfig requestConfig(_locationBlock, _vServConfig, request);
+	RequestConfig requestConfig(_client.locationBlock, _client.virtualServer, _client.request);
 	std::string	cgiResult;
 
 	if (requestConfig.getValidMethod() == false)
@@ -34,13 +21,10 @@ Method ManageRequest::identify(RequestHeader &request)
 	else if (requestConfig.getRedirect() == true)
 		return (index.redirect(requestConfig.getRedirectPath()));
 	else if (requestConfig.getAutoindex() == true)
-		return (index.autoindex(_locationBlock.getStringField("root") != ""
-		? _locationBlock.getStringField("root") : _vServConfig.getStringField("root"), requestConfig.getRootPath()));
+		return (index.autoindex(_client.locationBlock.getStringField("root") != ""
+		? _client.locationBlock.getStringField("root") : _client.virtualServer.getStringField("root"), requestConfig.getRootPath()));
 	else if (requestConfig.getCgi() == true)
-	{
-		CgiHandler cgi(request, _vServConfig, _locationBlock, requestConfig.getMethod(), requestConfig.getRootPath(), _body);
-		cgiResult = cgi.execCgi();
-	}
+		cgiResult = CgiHandler::execCgi(_client);
 	if (requestConfig.getMethod() == "GET")
 	{
 		Get	get;
@@ -49,7 +33,7 @@ Method ManageRequest::identify(RequestHeader &request)
 	else if (requestConfig.getMethod() == "POST")
 	{
 		Post post;
-		return (post.exec(requestConfig, _request.getBodydata()));
+		return (post.exec(requestConfig, _client.request.getBodydata()));
 	}
 	else
 	{
