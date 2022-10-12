@@ -29,45 +29,32 @@ Method ManageRequest::identify(RequestHeader &request)
 	RequestConfig requestConfig(_locationBlock, _vServConfig, request);
 	std::string	cgiResult;
 
-	try
+	if (requestConfig.getValidMethod() == false)
+		throw(STATUS_405);
+	else if (requestConfig.getRedirect() == true)
+		return (index.redirect(requestConfig.getRedirectPath()));
+	else if (requestConfig.getAutoindex() == true)
+		return (index.autoindex(_locationBlock.getStringField("root") != ""
+		? _locationBlock.getStringField("root") : _vServConfig.getStringField("root"), requestConfig.getRootPath()));
+	else if (requestConfig.getCgi() == true)
 	{
-		if (requestConfig.getValidMethod() == false)
-			throw(STATUS_405);
-		else if (requestConfig.getRedirect() == true)
-			return (index.redirect(requestConfig.getRedirectPath()));
-		else if (requestConfig.getAutoindex() == true)
-			return (index.autoindex(_locationBlock.getStringField("root") != ""
-			? _locationBlock.getStringField("root") : _vServConfig.getStringField("root"), requestConfig.getRootPath()));
-		else if (requestConfig.getCgi() == true)
-		{
-			CgiHandler cgi(request, _vServConfig, _locationBlock, requestConfig.getMethod(), requestConfig.getRootPath(), _body);
-			cgiResult = cgi.execCgi();
-		}
-		if (requestConfig.getMethod() == "GET")
-		{
-			Get	get;
-			return (get.exec(requestConfig, cgiResult));
-		}
-		else if (requestConfig.getMethod() == "POST")
-		{
-			Post post;
-			return (post.exec(requestConfig, _request.getBodydata()));
-		}
-		else
-		{
-			Delete	del;
-			return (del.exec(requestConfig, cgiResult));
-		}
+		CgiHandler cgi(request, _vServConfig, _locationBlock, requestConfig.getMethod(), requestConfig.getRootPath(), _body);
+		cgiResult = cgi.execCgi();
 	}
-	catch(const char *e)
+	if (requestConfig.getMethod() == "GET")
 	{
-		ErrorStatus	error;
-		return (error.buildError(e, _vServConfig));
+		Get	get;
+		return (get.exec(requestConfig, cgiResult));
 	}
-	catch(...)
+	else if (requestConfig.getMethod() == "POST")
 	{
-		ErrorStatus	error;
-		return (error.buildError(STATUS_500, _vServConfig));
+		Post post;
+		return (post.exec(requestConfig, _request.getBodydata()));
+	}
+	else
+	{
+		Delete	del;
+		return (del.exec(requestConfig, cgiResult));
 	}
 	return (index);
 }
