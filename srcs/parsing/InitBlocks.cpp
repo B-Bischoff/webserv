@@ -78,7 +78,7 @@ void	InitBlocks::setLocation(VirtualServerConfig &vServ)
 
 void	InitBlocks::setMaxBodySize(VirtualServerConfig &vServ)
 {
-	unsigned int	size;
+	long size;
 
 	_streamLine >> _keyWord;
 	size = atol(_keyWord.c_str());

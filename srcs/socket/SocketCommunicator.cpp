@@ -15,7 +15,7 @@ int SocketCommunicator::receiveRequestHeader(const int& socket, std::string& buf
 	return nbytes;
 }
 
-int SocketCommunicator::receiveRequestBody(const int& socket, std::string& buffer, const RequestHeader& header, const int& maxSize)
+int SocketCommunicator::receiveRequestBody(const int& socket, std::string& buffer, const RequestHeader& header, const long& maxSize)
 {
 	int retValue;
 	if (isChunkedRequest(header))
@@ -26,9 +26,9 @@ int SocketCommunicator::receiveRequestBody(const int& socket, std::string& buffe
 	return retValue;
 }
 
-int SocketCommunicator::receiveChunkedRequestBody(const int& socket, std::string& buffer, const int& maxSize)
+int SocketCommunicator::receiveChunkedRequestBody(const int& socket, std::string& buffer, const long& maxSize)
 {
-	int totalBytesRead = 0;
+	long totalBytesRead = 0;
 	int chunkLength = 1;
 	
 	while (totalBytesRead <= maxSize && chunkLength > 0)
@@ -89,10 +89,10 @@ int SocketCommunicator::convertHexaNumberInStrToInt(std::string& str)
 	return number;
 }
 
-int SocketCommunicator::receiveStandardRequestBody(const int& socket, std::string& buffer, const RequestHeader& header, const int& maxSize)
+int SocketCommunicator::receiveStandardRequestBody(const int& socket, std::string& buffer, const RequestHeader& header, const long& maxSize)
 {
-	int bytesToRead = atoi(header.getField("Content-Length").c_str());
-	if (bytesToRead <= 0)
+	long bytesToRead = atol(header.getField("Content-Length").c_str());
+	if (bytesToRead <= 0) // Need to throw error 411 (Lenth required) if content-length is not found
 		return 0;
 	if (bytesToRead > maxSize) // Need to throw a specific error code
 		return 0; // Change this by "throw [ERROR_CODE]"
@@ -115,4 +115,3 @@ bool SocketCommunicator::isChunkedRequest(const RequestHeader& header)
 {
 	return (header.getField("Transfer-Encoding") == "chunked");
 }
-

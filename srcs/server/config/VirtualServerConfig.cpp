@@ -20,12 +20,12 @@ unsigned int	VirtualServerConfig::getPort(void) const
 	return _port;
 }
 
-void	VirtualServerConfig::setMaxBodySize(unsigned int size)
+void	VirtualServerConfig::setMaxBodySize(long size)
 {
 	_client_max_body_size = size;
 }
 
-unsigned int	VirtualServerConfig::getMaxBodySize(void) const
+long	VirtualServerConfig::getMaxBodySize(void) const
 {
 	return (_client_max_body_size);
 }

@@ -8,6 +8,9 @@
 #include <fstream>
 #include <map>
 #include <vector>
+
+#include "StatusCode.hpp"
+
 #define MAX_BODY_SIZE 30000
 #define ROOT_PATH "./pages"
 
