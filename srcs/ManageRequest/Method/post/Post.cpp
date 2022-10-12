@@ -61,9 +61,8 @@ void	Post::createFile(const std::string &fileName, const std::string &path, cons
 
 	std::string outfile = path + "/" + fileName;
 		file.open(outfile.c_str(), std::ofstream::out);
-	std::cout << outfile << std::endl;
 	if (file.is_open() == false)
-		throw(STATUS_500);
+		throw(STATUS_400);
 	file << body;
 	file.close();
 }

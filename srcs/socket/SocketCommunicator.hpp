@@ -10,8 +10,8 @@
 
 class SocketCommunicator {
 private:
-	static int receiveStandardRequestBody(const int& socket, std::string& buffer, const RequestHeader& header, const int& maxSize);
-	static int receiveChunkedRequestBody(const int& socket, std::string& buffer, const int& maxSize);
+	static int receiveStandardRequestBody(const int& socket, std::string& buffer, const RequestHeader& header, const long& maxSize);
+	static int receiveChunkedRequestBody(const int& socket, std::string& buffer, const long& maxSize);
 	static int receiveChunkLength(const int& socket);
 	static int convertHexaNumberInStrToInt(std::string& str);
 
@@ -19,7 +19,7 @@ private:
 
 public:
 	static int receiveRequestHeader(const int& socket, std::string& buffer);
-	static int receiveRequestBody(const int& socket, std::string& buffer, const RequestHeader& header, const int& maxSize);
+	static int receiveRequestBody(const int& socket, std::string& buffer, const RequestHeader& header, const long& maxSize);
 };
 
 #endif

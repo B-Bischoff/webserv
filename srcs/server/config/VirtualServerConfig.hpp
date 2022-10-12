@@ -27,7 +27,7 @@ typedef std::map <std::string, std::vector <std::string> > Serv;
 class VirtualServerConfig : public ABlock
 {
 	private:
-		unsigned int		_client_max_body_size;
+		long _client_max_body_size;
 		std::vector<int>	_errorStatus;
 
 	public:
@@ -38,8 +38,8 @@ class VirtualServerConfig : public ABlock
 		void						setPort(std::string ip);
 		unsigned int				getPort(void) const;
 
-		void						setMaxBodySize(unsigned int size);
-		unsigned int				getMaxBodySize(void) const;
+		void						setMaxBodySize(long size);
+		long						getMaxBodySize(void) const;
 
 		void						setErrorStatus(std::vector<int> values);
 
