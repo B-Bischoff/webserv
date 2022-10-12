@@ -177,13 +177,11 @@ void Server::listenBody(const int& clientFd)
 const Method Server::processClientRequest(const int& clientFd)
 {
 	Client& client = _clients[clientFd];
-	VirtualServerConfig& config = _servers.at(client.virtualServerId).getVirtualServerConfig();
-	LocationSelector	select;
-	LocationBlock locationBlock = select.selectLocationBlock(client.request.getField("Path"), config.loc);
-
+	client.virtualServer = _servers.at(client.virtualServerId).getVirtualServerConfig();
+	client.locationBlock = LocationSelector::selectLocationBlock(client.request.getField("Path"), client.virtualServer.loc);
 	Method dst;
-	ManageRequest manager(config, locationBlock, client.request, client.body);
-	dst = manager.identify(client.request);
+	ManageRequest manager(client);
+	dst = manager.identify();
 
 	dst.setCloseAfterSend(client.request.getField("Connection") == "close");
 

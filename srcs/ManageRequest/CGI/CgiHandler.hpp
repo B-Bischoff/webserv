@@ -4,22 +4,19 @@
 #include "webserv.hpp"
 #include <sys/wait.h>
 #include <sys/types.h>
+#include "Server.hpp"
+
+struct Client;
 
 class CgiHandler
 {
 	private:
-		std::map<std::string, std::string>	_env;
-		char								**_charEnv;
-		char								**_args;
-		std::string							_body;
-
-		void	initCharEnv();
+		static	void	initCharEnv(std::map<std::string, std::string> &_env, char **_charEnv, char **_args);
+		static	void setGlobalCgiVariable(const Client &client, std::map<std::string, std::string>	&_env);
 
 	public:
-		CgiHandler(RequestHeader &request, VirtualServerConfig &vServ, LocationBlock &loc, const std::string &method, const std::string &path, std::string &body);
-		~CgiHandler();
 
-		std::string	execCgi();
+		static std::string	execCgi(const Client &client);
 };
 
 #endif
