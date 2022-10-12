@@ -50,11 +50,16 @@ private:
 	void serverLoop();
 
 	void acceptConnection(const int& serverSocket);
+
+	void manageClientRequest(const int& clientFd);
 	int listenClient(const int& clientFd);
 	int listenHeader(const int& clientFd);
 	void listenBody(const int& clientFd);
 	const Method processClientRequest(const int& clientFd);
-	void createClientResponse(const int& clientFd, Method& method);
+	void createClientResponseFromMethod(const int& clientFd, Method& method);
+	Method manageError(const int& clientFd, const char* e);
+
+	void respondToClient(const int& clientFd);
 
 	bool needToReceiveBody(const RequestHeader& request) const;
 	bool isAVirtualServer(const int& fd) const;

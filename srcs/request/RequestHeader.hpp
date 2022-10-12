@@ -11,9 +11,6 @@
 
 #include "StatusCode.hpp"
 
-#define MAX_BODY_SIZE 30000
-#define ROOT_PATH "./pages"
-
 struct BodyData {
 	std::map<std::string, std::string> metadata;
 	std::string content;

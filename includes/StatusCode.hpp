@@ -10,6 +10,8 @@
 #define STATUS_404 "404 Not Found"
 #define STATUS_405 "405 Method Not Allowed"
 #define STATUS_411 "411 Length Required"
+#define STATUS_413 "413 Request Entity Too Large"
+#define STATUS_414 "414 Request-URI Too Long"
 #define STATUS_500 "500 Internal Server Error"
 #define STATUS_505 "HTTP Version Not Supported"
 
