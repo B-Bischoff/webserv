@@ -12,6 +12,9 @@ void	RequestHeader::parseRequestHeader(std::string& header)
 	{
 		parseField(line);
 	}
+
+	if (_fields["Path"].length() > 2048)
+		throw (STATUS_414);
 	
 	// Debug: Print map content
 	/*

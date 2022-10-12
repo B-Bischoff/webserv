@@ -37,61 +37,25 @@ void Server::serverLoop()
     {
 		std::cout << std::endl << "+++++++ Waiting for new connection ++++++++" << std::endl << std::endl;
 
-		//std::cout << "Response ready: " << _clients.size() << std::endl;
-
 		fd_set readFds = _master;
 		fd_set writeFds = createWriteFdSet();
 		if (select(_fdmax + 1, &readFds, &writeFds, NULL, NULL) == -1)
 		{
-			perror("Select");
-			exit(EXIT_FAILURE);
+			perror("Select"); // To remove
+			exit(EXIT_FAILURE); // To remove
 		}
 
 		for (int i = 0; i <= _fdmax; i++)
 		{
-			if (FD_ISSET(i, &readFds)) // Socket ready to communicate
+			if (FD_ISSET(i, &readFds))
 			{
 				if (isAVirtualServer(i)) // Incoming connection from new client
 					acceptConnection(i);
 				else // Client wants to communicate
-				{
-					Method method;
-					try {
-						if (listenClient(i) == 1)
-							break; // Return to select to wait request body
-						method = processClientRequest(i);
-					}
-					catch (const char* e)
-					{
-						ErrorStatus error;
-						VirtualServerConfig& config = _servers.at(_clients[i].virtualServerId).getVirtualServerConfig();
-						method = error.buildError(e, config);
-					}
-					catch (...)
-					{
-						// Internal server error
-						ErrorStatus error;
-						VirtualServerConfig& config = _servers.at(_clients[i].virtualServerId).getVirtualServerConfig();
-						method = error.buildError(STATUS_500, config);
-					}
-					createClientResponse(i, method);
-				}
+					manageClientRequest(i);
 			}
-			if (FD_ISSET(i, &writeFds) && _clients[i].response.response_header != "") // Send data to client
-			{
-				std::cout << "Client " << i << " ready to receive response" << std::endl;
-				const ResponseHeader& response = _clients[i].response;
-				// Make a send all method in SocketCommunicator
-				if (send(i, response.response_header.c_str(), response.response_header.size(), 0) == -1)
-				{
-					std::cout << "Send error" << std::endl;
-					removeFd(i, _master);
-					return;
-				}
-				if (response.closeAfterSend == true)
-					removeFd(i, _master);
-				_clients.erase(i);
-			}
+			if (FD_ISSET(i, &writeFds) && _clients[i].response.response_header != "")
+				respondToClient(i);
 		}
 	}
 }
@@ -121,7 +85,25 @@ void Server::acceptConnection(const int& serverSocket)
 		fcntl(_newSocket, F_SETFL, O_NONBLOCK); // Set fd to non-blockant (prg will not get stuck on recv)
 		addFd(_newSocket, _master);
 		_clients[_newSocket].needToReceiveBody = false;
+		_clients[_newSocket].virtualServerId = 0;
 	}
+}
+
+void Server::manageClientRequest(const int& clientFd)
+{
+	Method method;
+	try {
+		if (listenClient(clientFd) == 1)
+			return; // Return to select to wait request body
+		method = processClientRequest(clientFd);
+	}
+	catch (const char* e) {
+		method = manageError(clientFd, e);
+	}
+	catch (...) {
+		method = manageError(clientFd, STATUS_500);
+	}
+	createClientResponseFromMethod(clientFd, method);
 }
 
 int Server::listenClient(const int& clientFd)
@@ -184,8 +166,7 @@ void Server::listenBody(const int& clientFd)
 	std::string requestBody;
 	if (SocketCommunicator::receiveRequestBody(clientFd, requestBody, _clients[clientFd].request, config.getMaxBodySize()) == -1)
 	{
-		std::cout << "Recv (request body) error" << std::endl;
-		throw ("ERROR");
+		// Manage error more deeply ...
 	}
 
 	std::cout << "Request body: " << requestBody << std::endl;
@@ -207,7 +188,21 @@ const Method Server::processClientRequest(const int& clientFd)
 	return dst;
 }
 
-void Server::createClientResponse(const int& clientFd, Method& method)
+Method Server::manageError(const int& clientFd, const char* e)
+{
+	Method method;
+	ErrorStatus error;
+	if (_clients[clientFd].virtualServerId == 0)
+		method = error.buildError(e);
+	else
+	{
+		VirtualServerConfig& config = _servers.at(_clients[clientFd].virtualServerId).getVirtualServerConfig();
+		method = error.buildError(e, config);
+	}
+	return method;
+}
+
+void Server::createClientResponseFromMethod(const int& clientFd, Method& method)
 {
 	ResponseHeader header;
 
@@ -215,6 +210,22 @@ void Server::createClientResponse(const int& clientFd, Method& method)
 	header.closeAfterSend = method.getCloseAfterSend();
 	_clients[clientFd].response = header;
 	_clients[clientFd].needToReceiveBody = false;
+}
+
+void Server::respondToClient(const int& clientFd)
+{
+	bool sendError = false;
+	std::cout << "Client " << clientFd << " ready to receive response" << std::endl;
+	const ResponseHeader& response = _clients[clientFd].response;
+	// Make a send all method in SocketCommunicator
+	if (send(clientFd, response.response_header.c_str(), response.response_header.size(), 0) == -1)
+	{
+		std::cout << "Send error" << std::endl;
+		sendError = true;
+	}
+	_clients.erase(clientFd);
+	if (response.closeAfterSend == true || sendError == true)
+		removeFd(clientFd, _master);
 }
 
 bool Server::needToReceiveBody(const RequestHeader& request) const

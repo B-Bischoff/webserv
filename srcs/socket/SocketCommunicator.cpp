@@ -35,7 +35,7 @@ int SocketCommunicator::receiveChunkedRequestBody(const int& socket, std::string
 	{
 		chunkLength = receiveChunkLength(socket);
 		if (chunkLength == -1)
-			return -1; // Error occured
+			throw (STATUS_500);
 
 		int nbytes = 1;
 		int bytesRead = 0;
@@ -51,12 +51,12 @@ int SocketCommunicator::receiveChunkedRequestBody(const int& socket, std::string
 			}
 		}
 		if (nbytes == -1)
-			return nbytes; // Error occured
+			throw (STATUS_500);
 		buffer.erase(buffer.length() - 2, 2); // Remove "\r\n" (end of chunk indicator)
 	}
 
 	if (totalBytesRead > maxSize)
-		return -1; // Throw specific exception instead of -1
+		throw (STATUS_413);
 
 	return 0;
 }
@@ -92,10 +92,10 @@ int SocketCommunicator::convertHexaNumberInStrToInt(std::string& str)
 int SocketCommunicator::receiveStandardRequestBody(const int& socket, std::string& buffer, const RequestHeader& header, const long& maxSize)
 {
 	long bytesToRead = atol(header.getField("Content-Length").c_str());
-	if (bytesToRead <= 0) // Need to throw error 411 (Lenth required) if content-length is not found
-		return 0;
+	if (bytesToRead <= 0)
+		throw (STATUS_411);
 	if (bytesToRead > maxSize) // Need to throw a specific error code
-		return 0; // Change this by "throw [ERROR_CODE]"
+		throw (STATUS_413);
 
 	char temp;
 	int nbytes = 1;

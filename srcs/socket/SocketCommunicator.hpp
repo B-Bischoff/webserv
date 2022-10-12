@@ -7,6 +7,7 @@
 #include <cstdlib>
 
 #include "RequestHeader.hpp"
+#include "StatusCode.hpp"
 
 class SocketCommunicator {
 private:
