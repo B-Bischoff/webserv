@@ -59,7 +59,6 @@ void Server::serverLoop()
 					try {
 						if (listenClient(i) == 1)
 							break; // Return to select to wait request body
-						throw 45;
 						method = processClientRequest(i);
 					}
 					catch (const char* e)
