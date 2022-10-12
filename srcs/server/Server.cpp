@@ -54,23 +54,44 @@ void Server::serverLoop()
 				if (isAVirtualServer(i)) // Incoming connection from new client
 					acceptConnection(i);
 				else // Client wants to communicate
-					listenClient(i);
+				{
+					Method method;
+					try {
+						if (listenClient(i) == 1)
+							break; // Return to select to wait request body
+						throw 45;
+						method = processClientRequest(i);
+					}
+					catch (const char* e)
+					{
+						ErrorStatus error;
+						VirtualServerConfig& config = _servers.at(_clients[i].virtualServerId).getVirtualServerConfig();
+						method = error.buildError(e, config);
+					}
+					catch (...)
+					{
+						// Internal server error
+						ErrorStatus error;
+						VirtualServerConfig& config = _servers.at(_clients[i].virtualServerId).getVirtualServerConfig();
+						method = error.buildError(STATUS_500, config);
+					}
+					createClientResponse(i, method);
+				}
 			}
 			if (FD_ISSET(i, &writeFds) && _clients[i].response.response_header != "") // Send data to client
 			{
 				std::cout << "Client " << i << " ready to receive response" << std::endl;
 				const ResponseHeader& response = _clients[i].response;
 				// Make a send all method in SocketCommunicator
-				std::cout << response.response_header << std::endl;
 				if (send(i, response.response_header.c_str(), response.response_header.size(), 0) == -1)
 				{
 					std::cout << "Send error" << std::endl;
 					removeFd(i, _master);
 					return;
 				}
-				_clients.erase(i);
 				if (response.closeAfterSend == true)
 					removeFd(i, _master);
+				_clients.erase(i);
 			}
 		}
 	}
@@ -104,35 +125,21 @@ void Server::acceptConnection(const int& serverSocket)
 	}
 }
 
-void Server::listenClient(const int& clientFd)
+int Server::listenClient(const int& clientFd)
 {
-	Method method;
-
-
 	std::cout << "client " << clientFd << " wants to communicate" << std::endl;
 
 	if (_clients[clientFd].needToReceiveBody == false)
 	{
 		if (listenHeader(clientFd) == 1)
-			return; // Go back to select to wait request body
+			return 1; // Go back to select to wait request body
 	}
 	else
-	{
-		try {
-			listenBody(clientFd);
-		}
-		catch (const char* e)
-		{
-			ErrorStatus error;
-			method = error.buildError(e, _servers.at(_clients[clientFd].virtualServerId).getVirtualServerConfig());
-			createClientResponse(clientFd, method);
-			return;
-		}
-	}
+		listenBody(clientFd);
+	
+	// Maybe add a header & body parsing here to check every possible error case
 
-	method = processClientRequest(clientFd);
-
-	createClientResponse(clientFd, method);
+	return 0;
 }
 
 int Server::listenHeader(const int& clientFd)
@@ -195,19 +202,11 @@ const Method Server::processClientRequest(const int& clientFd)
 	LocationBlock locationBlock = select.selectLocationBlock(client.request.getField("Path"), config.loc);
 
 	Method dst;
-	try {
-		ManageRequest manager(config, locationBlock, client.request, client.body);
-		dst = manager.identify(client.request);
-	}
-	catch(const char *e)
-	{
-		ErrorStatus error;
-		dst = error.buildError(e, config);
-	}
+	ManageRequest manager(config, locationBlock, client.request, client.body);
+	dst = manager.identify(client.request);
 
 	dst.setCloseAfterSend(client.request.getField("Connection") == "close");
 
-	std::cout << dst.getBody() << std::endl;
 	return dst;
 }
 

@@ -50,7 +50,7 @@ private:
 	void serverLoop();
 
 	void acceptConnection(const int& serverSocket);
-	void listenClient(const int& clientFd);
+	int listenClient(const int& clientFd);
 	int listenHeader(const int& clientFd);
 	void listenBody(const int& clientFd);
 	const Method processClientRequest(const int& clientFd);
