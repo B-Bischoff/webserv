@@ -1,55 +1,47 @@
 #include "CgiHandler.hpp"
 
-CgiHandler::CgiHandler(RequestHeader &request, VirtualServerConfig &vServ, LocationBlock &loc, const std::string &method, const std::string &path, std::string &body)
+void	CgiHandler::setGlobalCgiVariable(const Client &client, std::map<std::string, std::string> &_env)
 {
-	(void)vServ;
-	_body = body;
 	_env["SERVER_SOFTWARE"] = "Webserv/1.1";
-	_env["SERVER_NAME"] = request.getField("Host").substr(0, request.getField("Host").find_first_of(':'));
+	_env["SERVER_NAME"] = client.request.getField("Host").substr(0, client.request.getField("Host").find_first_of(':'));
 	_env["GATEWAY_INTERFACE"] = "PHP/8.1.9";
 
 	_env["REDIRECT_STATUS"] = "200";
 	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
-	_env["SERVER_PORT"] = request.getField("Host").substr(request.getField("Host").find_first_of(':') + 1);
-	_env["REQUEST_METHOD"] = method;
-	// _env["PATH_INFO"] = "/pages/coucou.php";
-	_env["PATH_INFO"] = request.getField("Path").substr(0, request.getField("Path").find_first_of('?'));
-	_env["PATH_TRANSLATED"] = path.substr(0, path.find_first_of('?'));
-	_env["SCRIPT_NAME"] = loc.getStringField("cgi_pass");
-	if (method == "GET")
+	_env["SERVER_PORT"] = client.request.getField("Host").substr(client.request.getField("Host").find_first_of(':') + 1);
+	_env["REQUEST_METHOD"] = client.request.getField("Method");
+	_env["PATH_INFO"] = client.request.getField("Path").substr(0, client.request.getField("Path").find_first_of('?'));
+	_env["PATH_TRANSLATED"] = client.virtualServer.getStringField("root") + _env["PATH_INFO"];
+	_env["SCRIPT_NAME"] = client.locationBlock.getStringField("cgi_pass");
+	if (client.request.getField("Method") == "GET")
 	{
 		_env["QUERY_STRING"] = "";
-		if (request.getField("Path").find('?') != std::string::npos)
-			_env["QUERY_STRING"] = request.getField("Path").substr(request.getField("Path").find_first_of('?') + 1);
+		if (client.request.getField("Path").find('?') != std::string::npos)
+			_env["QUERY_STRING"] = client.request.getField("Path").substr(client.request.getField("Path").find_first_of('?') + 1);
 	}
-	if (method == "POST")
+	if (client.request.getField("Method") == "POST")
 	{
-		if (request.getField("Content-Length") == "")
+		if (client.request.getField("Content-Length") == "")
 			throw (STATUS_411);
-		_env["CONTENT_LENGTH"] = request.getField("Content-Length");
-		_env["CONTENT_TYPE"] = request.getField("Content-Type");
+		_env["CONTENT_LENGTH"] = client.request.getField("Content-Length");
+		_env["CONTENT_TYPE"] = client.request.getField("Content-Type");
 	}
-	_env["HTTP_METHOD"] = method;
-	if (request.getField("Accept").empty() == false)
-		_env["HTTP_ACCEPT"] = request.getField("Accept");
-	if (request.getField("Accept-Language").empty() == false)
-		_env["HTTP_ACCEPT_LANGUAGE"] = request.getField("Accept-Language");
-	if (request.getField("User-Agent").empty() == false)
-		_env["HTTP_USER_AGENT"] = request.getField("User-Agent");
-	if (request.getField("Referer").empty() == false)
-		_env["HTTP_REFERER"] = request.getField("Referer");
+	_env["HTTP_METHOD"] = client.request.getField("Method");
+	if (client.request.getField("Accept").empty() == false)
+		_env["HTTP_ACCEPT"] = client.request.getField("Accept");
+	if (client.request.getField("Accept-Language").empty() == false)
+		_env["HTTP_ACCEPT_LANGUAGE"] = client.request.getField("Accept-Language");
+	if (client.request.getField("User-Agent").empty() == false)
+		_env["HTTP_USER_AGENT"] = client.request.getField("User-Agent");
+	if (client.request.getField("Referer").empty() == false)
+		_env["HTTP_REFERER"] = client.request.getField("Referer");
 }
 
-void	CgiHandler::initCharEnv()
+void	CgiHandler::initCharEnv(std::map<std::string, std::string> &_env, char **_charEnv, char **_args)
 {
 	std::map<std::string, std::string>::iterator	it = _env.begin();
 	int												i = 0;
-	_charEnv = new char*[_env.size() + 1];
-	if (!_charEnv)
-		throw("malloc charenv");
-	_args = new char*[3];
-	if (!_args)
-		throw("malloc args");
+	
 	while (it != _env.end())
 	{
 		_charEnv[i] = strdup((it->first + "=" + it->second).c_str());
@@ -64,8 +56,19 @@ void	CgiHandler::initCharEnv()
 	_args[2] = NULL;
 }
 
-std::string	CgiHandler::execCgi()
+std::string	CgiHandler::execCgi(const Client &client)
 {
+	std::map<std::string, std::string>	_env;
+	char								**_charEnv = NULL;
+	char								**_args = NULL;
+
+	setGlobalCgiVariable(client, _env);
+	_charEnv = new char*[_env.size() + 1];
+	if (!_charEnv)
+		throw("malloc charenv");
+	_args = new char*[3];
+	if (!_args)
+		throw("malloc args");
 	pid_t		pid;
 	std::string	response;
 	int			saveStdin;
@@ -78,9 +81,9 @@ std::string	CgiHandler::execCgi()
 
 	saveStdin = dup(STDIN_FILENO);
 	saveStdout = dup(STDOUT_FILENO);
-	write(fdIn, _body.c_str(), _body.size());
+	write(fdIn, client.body.c_str(), client.body.size());
 	lseek(fdIn, 0, SEEK_SET);
-	initCharEnv();
+	initCharEnv(_env, _charEnv, _args);
 	pid = fork();
 	if (pid == -1)
 		throw("pid");
@@ -121,10 +124,4 @@ std::string	CgiHandler::execCgi()
 	std::cout << response << std::endl;
 	std::cout << "================================" << std::endl;
 	return (response);
-}
-
-
-CgiHandler::~CgiHandler()
-{
-
 }

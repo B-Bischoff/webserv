@@ -27,11 +27,13 @@
 #include "SocketCommunicator.hpp"
 
 struct Client {
-	RequestHeader request;
-	ResponseHeader response;
-	bool needToReceiveBody;
-	int virtualServerId;
-	std::string body; // To delete
+	RequestHeader 		request;
+	ResponseHeader 		response;
+	bool 				needToReceiveBody;
+	VirtualServerConfig	virtualServer;
+	LocationBlock		locationBlock;
+	int 				virtualServerId;
+	std::string 		body; // To delete
 };
 
 class Server {

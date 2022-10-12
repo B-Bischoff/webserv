@@ -14,7 +14,7 @@ Method	Get::exec(RequestConfig &config, const std::string &body)
 {
 	std::ifstream	ifs;
 
-	ifs.open(config.getRootPath().c_str(), std::ios::in);
+	ifs.open(config.getRootPath().substr(0, config.getRootPath().find_first_of('?')).c_str(), std::ios::in);
 		
 	if (ifs.is_open() == false)
 		throw (STATUS_404);

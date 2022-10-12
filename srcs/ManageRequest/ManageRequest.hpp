@@ -1,7 +1,7 @@
 #ifndef MANAGE_REQUEST_HPP
 # define MANAGE_REQUEST_HPP
 
-#include "VirtualServerConfig.hpp"
+#include "Server.hpp"
 #include "LocationBlock.hpp"
 #include "Method.hpp"
 #include "CgiHandler.hpp"
@@ -10,19 +10,17 @@
 #include "Delete.hpp"
 #include "ErrorStatus.hpp"
 
+struct Client;
 class ManageRequest
 {
 	private:
-		VirtualServerConfig	&_vServConfig; // Virtual server (reference)
-		LocationBlock		&_locationBlock; // Virtual server location block previously choosen (reference)
-		RequestHeader		&_request;// Request header + body
-		std::string			&_body; // Request body
+		Client					&_client;
 
 	public:
-		ManageRequest(VirtualServerConfig &vServCongif, LocationBlock &locationBlock, RequestHeader &request, std::string &body);
+		ManageRequest(Client &client);
 		~ManageRequest();
 		
-		Method			identify(RequestHeader &request);
+		Method			identify();
 };
 
 #endif
