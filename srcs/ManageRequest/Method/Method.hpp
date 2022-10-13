@@ -29,6 +29,7 @@ class Method
 		std::string		_body;
 		std::string 	_path;
 		std::string 	_status;
+		std::string		_header;
 		RequestConfig	_requestConfig;
 
 	public:
@@ -36,16 +37,17 @@ class Method
 		Method(RequestHeader request);
 		virtual ~Method();
 
-		Method		exec(RequestConfig &config, const std::string &body);
-		int			getSize() const;
-		std::string	getBody() const;
-		std::string	getPath() const;
-		std::string	getStatus() const;
+		Method			exec(RequestConfig &config, const std::string &body);
+		Method			&autoindex(const std::string &rootPath, const std::string &fullPath);
+		Method			&redirect(const std::string &redirectUrl);
 		RequestConfig	&getConf();
-		Method	&autoindex(const std::string &rootPath, const std::string &fullPath);
-		Method	&redirect(const std::string &redirectUrl);
-		bool	getCloseAfterSend() const;
-		void		setCloseAfterSend(const bool& value);
+		int				getSize() const;
+		std::string		getBody() const;
+		std::string		getHeader() const;
+		std::string		getPath() const;
+		std::string		getStatus() const;
+		bool			getCloseAfterSend() const;
+		void			setCloseAfterSend(const bool& value);
 
 };
 

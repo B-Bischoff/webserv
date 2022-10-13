@@ -21,7 +21,6 @@ Method	Post::exec(RequestConfig &config, const std::vector<BodyData> &bodyData)
 		createFile(fileName, config.getUpload(), bodyData[_filePos].content);
 		_status = STATUS_201;
 		_body += "<a href=\"\">Your file has been upload</a>";
-		_body = "";
 		return (*this);
 	}
 	if (config.getCgi() == true)
@@ -54,7 +53,6 @@ std::string	Post::getFileName(const std::vector<BodyData> &bodyData)
 	return ("");
 }
 
-//Create a file with body content and fileName name to upload directory
 void	Post::createFile(const std::string &fileName, const std::string &path, const std::string &body)
 {
 	std::ofstream			file;
@@ -62,7 +60,12 @@ void	Post::createFile(const std::string &fileName, const std::string &path, cons
 	std::string outfile = path + "/" + fileName;
 		file.open(outfile.c_str(), std::ofstream::out);
 	if (file.is_open() == false)
-		throw(STATUS_400);
+	{
+		errno = 0;
+		if (errno == 13)
+			throw(STATUS_403);
+		throw(STATUS_409);
+	}
 	file << body;
 	file.close();
 }
