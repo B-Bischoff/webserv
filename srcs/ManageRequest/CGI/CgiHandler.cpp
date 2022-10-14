@@ -45,11 +45,11 @@ void	CgiHandler::initCharEnv(std::map<std::string, std::string> &_env, char **_c
 	while (it != _env.end())
 	{
 		_charEnv[i] = strdup((it->first + "=" + it->second).c_str());
-		std::cout << _charEnv[i] << std::endl;
+		// std::cout << _charEnv[i] << std::endl;
 		i++;
 		it++;
 	}
-	std::cout << "end of initCharEnv" << std::endl;
+	// std::cout << "end of initCharEnv" << std::endl;
 	_charEnv[i] = NULL;
 	_args[0] = (char *)_env["SCRIPT_NAME"].c_str();
 	_args[1] = (char *)_env["PATH_TRANSLATED"].c_str();

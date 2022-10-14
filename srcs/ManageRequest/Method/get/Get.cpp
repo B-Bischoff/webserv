@@ -10,12 +10,14 @@ Get::Get()
 
 }
 
-Method	Get::exec(RequestConfig &config, const std::string &body)
+Method	Get::exec(RequestConfig &config, const std::string &cgiResult)
 {
 	std::ifstream	ifs;
+	errno = 0;
 
-	ifs.open(config.getRootPath().substr(0, config.getRootPath().find_first_of('?')).c_str(), std::ios::in);
-		
+	ifs.open(config.getRootPath().c_str(), std::ios::in);
+	if (errno == 13)
+		throw(STATUS_403);
 	if (ifs.is_open() == false)
 		throw (STATUS_404);
 	if (config.getCgi() == false)
@@ -27,9 +29,10 @@ Method	Get::exec(RequestConfig &config, const std::string &body)
 	}
 	else
 	{
-		if (body.empty() == true)
+		if (cgiResult.empty() == true)
 			throw (STATUS_204);
-		_body = body;
+		_header = cgiResult.substr(0, cgiResult.find("\r\n\r\n"));
+		_body = cgiResult.substr(cgiResult.find("\r\n\r\n") + 4);
 	}
 	_size = _body.size();
 	_status = STATUS_200;
