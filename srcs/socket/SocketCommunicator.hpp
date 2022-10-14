@@ -3,11 +3,14 @@
 
 #include <iostream>
 #include <sstream>
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <cstdlib>
 
-#include "RequestHeader.hpp"
+#include "Server.hpp"
 #include "StatusCode.hpp"
+
+struct Client;
 
 class SocketCommunicator {
 private:
@@ -21,6 +24,7 @@ private:
 public:
 	static int receiveRequestHeader(const int& socket, std::string& buffer);
 	static int receiveRequestBody(const int& socket, std::string& buffer, const RequestHeader& header, const long& maxSize);
+	static int sendResponse(const int& socket, Client& client);
 };
 
 #endif

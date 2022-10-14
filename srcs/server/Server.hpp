@@ -29,6 +29,7 @@
 struct Client {
 	RequestHeader 		request;
 	ResponseHeader 		response;
+	size_t 				bytesSent;
 	bool 				needToReceiveBody;
 	VirtualServerConfig	virtualServer;
 	LocationBlock		locationBlock;
