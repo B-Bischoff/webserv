@@ -115,3 +115,22 @@ bool SocketCommunicator::isChunkedRequest(const RequestHeader& header)
 {
 	return (header.getField("Transfer-Encoding") == "chunked");
 }
+
+int SocketCommunicator::sendResponse(const int& socket, Client& client)
+{
+	size_t SIZE = 32768;
+
+	std::string str = client.response.response_header.substr(client.bytesSent, SIZE);
+
+	size_t n = send(socket, str.c_str(), str.size(), 0);
+	//std::cout << n << "/" << length << std::endl;
+	if (n <= 0)
+	{
+		std::cout << "error" << std::endl;
+		//perror("SEND");
+		return -1;
+	}
+	else
+		client.bytesSent += n;
+	return client.response.response_header.length() - client.bytesSent;
+}

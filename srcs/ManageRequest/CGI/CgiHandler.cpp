@@ -119,9 +119,9 @@ std::string	CgiHandler::execCgi(const Client &client)
 	if (!pid)
 		exit(0);
 
-	std::cout << "Cgi response:" << std::endl;
-	std::cout << "================================" << std::endl;
-	std::cout << response << std::endl;
-	std::cout << "================================" << std::endl;
+	// std::cout << "Cgi response:" << std::endl;
+	// std::cout << "================================" << std::endl;
+	// std::cout << response << std::endl;
+	// std::cout << "================================" << std::endl;
 	return (response);
 }

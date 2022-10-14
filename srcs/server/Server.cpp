@@ -29,13 +29,15 @@ void Server::removeFd(const int &fd, fd_set& set)
 {
 	FD_CLR(fd, &set);
 	close(fd);
+	if (fd == _fdmax)
+		_fdmax--;
 }
 
 void Server::serverLoop()
 {
     while(1)
     {
-		std::cout << std::endl << "+++++++ Waiting for new connection ++++++++" << std::endl << std::endl;
+		//std::cout << std::endl << "+++++++ Waiting for new connection ++++++++" << std::endl << std::endl;
 
 		fd_set readFds = _master;
 		fd_set writeFds = createWriteFdSet();
@@ -52,10 +54,16 @@ void Server::serverLoop()
 				if (isAVirtualServer(i)) // Incoming connection from new client
 					acceptConnection(i);
 				else // Client wants to communicate
+				{
 					manageClientRequest(i);
+					break;
+				}
 			}
 			if (FD_ISSET(i, &writeFds) && _clients[i].response.response_header != "")
+			{
 				respondToClient(i);
+				break;
+			}
 		}
 	}
 }
@@ -86,6 +94,7 @@ void Server::acceptConnection(const int& serverSocket)
 		addFd(_newSocket, _master);
 		_clients[_newSocket].needToReceiveBody = false;
 		_clients[_newSocket].virtualServerId = 0;
+		_clients[_newSocket].bytesSent = 0;
 	}
 }
 
@@ -131,12 +140,9 @@ int Server::listenHeader(const int& clientFd)
 
 	if (receiveReturn <= 0) // Client disconnected or recv error
 	{
-		if (receiveReturn == 0)
-			std::cout << "Socket: " << clientFd << " disconnected" << std::endl;
-		else
-			perror("recv");
 		std::cout << "Socket: " << clientFd << " quit" << std::endl;
 		removeFd(clientFd, _master);
+		_clients.erase(clientFd);
 		return 1;
 	}
 
@@ -169,7 +175,7 @@ void Server::listenBody(const int& clientFd)
 		// Manage error more deeply ...
 	}
 
-	std::cout << "Request body: " << requestBody << std::endl;
+	// std::cout << "Request body: " << requestBody << std::endl;
 	_clients[clientFd].body = requestBody;
 	_clients[clientFd].request.parseRequestBody(requestBody);
 }
@@ -215,17 +221,25 @@ void Server::createClientResponseFromMethod(const int& clientFd, Method& method)
 void Server::respondToClient(const int& clientFd)
 {
 	bool sendError = false;
-	std::cout << "Client " << clientFd << " ready to receive response" << std::endl;
+	//std::cout << "Client " << clientFd << " ready to receive response" << std::endl;
 	const ResponseHeader& response = _clients[clientFd].response;
-	// Make a send all method in SocketCommunicator
-	if (send(clientFd, response.response_header.c_str(), response.response_header.size(), 0) == -1)
+
+	int sendReturn = SocketCommunicator::sendResponse(clientFd, _clients[clientFd]);
+
+	if (sendReturn == -1)
 	{
 		std::cout << "Send error" << std::endl;
 		sendError = true;
 	}
-	_clients.erase(clientFd);
-	if (response.closeAfterSend == true || sendError == true)
-		removeFd(clientFd, _master);
+	if (sendReturn <= 0) // If data fully sent or error 
+	{
+		_clients.erase(clientFd);
+		if (response.closeAfterSend == true || sendError == true)
+		{
+			std::cout << "Removed client" << std::endl;
+			removeFd(clientFd, _master);
+		}
+	}
 }
 
 bool Server::needToReceiveBody(const RequestHeader& request) const
