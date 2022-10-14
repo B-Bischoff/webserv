@@ -169,7 +169,7 @@ void Server::listenBody(const int& clientFd)
 		// Manage error more deeply ...
 	}
 
-	std::cout << "Request body: " << requestBody << std::endl;
+	// std::cout << "Request body: " << requestBody << std::endl;
 	_clients[clientFd].body = requestBody;
 	_clients[clientFd].request.parseRequestBody(requestBody);
 }

@@ -71,3 +71,8 @@ void	Method::setCloseAfterSend(const bool& value)
 {
 	_closeAfterSend = value;
 }
+
+std::string	Method::getHeader() const
+{
+	return (this->_header);
+}

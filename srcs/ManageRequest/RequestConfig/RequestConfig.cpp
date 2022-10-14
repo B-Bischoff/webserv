@@ -47,7 +47,7 @@ void	RequestConfig::initRootPath(RequestHeader &request, LocationBlock &locBlock
 		_rootPath = locBlock.getStringField("root");
 	else
 		_rootPath = confBlock.getStringField("root");
-	_rootPath += request.getField("Path");
+	_rootPath += request.getField("Path").substr(0, request.getField("Path").find_first_of('?'));
 }
 
 
