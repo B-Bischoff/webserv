@@ -172,7 +172,9 @@ void Server::listenBody(const int& clientFd)
 	std::string requestBody;
 	if (SocketCommunicator::receiveRequestBody(clientFd, requestBody, _clients[clientFd].request, config.getMaxBodySize()) == -1)
 	{
-		// Manage error more deeply ...
+		removeFd(clientFd, _master);
+		_clients.erase(clientFd);
+		return;
 	}
 
 	// std::cout << "Request body: " << requestBody << std::endl;
