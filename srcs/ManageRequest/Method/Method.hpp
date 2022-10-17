@@ -29,17 +29,17 @@ class Method
 		std::string		_body;
 		std::string 	_path;
 		std::string 	_status;
-		std::string		_header;
+		std::string		_cgiHeader;
 		RequestConfig	_requestConfig;
 
 	public:
 		Method();
-		Method(RequestHeader request);
+		Method(const RequestConfig &requestConfig);
 		virtual ~Method();
 
 		Method			exec(RequestConfig &config, const std::string &body);
 		Method			&autoindex(const std::string &rootPath, const std::string &fullPath);
-		Method			&redirect(const std::string &redirectUrl);
+		Method			&redirect(const RequestConfig &requestConfig);
 		RequestConfig	&getConf();
 		int				getSize() const;
 		std::string		getBody() const;

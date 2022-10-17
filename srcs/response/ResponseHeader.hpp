@@ -7,6 +7,7 @@
 #include <cstring>
 #include <fstream>
 #include "Method.hpp"
+#include "StatusCode.hpp"
 
 class ResponseHeader
 {

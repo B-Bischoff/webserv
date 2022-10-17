@@ -214,7 +214,17 @@ void Server::createClientResponseFromMethod(const int& clientFd, Method& method)
 {
 	ResponseHeader header;
 
-	header.build_response(method);
+	try
+	{
+		header.build_response(method);
+	}
+	catch(const char *e)
+	{
+		ErrorStatus	error;
+		error.buildError(e);
+		header.build_response(error);
+	}
+	
 	header.closeAfterSend = method.getCloseAfterSend();
 	_clients[clientFd].response = header;
 	_clients[clientFd].needToReceiveBody = false;
