@@ -43,7 +43,7 @@ void Server::serverLoop()
 		fd_set writeFds = createWriteFdSet();
 		if (select(_fdmax + 1, &readFds, &writeFds, NULL, NULL) == -1)
 		{
-			perror("Select"); // To remove
+			std::cerr << "SELECTED FAILED QUITTING PROGRAM" << std::endl;
 			exit(EXIT_FAILURE); // To remove
 		}
 
@@ -56,7 +56,6 @@ void Server::serverLoop()
 				else // Client wants to communicate
 				{
 					manageClientRequest(i);
-					break;
 				}
 			}
 			if (FD_ISSET(i, &writeFds) && _clients[i].response.response_header != "")
@@ -136,7 +135,7 @@ int Server::listenHeader(const int& clientFd)
 {
 	std::string buf;
 	int receiveReturn = SocketCommunicator::receiveRequestHeader(clientFd, buf);
-	std::cout << "Request Header: " << buf << std::endl;
+	//std::cout << "Request Header: " << buf << std::endl;
 
 	if (receiveReturn <= 0) // Client disconnected or recv error
 	{
