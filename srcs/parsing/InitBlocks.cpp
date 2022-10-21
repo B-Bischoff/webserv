@@ -138,11 +138,16 @@ void	InitBlocks::setLogs(VirtualServerConfig &vServ)
 
 void	InitBlocks::setRootIndex(VirtualServerConfig &vServ)
 {
-	_streamLine >> _keyWord;
-	if (_streamLine.str().find("index") != std::string::npos)
+	if (_keyWord == "index")
+	{
+		_streamLine >> _keyWord;
 		_inLocationBlock == true ? vServ.loc[_locationBlock].setStringField(_keyWord, "index") : vServ.setStringField(_keyWord, "index");
+	}
 	else
+	{
+		_streamLine >> _keyWord;
 		_inLocationBlock == true ? vServ.loc[_locationBlock].setStringField(_keyWord, "root") : vServ.setStringField(_keyWord, "root");
+	}
 }
 
 void	InitBlocks::setListen(VirtualServerConfig &vServ)
