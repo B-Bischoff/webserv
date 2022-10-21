@@ -15,6 +15,7 @@ int main(void)
 		exit(EXIT_FAILURE);
 	}
 
+	signal(SIGPIPE, SIG_IGN); // return error when client break the socket while the server send a response
 	Server server(configList);
 
 	return 0;
