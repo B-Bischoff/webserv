@@ -1,11 +1,11 @@
 #include "Method.hpp"
 
-Method::Method(RequestHeader request) : _closeAfterSend(false)
+Method::Method(const RequestConfig &requestConfig) : _closeAfterSend(false), _requestConfig(requestConfig)
 {
-	(void)request;
+
 }
 
-Method::Method() : _closeAfterSend(false)
+Method::Method()
 {
 
 }
@@ -50,13 +50,14 @@ Method	&Method::autoindex(const std::string &rootPath, const std::string &fullPa
 	return (*this);
 }
 
-Method	&Method::redirect(const std::string &redirectUrl)
+Method	&Method::redirect(const RequestConfig &requestConfig)
 {
+	_requestConfig = requestConfig;
 	_body = "<html>\n<head>\n<title>Redirection en cours</title\n<meta";
 	_body += "http-equiv=\"refresh\" content=\"5; URL=";
-	_body += redirectUrl;
+	_body += requestConfig.getRedirectPath();
    	_body += "\">\n</head>\n<body>\nRedirection vers ";
-	_body += redirectUrl +  " dans 5 secondes.\n</body>\n</html>";
+	_body += requestConfig.getRedirectPath() +  " dans 5 secondes.\n</body>\n</html>";
 	_size = _body.size();
 	_status = STATUS_301;
 	return (*this);
@@ -74,5 +75,5 @@ void	Method::setCloseAfterSend(const bool& value)
 
 std::string	Method::getHeader() const
 {
-	return (this->_header);
+	return (this->_cgiHeader);
 }
