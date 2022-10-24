@@ -13,7 +13,7 @@ class Get : public virtual Method
 		Get();
 		~Get();
 
-		Method	exec(RequestConfig &config, const std::string &body);
+		Method	exec(RequestConfig &config, std::string &cgiResult);
 };
 
 #endif

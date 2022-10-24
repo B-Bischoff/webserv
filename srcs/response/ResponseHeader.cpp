@@ -138,7 +138,8 @@ std::string	ResponseHeader::get_extension_file(std::string path)
 		return (dst = "text/x-c");
 	else if (path.find(".php\0", 0) != path.npos)
 		return (dst = "text/html");
-	return (dst = "plain/text");
+	else
+		throw(STATUS_415);
 }
 
 void	ResponseHeader::build_response(Method &method)

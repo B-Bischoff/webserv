@@ -12,14 +12,14 @@ ManageRequest::~ManageRequest()
 
 Method ManageRequest::identify()
 {
-	Method index;
 	RequestConfig requestConfig(_client.locationBlock, _client.virtualServer, _client.request);
+	Method index(requestConfig);
 	std::string	cgiResult;
 
 	if (requestConfig.getValidMethod() == false)
 		throw(STATUS_405);
 	else if (requestConfig.getRedirect() == true)
-		return (index.redirect(requestConfig.getRedirectPath()));
+		return (index.redirect(requestConfig));
 	else if (requestConfig.getAutoindex() == true)
 		return (index.autoindex(_client.locationBlock.getStringField("root") != ""
 		? _client.locationBlock.getStringField("root") : _client.virtualServer.getStringField("root"), requestConfig.getRootPath()));
