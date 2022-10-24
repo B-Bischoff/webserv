@@ -19,8 +19,12 @@ Method	Post::exec(RequestConfig &config, const std::vector<BodyData> &bodyData)
 		if (fileName == "")
 			throw(STATUS_NO_FILENAME);
 		createFile(fileName, config.getUpload(), bodyData[_filePos].content);
+		// Need to create a function to create every file in bodyData vector
+		//createFile("SecondFile.mp4", config.getUpload(), bodyData[1].content);
+
 		_status = STATUS_201;
-		_body += "<a href=\"\">Your file has been upload</a>";
+		_body += "<a href=\"\">Your file has been uploaded</a>";
+		_size = _body.size();
 		return (*this);
 	}
 	if (config.getCgi() == true)
@@ -58,7 +62,7 @@ void	Post::createFile(const std::string &fileName, const std::string &path, cons
 	std::ofstream			file;
 
 	std::string outfile = path + "/" + fileName;
-		file.open(outfile.c_str(), std::ofstream::out);
+		file.open(outfile.c_str(), std::ofstream::out | std::ios_base::binary);
 	if (file.is_open() == false)
 	{
 		errno = 0;

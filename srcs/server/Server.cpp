@@ -94,6 +94,7 @@ void Server::acceptConnection(const int& serverSocket)
 		_clients[_newSocket].needToReceiveBody = false;
 		_clients[_newSocket].virtualServerId = 0;
 		_clients[_newSocket].bytesSent = 0;
+		_clients[_newSocket].bytesRead = 0;
 	}
 }
 
@@ -124,7 +125,10 @@ int Server::listenClient(const int& clientFd)
 			return 1; // Go back to select to wait request body
 	}
 	else
-		listenBody(clientFd);
+	{
+		if (listenBody(clientFd) != 0)
+			return 1;
+	}
 	
 	// Maybe add a header & body parsing here to check every possible error case
 
@@ -164,21 +168,24 @@ int Server::listenHeader(const int& clientFd)
 	return 0;
 }
 
-void Server::listenBody(const int& clientFd)
+int Server::listenBody(const int& clientFd)
 {
 	VirtualServerConfig& config = _servers.at(_clients[clientFd].virtualServerId).getVirtualServerConfig();
 
-	std::string requestBody;
-	if (SocketCommunicator::receiveRequestBody(clientFd, requestBody, _clients[clientFd].request, config.getMaxBodySize()) == -1)
+	int recvBodyReturn = SocketCommunicator::receiveRequestBody(clientFd, _clients[clientFd], config.getMaxBodySize());
+
+	if (recvBodyReturn == -1)
 	{
 		removeFd(clientFd, _master);
 		_clients.erase(clientFd);
-		return;
+		return -1;
 	}
+	else if (recvBodyReturn != 0)
+		return 1;
 
-	// std::cout << "Request body: " << requestBody << std::endl;
-	_clients[clientFd].body = requestBody;
-	_clients[clientFd].request.parseRequestBody(requestBody);
+	//std::cout << "Request body: " << _clients[clientFd].body << std::endl;
+	_clients[clientFd].request.parseRequestBody(_clients[clientFd].body);
+	return 0;
 }
 
 const Method Server::processClientRequest(const int& clientFd)

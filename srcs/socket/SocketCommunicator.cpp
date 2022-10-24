@@ -15,14 +15,14 @@ int SocketCommunicator::receiveRequestHeader(const int& socket, std::string& buf
 	return nbytes;
 }
 
-int SocketCommunicator::receiveRequestBody(const int& socket, std::string& buffer, const RequestHeader& header, const long& maxSize)
+int SocketCommunicator::receiveRequestBody(const int& socket, Client& client, const long& maxSize)
 {
 	int retValue;
-	if (isChunkedRequest(header))
-		retValue = receiveChunkedRequestBody(socket, buffer, maxSize);
+	if (isChunkedRequest(client.request))
+		retValue = receiveChunkedRequestBody(socket, client.body, maxSize);
 	else
-		retValue = receiveStandardRequestBody(socket, buffer, header, maxSize);;
-	
+		retValue = receiveStandardRequestBody(socket, client, maxSize);;
+
 	return retValue;
 }
 
@@ -89,26 +89,30 @@ int SocketCommunicator::convertHexaNumberInStrToInt(std::string& str)
 	return number;
 }
 
-int SocketCommunicator::receiveStandardRequestBody(const int& socket, std::string& buffer, const RequestHeader& header, const long& maxSize)
+int SocketCommunicator::receiveStandardRequestBody(const int& socket, Client& client, const long& maxSize)
 {
-	long bytesToRead = atol(header.getField("Content-Length").c_str());
+	size_t bytesToRead = atol(client.request.getField("Content-Length").c_str());
 	if (bytesToRead <= 0)
 		throw (STATUS_411);
-	if (bytesToRead > maxSize) // Need to throw a specific error code
+	if (bytesToRead > static_cast<size_t>(maxSize))
 		throw (STATUS_413);
 
-	char temp;
-	int nbytes = 1;
+	bytesToRead -= client.body.length();
 
-	while (bytesToRead > 0 && nbytes > 0)
-	{
-		nbytes = recv(socket, &temp, 1, 0);
-		if (nbytes > 0)
-			buffer += temp;
-		bytesToRead -= 1;
-	}
-	
-	return nbytes;
+	if (bytesToRead > 32768)
+		bytesToRead = 32768;
+
+	char	temp[32768];
+	memset(temp, 0, 32768);
+	size_t n = recv(socket, temp, bytesToRead, 0);
+	if (n > 0)
+		client.body.append(temp, n);
+
+	client.bytesRead += n;
+
+
+	//return atol(header.getField("Content-Length").c_str()) - buffer.length();
+	return atol(client.request.getField("Content-Length").c_str()) - client.bytesRead;
 }
 
 bool SocketCommunicator::isChunkedRequest(const RequestHeader& header)
@@ -122,7 +126,7 @@ int SocketCommunicator::sendResponse(const int& socket, Client& client)
 
 	std::string str = client.response.response_header.substr(client.bytesSent, SIZE);
 
-	size_t n = send(socket, str.c_str(), str.size(), 0);
+	long n = send(socket, str.c_str(), str.size(), 0);
 	//std::cout << n << "/" << length << std::endl;
 	if (n <= 0)
 	{
