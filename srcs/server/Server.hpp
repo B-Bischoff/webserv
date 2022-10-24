@@ -30,6 +30,7 @@ struct Client {
 	RequestHeader 		request;
 	ResponseHeader 		response;
 	size_t 				bytesSent;
+	size_t				bytesRead;
 	bool 				needToReceiveBody;
 	VirtualServerConfig	virtualServer;
 	LocationBlock		locationBlock;
@@ -57,7 +58,7 @@ private:
 	void manageClientRequest(const int& clientFd);
 	int listenClient(const int& clientFd);
 	int listenHeader(const int& clientFd);
-	void listenBody(const int& clientFd);
+	int listenBody(const int& clientFd);
 	const Method processClientRequest(const int& clientFd);
 	void createClientResponseFromMethod(const int& clientFd, Method& method);
 	Method manageError(const int& clientFd, const char* e);
