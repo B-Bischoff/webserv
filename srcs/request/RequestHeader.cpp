@@ -159,6 +159,7 @@ std::string RequestHeader::parseBodyContent(std::istringstream& ss, const std::s
 	{
 		bodyContent += line + '\n';
 	}
+	bodyContent.erase(bodyContent.length() - 2);
 	return bodyContent;
 }
 
