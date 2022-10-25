@@ -157,9 +157,9 @@ std::string RequestHeader::parseBodyContent(std::istringstream& ss, const std::s
 	std::string bodyContent;
 	while (std::getline(ss, line) && line.find(boundary) == std::string::npos)
 	{
-		if (line != "\r")
-			bodyContent += line + '\n';
+		bodyContent += line + '\n';
 	}
+	bodyContent.erase(bodyContent.length() - 2);
 	return bodyContent;
 }
 

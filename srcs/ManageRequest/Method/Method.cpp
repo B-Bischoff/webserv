@@ -63,6 +63,14 @@ Method	&Method::redirect(const RequestConfig &requestConfig)
 	return (*this);
 }
 
+void	Method::setResponseValue(std::string body, std::string status, std::string path)
+{
+	_body = body;
+	_size = body.size();
+	_status = status;
+	_path = path;
+}
+
 bool	Method::getCloseAfterSend() const
 {
 	return _closeAfterSend;

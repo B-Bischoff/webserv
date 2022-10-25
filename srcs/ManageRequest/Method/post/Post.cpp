@@ -21,15 +21,13 @@ Method	Post::exec(RequestConfig &config, const std::vector<BodyData> &bodyData, 
 			if (fileName == "")
 				throw(STATUS_NO_FILENAME);
 			createFile(fileName, config.getUpload(), bodyData[_filePos].content);
-			setResponseValue(_body, STATUS_201, _requestConfig.getRootPath());
+			setResponseValue(_body, STATUS_204, _requestConfig.getRootPath());
 		}
-		if (config.getCgi() == true)
-		{
+		else if (config.getCgi() == true)
 			setResponseValue(cgiResult, STATUS_200, _requestConfig.getRootPath());
-		}
 	}
 	else
-		throw(STATUS_501);
+		setResponseValue("", STATUS_204, _requestConfig.getRootPath());
 	return (*this);
 }
 
@@ -61,14 +59,9 @@ void	Post::createFile(const std::string &fileName, const std::string &path, cons
 	std::ofstream			file;
 
 	std::string outfile = path + "/" + fileName;
-	file.open(outfile.c_str(), std::ofstream::out);
+	file.open(outfile.c_str(), std::ofstream::out | std::ios_base::binary);
 	if (file.is_open() == false)
-	{
-		errno = 0;
-		if (errno == 13)
-			throw(STATUS_403);
-		throw(STATUS_409);
-	}
+		throw(STATUS_403);
 	file << body;
 	file.close();
 }

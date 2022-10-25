@@ -15,7 +15,7 @@ class Post : public Method
 		Post();
 		~Post();
 
-		Method	exec(RequestConfig &config, const std::vector<BodyData> &bodyData);
+		Method	exec(RequestConfig &config, const std::vector<BodyData> &bodyData, std::string &cgiResult);
 };
 
 #endif

@@ -31,7 +31,7 @@
 #define PORT				(std::string)"' is an invalid port. Port range: 0-65535"
 #define	PATH				(std::string)"Can't open file : '"
 #define	LOG_LEVEL			(std::string)"Unknown log_level"
-#define	TOO_MUCH_ARGS		(std::string)"too much args for this parameter"
+#define	TOO_MUCH_ARGS		(std::string)"Wrong args format"
 #define WRONG_METHOD		(std::string)"Unauthorized method : '"
 #define WRONG_STATUS		(std::string)"Wrong status entered as redirection. Only accept 301/302, got : '"
 #define WRONG_URL			(std::string)"Wrong URL entered : '"

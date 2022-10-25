@@ -20,7 +20,8 @@ Method	Delete::exec(RequestConfig &config, const std::string &body)
 		throw (STATUS_404);
 	if (config.getRootPath().find("/uploads/") == std::string::npos)
 		throw (STATUS_403);
-	remove(config.getRootPath().c_str());
+	if (remove(config.getRootPath().c_str()) == -1)
+		throw(STATUS_403);
 	_status = STATUS_204;
 	return (*this);
 }

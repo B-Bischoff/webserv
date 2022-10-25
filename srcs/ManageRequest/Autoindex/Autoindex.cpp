@@ -3,10 +3,14 @@
 Autoindex::Autoindex(std::string rootPath, std::string fullPath) : _path(fullPath)
 {
 	_webPath = fullPath.substr(rootPath.length());
-	_headBody = "<html>\n<head><title>Index of ";
-	_headBody += _webPath;
-	_headBody += "</title><head>\n<body>\n<h1>Index of " + _webPath + "</h1><hr><pre>\n";
-	_endBody = "</pre><hr></body>\n</html>";
+	_headBody = "<h1>Index of " + _webPath + "</h1>\n"
+			  "<hr/>\n"
+			  "<table style=\"width:100%\">\n"
+			  "    <tr>\n"
+			  "        <th align=\"left\">Name</th>\n"
+			  "        <th align=\"left\">Date</th>\n"
+			  "        <th align=\"left\">Size</th>\n"
+			  "    </tr>\n";
 }
 
 Autoindex::~Autoindex()
@@ -44,7 +48,7 @@ void	Autoindex::insertTabChar(std::string &directoryName)
 	float	check = (size - dirLen) / 8;
 	if (needed != check)
 		needed++;
-	while (needed--)
+	while (needed-- && needed > 0)
 	{
 		_tmpBody.append("\t");
 	}
@@ -52,13 +56,11 @@ void	Autoindex::insertTabChar(std::string &directoryName)
 
 void	Autoindex::addToBody(std::string &directoryName)
 {
-	std::string	syntax = "<a href=\"\"></a>";
-	_tmpBody = syntax;
-	_tmpBody.insert(9, directoryName);
-	_tmpBody.insert(11 + directoryName.size(), directoryName);
-	insertTabChar(directoryName);
-	_tmpBody.append(_directoryInfo[1].erase('\n'));
-	_tmpBody.append("\t\t\t\t" + _directoryInfo[2]);
+	_tmpBody = "<tr>\n";
+	_tmpBody += "        <td><a href=\"" + directoryName + "\">" + directoryName + "</a></td>\n";
+	_tmpBody += "        <td>" + _directoryInfo[1] + "</td>\n";
+	_tmpBody += "        <td>" + _directoryInfo[2] + "</td>\n";
+	_tmpBody += "    </tr>\n";
 }
 
 std::string	Autoindex::buildAutoindex()

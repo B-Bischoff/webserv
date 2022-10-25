@@ -158,7 +158,7 @@ void	ResponseHeader::build_response(Method &method)
 		ext = get_extension_file(method.getPath());
 	convert << method.getSize();
 
-	response_header = protocol + method.getStatus() + "\r\n" + content_type + ext + "\r\n";
+	response_header = protocol + method.getStatus() + "\r\n" + content_type + ext +"; charset=UTF-8" + "\r\n";
 	if (method.getConf().getRedirect() == true) 
 		response_header += "Location: " + method.getConf().getRedirectPath() + "\r\n";
 	response_header += content_length + convert.str() + "\r\n\r\n" + method.getBody();
