@@ -9,6 +9,7 @@ class Post : public Method
 	private:
 		int	_filePos;	
 
+		void		uploadFiles(RequestConfig &config, const std::vector<BodyData> &bodyData);
 		std::string	getFileName(const std::vector<BodyData> &bodyData);
 		void		createFile(const std::string &fileName, const std::string &path, const std::string &body);
 	public:
@@ -19,3 +20,4 @@ class Post : public Method
 };
 
 #endif
+
