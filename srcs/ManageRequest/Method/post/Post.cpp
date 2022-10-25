@@ -11,22 +11,25 @@ Post::~Post()
 }
 
 
-Method	Post::exec(RequestConfig &config, const std::vector<BodyData> &bodyData)
+Method	Post::exec(RequestConfig &config, const std::vector<BodyData> &bodyData, std::string &cgiResult)
 {
-	if (config.getUpload() != "")
+	if (config.getUpload() != "" || config.getCgi() == true)
 	{
-		std::string	fileName = getFileName(bodyData);
-		if (fileName == "")
-			throw(STATUS_NO_FILENAME);
-		createFile(fileName, config.getUpload(), bodyData[_filePos].content);
-		_status = STATUS_201;
-		_body += "<a href=\"\">Your file has been upload</a>";
-		return (*this);
+		if (config.getUpload() != "")
+		{
+			std::string	fileName = getFileName(bodyData);
+			if (fileName == "")
+				throw(STATUS_NO_FILENAME);
+			createFile(fileName, config.getUpload(), bodyData[_filePos].content);
+			setResponseValue(_body, STATUS_201, _requestConfig.getRootPath());
+		}
+		if (config.getCgi() == true)
+		{
+			setResponseValue(cgiResult, STATUS_200, _requestConfig.getRootPath());
+		}
 	}
-	if (config.getCgi() == true)
-	{
-
-	}
+	else
+		throw(STATUS_501);
 	return (*this);
 }
 
@@ -58,7 +61,7 @@ void	Post::createFile(const std::string &fileName, const std::string &path, cons
 	std::ofstream			file;
 
 	std::string outfile = path + "/" + fileName;
-		file.open(outfile.c_str(), std::ofstream::out);
+	file.open(outfile.c_str(), std::ofstream::out);
 	if (file.is_open() == false)
 	{
 		errno = 0;
