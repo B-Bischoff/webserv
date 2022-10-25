@@ -15,6 +15,7 @@
 #define STATUS_414 "414 Request-URI Too Long"
 #define STATUS_415 "415 Unsupported media-type"
 #define STATUS_500 "500 Internal Server Error"
+#define STATUS_501 "501 Not Implemented"
 #define STATUS_505 "HTTP Version Not Supported"
 
 #define STATUS_NO_FILENAME "No filename found during upload"

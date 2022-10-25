@@ -84,6 +84,6 @@ std::string	Autoindex::buildAutoindex()
   		closedir (dir);
 	}
 	else
-		throw(STATUS_500);
+		throw(STATUS_404);
 	return (_headBody);
 }

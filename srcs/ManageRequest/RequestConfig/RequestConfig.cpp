@@ -15,7 +15,7 @@ RequestConfig::RequestConfig(LocationBlock &locBlock, VirtualServerConfig &confB
 	if (locBlock.getStringField("upload") != "")
 		_upload = locBlock.getStringField("upload");
 	initRootPath(request, locBlock, confBlock);
-	isDirectoryPath(locBlock);
+	isDirectoryPath(locBlock, request);
 	isCgi(locBlock);
 }
 
@@ -51,10 +51,18 @@ void	RequestConfig::initRootPath(RequestHeader &request, LocationBlock &locBlock
 }
 
 
-void	RequestConfig::isDirectoryPath(LocationBlock &locBlock)
+void	RequestConfig::isDirectoryPath(LocationBlock &locBlock, RequestHeader &request)
 {
+	struct stat s;
 	if (_rootPath[_rootPath.size() - 1] != '/')
+	{
+		if (stat(_rootPath.c_str(), &s) == 0 &&  s.st_mode & S_IFDIR)
+		{
+			_isRedirect = true;
+			_redirectPath =  request.getField("Path").substr(0, request.getField("Path").find_first_of('?')) + "/";	
+		}
 		return;
+	}
 	if (locBlock.getStringField("index") != "")
 		_rootPath += locBlock.getStringField("index");
 	else if (locBlock.getBoolValue(AUTOINDEX) == true)
