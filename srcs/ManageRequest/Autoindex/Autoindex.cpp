@@ -38,22 +38,6 @@ void	Autoindex::getDirectoryInfo(std::string &directoryName, struct dirent *ent)
 	_directoryInfo.push_back((ent->d_type == DT_REG ? ss.str() + "\n" : "-\n"));
 }
 
-void	Autoindex::insertTabChar(std::string &directoryName)
-{
-	int		size = 48;
-	int		dirLen = directoryName.size();
-	if (dirLen == 8)
-		dirLen++;
-	int		needed = (size - dirLen) / 8;
-	float	check = (size - dirLen) / 8;
-	if (needed != check)
-		needed++;
-	while (needed-- && needed > 0)
-	{
-		_tmpBody.append("\t");
-	}
-}
-
 void	Autoindex::addToBody(std::string &directoryName)
 {
 	_tmpBody = "<tr>\n";

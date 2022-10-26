@@ -23,7 +23,6 @@ class Autoindex
 
 		void	getDirectoryInfo(std::string &directoryName, struct dirent *ent);
 		void	addToBody(std::string &directoryName);
-		void	insertTabChar(std::string &directoryName);
 
 	public:
 		Autoindex(std::string rootPath, std::string fullPath);
