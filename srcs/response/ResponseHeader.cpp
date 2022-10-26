@@ -136,8 +136,14 @@ std::string	ResponseHeader::get_extension_file(std::string path)
 		return (dst = "application/x-7z-compressed");
 	else if (path.find(".cpp\0", 0) != path.npos)
 		return (dst = "text/x-c");
+	else if (path.find(".mp4\0", 0) != path.npos)
+		return (dst = "video/mp4");
 	else if (path.find(".php\0", 0) != path.npos)
 		return (dst = "text/html");
+	else if (path.find(".txt\0", 0) != path.npos)
+		return (dst = "text/plain");
+	else if (path.find(".jpg\0", 0) != path.npos)
+		return (dst = "image/jpeg");
 	else
 		throw(STATUS_415);
 }
@@ -152,7 +158,7 @@ void	ResponseHeader::build_response(Method &method)
 		ext = get_extension_file(method.getPath());
 	convert << method.getSize();
 
-	response_header = protocol + method.getStatus() + "\r\n" + content_type + ext + "\r\n";
+	response_header = protocol + method.getStatus() + "\r\n" + content_type + ext +"; charset=UTF-8" + "\r\n";
 	if (method.getConf().getRedirect() == true) 
 		response_header += "Location: " + method.getConf().getRedirectPath() + "\r\n";
 	response_header += content_length + convert.str() + "\r\n\r\n" + method.getBody();

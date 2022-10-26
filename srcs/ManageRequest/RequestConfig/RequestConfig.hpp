@@ -19,7 +19,7 @@ class RequestConfig
 
 		bool	isValidMethod(std::string &method, LocationBlock &locBlock, VirtualServerConfig &confBlock);
 		void	initRootPath(RequestHeader &request, LocationBlock &locBlock, VirtualServerConfig &confBlock);
-		void	isDirectoryPath(LocationBlock &locBlock);
+		void	isDirectoryPath(LocationBlock &locBlock, RequestHeader &request);
 		void	isCgi(LocationBlock &locBlock);
 	public:
 		RequestConfig();

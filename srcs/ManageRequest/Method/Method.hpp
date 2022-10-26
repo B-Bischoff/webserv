@@ -40,6 +40,8 @@ class Method
 		Method			exec(RequestConfig &config, const std::string &body);
 		Method			&autoindex(const std::string &rootPath, const std::string &fullPath);
 		Method			&redirect(const RequestConfig &requestConfig);
+		void			setResponseValue(std::string body, std::string status, std::string path);
+
 		RequestConfig	&getConf();
 		int				getSize() const;
 		std::string		getBody() const;

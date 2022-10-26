@@ -15,7 +15,6 @@ Method ManageRequest::identify()
 	RequestConfig requestConfig(_client.locationBlock, _client.virtualServer, _client.request);
 	Method index(requestConfig);
 	std::string	cgiResult;
-
 	if (requestConfig.getValidMethod() == false)
 		throw(STATUS_405);
 	else if (requestConfig.getRedirect() == true)
@@ -33,7 +32,7 @@ Method ManageRequest::identify()
 	else if (requestConfig.getMethod() == "POST")
 	{
 		Post post;
-		return (post.exec(requestConfig, _client.request.getBodydata()));
+		return (post.exec(requestConfig, _client.request.getBodydata(), cgiResult));
 	}
 	else
 	{

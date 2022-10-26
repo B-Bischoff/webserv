@@ -11,21 +11,20 @@ Post::~Post()
 }
 
 
-Method	Post::exec(RequestConfig &config, const std::vector<BodyData> &bodyData)
+Method	Post::exec(RequestConfig &config, const std::vector<BodyData> &bodyData, std::string &cgiResult)
 {
-	if (config.getUpload() != "")
+	if (config.getUpload() != "" || config.getCgi() == true)
 	{
-		uploadFiles(config, bodyData);
-
-		_status = STATUS_201;
-		_body += "<a href=\"\">Your file has been uploaded</a>";
-		_size = _body.size();
-		return (*this);
+		if (config.getUpload() != "")
+		{
+			uploadFiles(config, bodyData);
+			setResponseValue(_body, STATUS_204, _requestConfig.getRootPath());
+		}
+		else if (config.getCgi() == true)
+			setResponseValue(cgiResult, STATUS_200, _requestConfig.getRootPath());
 	}
-	if (config.getCgi() == true)
-	{
-
-	}
+	else
+		setResponseValue("", STATUS_204, _requestConfig.getRootPath());
 	return (*this);
 }
 
@@ -35,7 +34,7 @@ void Post::uploadFiles(RequestConfig &config, const std::vector<BodyData> &bodyD
 	{
 		std::string fileName = getFileName(bodyData);
 		if (fileName == "")
-			throw (STATUS_NO_FILENAME);
+			throw (STATUS_500);
 		createFile(fileName, config.getUpload(), bodyData[_filePos].content);
 	}
 }
@@ -52,7 +51,7 @@ std::string	Post::getFileName(const std::vector<BodyData> &bodyData)
 	}
 	catch(const std::exception& e)
 	{
-		std::cout << "No filename" << std::endl;
+
 	}
 	return ("");
 }
@@ -62,14 +61,9 @@ void	Post::createFile(const std::string &fileName, const std::string &path, cons
 	std::ofstream			file;
 
 	std::string outfile = path + "/" + fileName;
-		file.open(outfile.c_str(), std::ofstream::out | std::ios_base::binary);
+	file.open(outfile.c_str(), std::ofstream::out | std::ios_base::binary);
 	if (file.is_open() == false)
-	{
-		errno = 0;
-		if (errno == 13)
-			throw(STATUS_403);
-		throw(STATUS_409);
-	}
+		throw(STATUS_403);
 	file << body;
 	file.close();
 }
