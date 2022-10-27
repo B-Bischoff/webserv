@@ -22,7 +22,7 @@ LocationBlock	LocationSelector::selectLocationBlock(const std::string &path, std
 				maxSizeIndex = i;
 			}
 		}
-		if (compareWildCard(locationPath, path) == true)
+		if (locationPath.find('*') != std::string::npos && compareWildCard(locationPath, path) == true)
 			return (serverBlock[i]);
 	}
 	return (serverBlock[maxSizeIndex]);
