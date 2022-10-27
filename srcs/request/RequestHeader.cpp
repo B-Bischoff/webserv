@@ -86,7 +86,6 @@ void RequestHeader::parseMultipartEnctype(std::string& body)
 			_body.push_back(BodyData());
 		}
 	}
-	_body.pop_back(); // Remove last unused body data added
 
 	
 	// Debug: Print body content
@@ -125,9 +124,7 @@ bool RequestHeader::parseMetadatas(const std::string& line)
 	_body[_body.size() - 1].metadata[key] = value;
 
 	if (line[i] == '\r') // no more metadata to read
-	{
 		return false;
-	}
 
 	i += 2;
 	key.clear();

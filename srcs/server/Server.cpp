@@ -54,9 +54,7 @@ void Server::serverLoop()
 				if (isAVirtualServer(i)) // Incoming connection from new client
 					acceptConnection(i);
 				else // Client wants to communicate
-				{
 					manageClientRequest(i);
-				}
 			}
 			if (FD_ISSET(i, &writeFds) && _clients[i].response.response_header != "")
 			{
@@ -117,8 +115,6 @@ void Server::manageClientRequest(const int& clientFd)
 
 int Server::listenClient(const int& clientFd)
 {
-	std::cout << "client " << clientFd << " wants to communicate" << std::endl;
-
 	if (_clients[clientFd].needToReceiveBody == false)
 	{
 		if (listenHeader(clientFd) == 1)
@@ -128,30 +124,34 @@ int Server::listenClient(const int& clientFd)
 	{
 		if (listenBody(clientFd) != 0)
 			return 1;
+		Client& client = _clients[clientFd];
+		VirtualServerConfig& config = _servers.at(_clients[clientFd].virtualServerId).getVirtualServerConfig();
+		if (atol(client.request.getField("Content-Length").c_str()) > config.getMaxBodySize())
+			throw (STATUS_413);
 	}
-	
-	// Maybe add a header & body parsing here to check every possible error case
 
 	return 0;
 }
 
 int Server::listenHeader(const int& clientFd)
 {
-	std::string buf;
-	int receiveReturn = SocketCommunicator::receiveRequestHeader(clientFd, buf);
+	int receiveReturn = SocketCommunicator::receiveRequestHeader(clientFd, _clients[clientFd].body);
 	//std::cout << "Request Header: " << buf << std::endl;
 
-	if (receiveReturn <= 0) // Client disconnected or recv error
+	if (receiveReturn < 0) // Client disconnected or recv error
 	{
 		std::cout << "Socket: " << clientFd << " quit" << std::endl;
 		removeFd(clientFd, _master);
 		_clients.erase(clientFd);
 		return 1;
 	}
+	else if (receiveReturn == 1)
+		return 1;
 
 	Client& client = _clients[clientFd];
 	
-	client.request.parseRequestHeader(buf);
+	client.request.parseRequestHeader(_clients[clientFd].body);
+	_clients[clientFd].body.clear();
 
 	VirtualServerSelector selector(_servers, client.request);
 	int virtualServerId = selector.selectServerFromRequest();
@@ -170,9 +170,7 @@ int Server::listenHeader(const int& clientFd)
 
 int Server::listenBody(const int& clientFd)
 {
-	VirtualServerConfig& config = _servers.at(_clients[clientFd].virtualServerId).getVirtualServerConfig();
-
-	int recvBodyReturn = SocketCommunicator::receiveRequestBody(clientFd, _clients[clientFd], config.getMaxBodySize());
+	int recvBodyReturn = SocketCommunicator::receiveRequestBody(clientFd, _clients[clientFd]);
 
 	if (recvBodyReturn == -1)
 	{

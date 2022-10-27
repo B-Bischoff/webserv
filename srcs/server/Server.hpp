@@ -35,7 +35,7 @@ struct Client {
 	VirtualServerConfig	virtualServer;
 	LocationBlock		locationBlock;
 	int 				virtualServerId;
-	std::string 		body; // To delete
+	std::string 		body;
 };
 
 class Server {
