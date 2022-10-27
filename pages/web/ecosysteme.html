@@ -1,0 +1,469 @@
+<!DOCTYPE HTML>
+<!--
+Phantom by HTML5 UP
+html5up.net | @ajlkn
+Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+<head>
+	<title>Écosystème</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+	<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-CP7YYY7WEF"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-CP7YYY7WEF');
+	</script>
+</head>
+<body class="is-preload">
+	<!-- Wrapper -->
+		<div id="wrapper">
+
+			<!-- Header -->
+				<header id="header">
+					<div class="inner">
+
+						<!-- Logo -->
+							<a href="index.html" class="logo">
+								<span class="symbol"><img src="images/Square-grey.png" alt="" /></span><span class="title">Page principale</span>
+							</a>
+
+						<!-- Nav -->
+							<nav>
+								<ul>
+									<li><a href="#menu">Menu</a></li>
+								</ul>
+							</nav>
+
+					</div>
+				</header>
+
+			<!-- Menu -->
+				<nav id="menu">
+					<h2>Menu</h2>
+					<ul>
+						<li><a href="index.html">Projets</a></li>
+						<li><a href="a-propos.html">À propos</a></li>
+						<li><a href="contact.html">Contact</a></li>
+					</ul>
+				</nav>
+
+			<!-- Main -->
+				<div id="main">
+					<div class="inner">
+						<h1>Écosystème</h1>
+						<span class="image main"><img src="images/Ecosysteme/background-1.png" alt="" /></span>
+
+						<h2>Contexte</h2>
+						<p>
+						Le but de ce projet était de m’améliorer dans le domaine du développement informatique. C’est alors que m’est venue l’idée de <b>simuler un écosystème</b>.
+						<br>
+						Mon objectif était donc de <b>créer deux espèces animales</b> capables chacune de reproduire un comportement simplifié, mais réaliste. J'ai opté pour les lapins et les renards,
+						un cas typique que l'on retrouve régulièrement dans les simulations de ce genre.
+						<br><br>
+						La finalité de ce projet est d'obtenir une application, où chacun peut lancer <u>sa simulation avec ses propres conditions initiales</u> et observer ses résultats.
+						<br>
+						C'est donc début novembre 2020 qu'ont débuté mes recherches afin d'amorcer au mieux la réalisation de ce projet à l'aide <a href="https://unity.com/"> du moteur de jeu Unity </a>.
+						</p>
+
+						<hr>
+
+						<h2>Réalisation</h2>
+						<p>Ce projet est composé de trois parties</p>
+						<ul>
+							<li>Génération d'un terrain</li>
+							<li>Création des espèces animales</li>
+							<li>Visualisation des données à l'aide de graphiques</li>
+						</ul>
+
+						<br>
+
+						<span class="image right"><img src="images/Ecosysteme/terrain-flipped.png" alt="" /><center><sup><i>rendu final</i><sup></center></span>
+						<h3>Terrain</h3>
+						<p>
+							Il y plusieurs points importants à respecter pour que le terrain soit <u>réaliste </u>. <br><br>
+							Premièrement, <b>le relief</b>, qui ajoutera des variations de hauteur et donnera au terrain un aspect naturel.<br>
+							Ensuite les <b>couches</b> : elles permettent de définir les zones d'eau, de sable et de forêt. <br>
+							Et enfin la <b>flore</b>, constituée d'arbres et de carottes. <br>
+						</p>
+
+						<blockquote>
+							<p><b>Précisions techniques</b><br></p>
+							<span class="image right"><img src="images/Ecosysteme/WireframePlane.png" alt="" /><center><sup><i>maillage du terrain (8x8)</i></sup></center></span>
+							<p>
+								Initialement, nous partons d'une surface plane, définie par une longueur et une largeur (cf. photo "maillage du terrain").
+								Le maillage est donc composé de plusieurs <b>sommets</b>, reliés entres eux par des segments formant des triangles.
+							</p>
+							<span class="image left"><img src="images/Ecosysteme/PerlinNoiseExample.png" alt="" /><center><sup><i>exemple de bruit Perlin</i></center></sup></span>
+
+							<p>
+								C'est en faisant varier la hauteur de chaque sommet que le terrain aura du relief. Pour ce faire nous utilisons un type de bruit spécifique, le <a href="#bruit_perlin">bruit Perlin*</a>.
+								En <b>superposant</b> notre maillage avec l'image de bruit Perlin, on associe chaque sommet à une nuance de gris. C'est en fonction de cette nuance que la hauteur sera définie. Dans mon cas, les zones claires représentent les zones à forte altitude (voir image ci-contre).
+							</p>
+
+							<span class="image right"><img src="images/Ecosysteme/Height02.png" alt="" /><center><sup><i>bruit Perlin avec couches et couleurs</i></center></sup></span>
+							<p>
+								Les couches sont définies en faisant des fourchettes de valeurs sur l'image du bruit Perlin. Ici, quatre couches ont été définies comme suit :
+								<ul>
+									<li>0 - 0.3 : eau </li>
+									<li>0.31 - 0.5 : sable </li>
+									<li>0.51 - 0.85 : plaine </li>
+									<li>0.86 - 1 : forêt </li>
+								</ul>
+							</p>
+
+							<p>Il ne reste plus qu'à indiquer à Unity que nous voulons un dégradé entre les couleurs des couches et notre terrain sera enfin coloré !</p>
+
+							<p>Il manque seulement la flore. Pour cela, rien de compliqué. Une fois que notre terrain est généré nous passons au crible <a href="#un_sommet_sur_deux"><i>un sommet sur deux</i>*</a> et suivant le résultat aléatoire d'un tirage, <u>on génère ou non</u> l'élément de flore souhaité.</p>
+							<p>Dans mon cas, voici les <b>probabilités d'apparition</b> des arbres et des carottes pour chaque couche :</p>
+
+							<div class="row">
+								<div class="col-6">
+									<span class="image left"><img src="images/Ecosysteme/tree.png" alt="" /><center><sup><i>modèle arbre</i></center></sup></span>
+									<ul>
+										<li>eau : 0%</li>
+										<li>sable : 0.5%</li>
+										<li>plaine : 4%</li>
+										<li>forêt : 8%</li>
+									</ul>
+								</div>
+								<div class="col-6">
+									<span class="image left"><img src="images/Ecosysteme/carrot.png" alt="" /><center><sup><i>modèle carotte</i></center></sup></span>
+									<ul>
+										<li>eau : 0%</li>
+										<li>sable : 1%</li>
+										<li>plaine : 3%</li>
+										<li>forêt : 30%</li>
+									</ul>
+								</div>
+							</div>
+
+						<br>
+						<p>La flore (arbres et carottes) est générée <b>juste avant</b> que la simulation ne commence. Par la suite des vagues de carottes (avec les mêmes probabilités d'apparition) auront lieu toutes les <b>60 secondes</b> (cette durée étant considérée dans la simulation comme un "cycle").</p>
+						<br>
+						<p id="bruit_perlin"><i>*Bruit Perlin</i> : Texture générée procéduralement avec pour particularité la <b>transition douce</b> entre les zones claires et sombres.</p>
+						<p id="un_sommet_sur_deux"><i>*Un sommet sur deux</i> : Il est possible d'analyser chaque sommet, cependant cette opération est relativement <b>couteuse</b>, de plus sauter un sommet permet aux éléments générés de ne pas entrer en <b>collision</b>.</p>
+
+						</blockquote>
+
+						<h3>Espèces animales</h3>
+
+						<h4>Lapins</h4>
+
+						<div class="row">
+							<div class="col-6">
+
+								<p>Le premier animal introduit sur le terrain est le lapin. L'objectif est d'avoir une espèce capable <b>d'interagir avec son environnement</b>, les carottes et les étendues d'eau dans notre cas.</p>
+								<p>Les lapins possèdent trois caractéristiques principales</p>
+								<ul>
+									<li>une vitesse de déplacement</li>
+									<li>un champ de vision</li>
+									<li>un temps de consommation (pour manger et boire)</li>
+								</ul>
+							</div>
+							<div class="col-6">
+								<span class="image fit"><img src="images/Ecosysteme/red.png" alt="" /><center><sup><i>modèle lapin</i></center></sup></span>
+							</div>
+						</div>
+
+						<p>Mais surtout, ce qui détermine si un individu est vivant ou non est son niveau d'eau et de nourriture. Ces données sont chacune simulées par une valeur comprise entre 0 et 100 et diminuent progressivement en <b>fonction du temps</b>. Si le niveau d'eau <u>ou</u> de faim atteint 0, alors <b>l'individu meurt</b>.</p>
+						<p>
+							Afin de survivre, l'animal doit décider quand chercher à boire et à manger. Pour ce faire, <b>un seuil</b> par quantité (définis par l'utilisateur) indique si le lapin a faim ou soif.<br>
+							Si le niveau d'eau <u>ou</u> de nourriture de l'animal est <u>inférieur au seuil</u> correspondant, alors il ira checher l'élément adéquat.
+						</p>
+
+
+						
+						<div class="row">
+							<div class="col-6">
+								<p>La vidéo qui suit montre un lapin se balader, puis chercher de l'eau et de la nourriture quand il en a le besoin.<br>Dans cet exemple, les deux seuils sont définis à 70, et les carottes ainsi que l'eau remplissent de 20 la jauge correspondante de l'animal.</p>
+								<p>Les jauges orange et bleue <b>indiquent le niveau</b> de nourriture et d'eau de chaque animal.</p>
+							</div>
+
+							<div class="col-6">
+								<span class="image fit">
+									<video controls width="100%">
+										<source src="images/Ecosysteme/Water-Food.mp4" type="video/webm">
+									</video>
+									<center><sup><i>démonstration de l'interaction avec la nourriture et l'eau</i></sup></center>
+								</span>
+							</div>
+						</div>
+
+
+						<blockquote>
+							<p><b>Précisions techniques</b><br></p>
+							<p>
+								Déplacements :
+								<div class="image right"><img src="images/Ecosysteme/navMesh.png" alt="" /><center><sup><i>visualisation NavMesh</i></sup></center></div>
+								Les animaux utilisent la technologie <a href="https://docs.unity3d.com/ScriptReference/AI.NavMesh.html">NavMesh component</a> fournie par Unity (module UnityEngine.AI) pour se déplacer.<br> Cette technologie permet de créer un type d'<i>agent</i> (que nous assignons à nos lapins) possédant une taille, une vitesse et une circonférence.<br>
+								Il faut ensutie créer une "NavMesh" du terrain, (voir photo ci-contre). Les zones bleues indiquent les endroits <b>pouvant être empruntés</b> par nos agents précédemment créés.<br>
+								Il suffit maintenant de spécifier une <b>position (en coordonnées)</b> à un individu pour que celui-ci s'y déplace <u>en trouvant lui même le chemin le plus court</u>.
+							</p>
+							<p>
+								Recherche de nourriture et d'eau :
+								<div class="image right"><img src="images/Ecosysteme/water_spot.png" alt="" /><center><sup><i>visualisation des points d'eau</i></sup></center></div>
+								Lorsqu'un animal boit, il <b>interagit</b> avec une sphère (rendue visible sur la photo ci-contre) symbolisant un point d'eau. (une sphère est créée dès lors qu'un sommet se trouve avec une valeur de bruit Perlin entre 0.22 et 0.25)<br>
+								Une liste contient toutes les carottes présentes sur le terrain, il en est de même pour les points d'eau.<br>
+								Lorsqu'un animal désire trouver la carotte ou le point d'eau le plus proche, il <b>parcourt la liste</b> en question et <a href="#calcul_distance">calcul la distance*</a> entre l'élément souhaité et sa propre position.
+								Si la distance est comprise dans son champ de vision, l'élément sélectionné sera la cible de l'animal. Cependant, si un élément suivant dans la liste se trouve être <b>plus proche</b> de l'animal, il sera alors la nouvelle cible.
+							</p>
+						</blockquote>
+
+
+						<p>Maintenant que chaque animal est capable de survivre, nous pouvons définir les <b>conditions de reproduction</b> pour chaque individu.</p>
+						<p>Le principe est similaire à celui de la nourriture et de l'eau. La possibilité de se reproduire est définie par deux seuils : à nouveau, un sur la jauge de nourriture et un sur celle d'eau.</p>
+						<p>
+							Si le niveau d'eau <u>et</u> celui de nourriture sont supérieurs à leurs seuils respectifs, l'animal va chercher dans son champ de vision un lapin du sexe opposé, lui aussi <b>apte à se reproduire</b>.<br>
+							Une fois que deux lapins se sont reproduis, la femelle sera alors <a href="#porteuse">porteuse*</a> et donnera naissance à plusieurs lapereaux une fois le <b>temps de gestation écoulé</b>.
+						</p>
+
+						<div class="row">
+							<div class="col-6">
+								<span class="image fit">
+									<video controls width="100%">
+										<source src="images/Ecosysteme/Reproduction.mp4" type="video/webm">
+									</video>
+									<center><sup><i>démonstration du mécanisme de reproduction</i></sup></center>
+								</span>
+							</div>
+							<div class="col-6">
+								<p>La prochaine vidéo montre premièrement la reproduction de deux lapins et ensuite la naissance de lapereaux, deux mâles dans notre cas.</p>
+							</div>
+						</div>
+
+						<p id="porteuse"><i>*Porteuse</i> : Le nombre d'animaux par portée est aléatoire <u>entre un minimum et un maximum</u> (tous deux inclus) définis par l'utilisateur.</p>
+						<p id="calcul_distance"><i>*Calcul de la distance</i> : Pour ce faire, j'utilise la fonction <a href="https://docs.unity3d.com/ScriptReference/Vector3.Distance.html">Vector3.Distance de Unity</a><br>
+
+						<p>À partir de ce stade, le seul facteur capable de <b>réguler la population</b> de lapins est le nombre de carottes disponible. Il est temps pour les renards de faire leur apparition.</p>
+
+						<h4>Renards</h4>
+
+						<div class="row">
+							<div class="col-6">
+
+								<p>Les caractéristiques et actions du renard sont <b>similaires</b> à celles du lapin. À la différence que pour se nourrir, il <b>chasse des lapins</b>.</p>
+								<p>Pour rendre les choses plus réalistes, les lapins vont désormais <b>fuir les prédateurs</b> à proximité.</p>
+								<span class="image fit">
+									<video controls width="100%">
+										<source src="images/Ecosysteme/Fox-Eating.mp4" type="video/webm">
+									</video>
+									<center><sup><i>démonstration de la chasse</i></sup></center>
+								</span>
+							</div>
+							<div class="col-6">
+								<span class="image fit"><img src="images/Ecosysteme/fox.png" alt="" /><center><sup><i>modèle du renard</i></center></sup></span>
+							</div>
+						</div>
+						<br>
+
+						<blockquote>
+							<p><b>Précisions techniques</b><br></p>
+							<p>
+								Déplacements :
+								<div class="image right"><img src="images/Ecosysteme/random_pos.png" alt="" /><center><sup><i>représentation des déplacements aléatoires</i></sup></center></div>
+								Lorsqu'un animal n'a pas le besoin de boire ou manger ni la capacité de se reproduire il se <b>déplace aléatoirement</b>.<br>
+								L'idée est de générer une position <u>ni trop loin, ni trop proche</u> de la position actuelle de l'animal.<br>
+								Voici la fonction utilisée (code en langage C#) :
+								<pre><code>Vector3 FindPosInCircle(Vector3 centre, float radius)
+{
+    Vector3 pos = new Vector3();
+    float angle = Random.value * Math.Pi;
+    float margin = 1.5f;
+
+    float norme = Random.Range(margin, radius);
+
+    pos.x = centre.x + (norme * Mathf.Cos(angle));
+    pos.z = centre.z + (norme * Mathf.Sin(angle));
+
+    return pos;
+}								</pre></code>
+								Le type de variable "Vector3" est une <a href="https://docs.unity3d.com/ScriptReference/Vector3.html">structure propre à Unity</a> contenant en première position, une position X, en seconde une position Y (hauteur), et enfin une position Z.<br>
+								La fonction Random.value va générer un nombre <b>entre 0 et 1</b>. On définit alors un angle en radians en multipliant cette valeur par 2&#x3C0.<br>
+								On genère ensuite une norme comprise <b>entre la distance minimale et maximale</b> du déplacement de l'animal.<br>
+								La variable "centre" correspond à la position <b>actuelle</b> de l'animal.<br>
+								On retrouve <b>la distance sur l'axe X</b> en multipliant la norme avec le cosinus de l'angle, puis on l'aditionne à la position (toujours sur l'axe X) de l'animal.<br>
+								On réalise la même opération pour l'axe Z mais cette fois-ci, avec le sinus.
+							</p>
+						</blockquote>
+
+						<div class="row">
+							<div class="col-6">
+								<p>Conclusion sur les espèces animales.</p>
+								<p>Afin de représenter le comportement de nos espèces de manière synthétique, voici un <b>algorigramme</b> reprennant <u>l'intégralité des notions précédentes</u>.</p>
+								<p>
+									Un choix personnel a été fait entre le besoin de nourriture et d'eau.<br>
+									Le schéma montre que <b>le besoin d'eau de l'animal est prioritaire</b> prioritaire par rapport à sa faim.
+								</p>
+								<p>
+									Le déplacement aléatoire possède 2 utilités.<br>
+									Premièrement, quand l'animal n'a besoin ni d'eau ni de nourriture et n'est pas apte à se reproduire, il va se déplacer aléatoirement <b>jusqu'à ce qu'un besoin primaire survienne</b>.<br>
+									Ensuite, imaginons que notre animal éprouve le besoin de s'hydrater mais qu'aucun point d'eau n'est à proximité. L'animal va alors se déplacer aléatoirement sur le terrain puis analyser à nouveau si il peut satisfaire son besoin. <u>Ceci lui évite de se laisser mourir car il ne trouve pas l'élément désiré</u>.
+								</p>
+							</div>
+							<div class="col-6">
+								<span class="image fit"><img src="images/Ecosysteme/animal-algorigram.png" alt="" /><center><sup><i>algorigramme des espèces</i></center></sup></span>
+							</div>
+						</div>
+
+
+						<h3>Graphique</h3>
+						<p>Il est relativement aisé de <b>suivre l'évolution</b> des animaux quand ils sont peu nombreux, mais dès lors qu'ils commencent à se reproduire on peut facilement s'y perdre.</p>
+
+						<div class="row">
+							<div class="col-6">
+								<p>C'est pourquoi, situé en bas de l'affichage, se trouvent le <b>nombre actuel</b> de carottes, lapins et renards <b>présents dans la simulation</b>.</p>
+								<p>De plus, des informations complémentaires sont affichées (comme la répartition adulte / enfant) au passage de la souris sur ces zones de texte.
+
+							</div>
+							<div class="col-6">
+								<span class="image fit"><img src="images/Ecosysteme/raw_info.png" alt="" /><center><sup><i>visualisation de l'interface</i></center></sup></span>
+							</div>
+						</div>
+
+
+						<div class="row">
+							<div class="col-6">
+								<span class="image fit"><img src="images/Ecosysteme/graph.png" alt="" /><center><sup><i>vue graphique</i></center></sup></span>
+							</div>
+							<div class="col-6">
+								<p>Une vue graphique est disponible pour suivre l'évolution de la simulation avec <b>le plus détails possible</b>.</p>
+								<p>Celle-ci est composée de 4 graphiques, chacun capable d'afficher 4 données en <u>fonction du temps</u>.</p>
+								<p>Chaque graphique est entièrement personnalisable :</p>
+								<ul>
+									<li><u>Données</u> selectionnées</li>
+									<li><u>Apparence</u> (couleur, taille points, grille en arrière plan, ...)</li>
+									<li><u>Moyenne</u> automatique ou manuelle des données</li>
+									<li><u>Sauvegarde</u> et chargement de la disposition de la vue graphique</li>
+								</ul>
+							</div>
+						</div>
+
+						<p>Les données pouvant être affichées sont les suivantes :</p>
+						<ul>
+							<li>Le nombre de carottes</li>
+							<li>Le nombre de lapins et de renards</li>
+							<li>Le nombre de décès</li>
+							<li>Les causes de décès (déshydratation, famine, chassé)
+						</ul>
+
+
+						<blockquote>
+							<p><b>Précisions techniques</b><br></p>
+							<p>Mesure des informations :</p>
+							<p>Comme mentionné précédemment, les lapins, renards et carottes <b>sont stockés dans des listes</b>. C'est grâce à elles que nous pouvons obtenir une multitude d'informations sur chaque élément présent dans la simulation.
+							<p>Il y a <b>10 prises de données par cycle</b>, autrement dit, <b>une toute les 6 secondes</b>, car un cycle dure une minute.</p>
+							<p>A chaque prise de données, on recueille les informations comme par exemple le nombre de lapins ou de carottes actuel afin de les garder en mémoire.</p>
+							<br>
+							<p>Graphiques :</p>
+							<p>Unity ne fournit pas d'outils pour dessiner des graphiques, j'ai ainsi après quelques recherches sur Internet réussi à <b>reprendre des productions existantes</b> (voir <a href="#sources">"Sources"</a>) et les <b>adapter à mes besoins</b>.</p>
+							<p>
+								Il faut premièrement <b>délimiter la zone de chaque graphique</b>.<br>
+								Dans mon cas, chaque graphique fait 33% de la longueur de l'écran sur l'axe horizontal (~633 pixels quand la résolution est de 1920 par 1080 pixels au format 16:9) et un un peu moins de 40% sur l'axe vertical (soit ~420 pixels).
+							</p>
+							<p>
+								On place ensuite les points sur la surface précédemment délimitée.
+								Les points sont <b>répartis régulièrement suivant l'axe X</b>, soit sur une longueur d'environ 633 pixels dans mon exemple.<br>
+								Pour l'axe Y, on cherche d'abord la <b>valeur la plus grande</b> dans la liste qui nous servira de référence. On divise alors la valeur de l'élément à placer par cette valeur maximum. <u>Le résultat sera entre 0 et 1</u>.
+								Pour afficher le point dans la zone de notre graphique on multiplie cette valeur par la hauteur du graphique (moins une legère marge afin de ne pas afficher de point sur la bordure de l'écran).
+							</p>
+							
+						</blockquote>
+
+
+						<hr>
+
+						<h2>Conclusion</h2>
+						<p>Il m'a fallu un peu moins de 6 mois pour obtenir une permière version stable, comprenant tout ce qui a été cité auparavant.</p>
+						<p>Ce projet a été énormément formateur sur de nombreux points.</p>
+						<ul>
+							<li><h4>La gestion</h4>
+								<p>
+									C'est à ce jour (mai 2021), <b>mon plus gros projet</b> personnel. Pour ne pas m'y perdre il a été important de bien <b>structurer et décomposer</b> chaque partie afin d'être le plus efficace et ordonné.
+								</p>
+							</li>
+							<li><h4>La programmation</h4>
+								<p>
+									J'ai découvert de nombreuses fonctionnalités comme la génération de maillage customisé ou bien l'utilisation de NavMesh. J'ai également pu renforcer certaines connaissances telles que le calcul vectoriel et l'utilisation de classes pour les animaux.<br>
+									Le plus important est <b>la structure du code</b>. Elle est à ce jour loin d'être parfaite, mais j'ai pu constater son importance et m'exercer à le rendre le mieux possible.
+								</p>
+							</li>
+							<li><h4>La modélisation</h4>
+								<p>
+									Malgré mon expérience avec le logiciel <a href="https://www.blender.org/">Blender</a>, modéliser puis animer un animal avec le moins de détails possible a été une <b>complète découverte</b>. J'en garde un très bon souvenir.
+								</p>
+							</li>
+							<li><h4>L'interface utilisateur</h4>
+								<p>
+									L'objectif est de la rendre <b>compréhensible instantanément</b>, ce qui m'aura pris de nombreuses heures à comprendre puis réaliser. Cela peut paraître simple, mais c'est en réalité un véritable challenge.<br>
+									J'ai dû sortir de ma zone de confort et redoubler de créativité pour tenter de rendre cette quantité d'informations assimilable par n'importe quel utilisateur.
+								</p>
+							</li>
+						</ul>
+						<br>
+
+						<p>
+							Le plus gros étant désormais achevé, je compte <u>perfectionner les derniers détails et corriger les bugs</u> qui seraient présents avant de considérer ce projet comme <b>complètement terminé</b>.
+						</p>
+
+						<hr>
+						<h2 id="sources">Sources</h2>
+
+						<h3>Inspirations</h3>
+						<p>
+							Sebastian Lague | Coding Adventure: Simulating an Ecosystem : <a href="https://www.youtube.com/watch?v=r_It_X7v-1E">https://www.youtube.com/watch?v=r_It_X7v-1E</a>
+							<br>
+							Primer | Simulation de la la sélection naturelle : <a href="https://www.youtube.com/watch?v=0ZGbIKd0XrM">https://www.youtube.com/watch?v=0ZGbIKd0XrM</a>
+						</p>
+
+						<h3>Terrain</h3>
+						<p>
+							Sebastian Lague | Procedural Landmass Generation (E01: Introduction) : <a href="https://www.youtube.com/watch?v=wbpMiKiSKm8">https://www.youtube.com/watch?v=wbpMiKiSKm8</a>
+							<br>
+							Catlike Coding | Procedural grid : <a href="https://catlikecoding.com/unity/tutorials/procedural-grid/">https://catlikecoding.com/unity/tutorials/procedural-grid/</a>
+							<br>
+							Brackeys | MESH GENERATION in Unity - Basics : <a href="https://www.youtube.com/watch?v=eJEpeUH1EMg">https://www.youtube.com/watch?v=eJEpeUH1EMg</a>
+							<br>
+							Brackeys | PROCEDURAL TERRAIN in Unity! - Mesh Generation : <a href="https://www.youtube.com/watch?v=64NblGkAabk">https://www.youtube.com/watch?v=64NblGkAabk</a>
+						</p>
+
+						<h3>Graphiques</h3>
+						<p>
+							Code Monkey | Unity Tutorial - Create a Graph : <a href="https://www.youtube.com/watch?v=CmU5-v-v1Qo">https://www.youtube.com/watch?v=CmU5-v-v1Qo</a>
+						</p>
+						<h2>Téléchargement</h2>
+						<!-- petite liste de 2 collones avec les icone de github et itch-->
+						<ul class="actions">
+						<li><a href="https://github.com/B-Bischoff/Ecosystem" class="button icon brands fa-github">Code source</a></li>
+						<li><a href="https://b-bischoff.itch.io/ecosystem" class="button icon brands fa-itch-io">Exécutable</a></li>
+					</ul>
+					</div>
+				</div>
+
+				<!-- Footer -->
+				<footer id="footer">
+					<div class="inner">
+						<ul class="copyright">
+							<li>Design adapté depuis une création : <a href="http://html5up.net">HTML5 UP</a></li>
+						</ul>
+					</div>
+				</footer>
+
+		</div>
+
+	<!-- Scripts -->
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/browser.min.js"></script>
+		<script src="assets/js/breakpoints.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
