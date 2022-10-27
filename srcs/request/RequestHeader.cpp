@@ -86,7 +86,6 @@ void RequestHeader::parseMultipartEnctype(std::string& body)
 			_body.push_back(BodyData());
 		}
 	}
-	_body.pop_back(); // Remove last unused body data added
 
 	
 	// Debug: Print body content

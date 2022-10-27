@@ -13,16 +13,13 @@ Post::~Post()
 
 Method	Post::exec(RequestConfig &config, const std::vector<BodyData> &bodyData, std::string &cgiResult)
 {
-	if (config.getUpload() != "" || config.getCgi() == true)
+	if (config.getUpload() != "")
 	{
-		if (config.getUpload() != "")
-		{
-			uploadFiles(config, bodyData);
-			setResponseValue(_body, STATUS_204, _requestConfig.getRootPath());
-		}
-		else if (config.getCgi() == true)
-			setResponseValue(cgiResult, STATUS_200, _requestConfig.getRootPath());
+		uploadFiles(config, bodyData);
+		setResponseValue(_body, STATUS_204, _requestConfig.getRootPath());
 	}
+	if (config.getCgi() == true)
+		setResponseValue(cgiResult, STATUS_200, _requestConfig.getRootPath());
 	else
 		setResponseValue("", STATUS_204, _requestConfig.getRootPath());
 	return (*this);
