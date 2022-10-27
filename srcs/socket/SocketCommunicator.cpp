@@ -5,33 +5,69 @@ int SocketCommunicator::receiveRequestHeader(const int& socket, std::string& buf
 	int nbytes = 1;
 	char temp;
 
-	while (nbytes > 0 && buffer.find("\r\n\r\n") == std::string::npos)
-	{
-		nbytes = recv(socket, &temp, 1, 0);
-		if (nbytes > 0)
-			buffer += temp;
-	}
+	nbytes = recv(socket, &temp, 1, 0);
+	if (nbytes > 0)
+		buffer += temp;
 
-	return nbytes;
+	if (nbytes <= 0) // Error
+		return -1;
+	else if (buffer.find("\r\n\r\n") == std::string::npos) // Need to go back to select
+		return 1;
+	return 0; // Header fully read
 }
 
-int SocketCommunicator::receiveRequestBody(const int& socket, Client& client, const long& maxSize)
+int SocketCommunicator::receiveRequestBody(const int& socket, Client& client)
 {
 	int retValue;
 	if (isChunkedRequest(client.request))
-		retValue = receiveChunkedRequestBody(socket, client.body, maxSize);
+		retValue = receiveChunkedRequestBody(socket, client.body);
 	else
-		retValue = receiveStandardRequestBody(socket, client, maxSize);;
+		retValue = receiveStandardRequestBody(socket, client);;
 
 	return retValue;
 }
 
-int SocketCommunicator::receiveChunkedRequestBody(const int& socket, std::string& buffer, const long& maxSize)
+int SocketCommunicator::convertHexaNumberInStrToInt(std::string& str)
+{
+	int number;
+
+	std::stringstream ss(str);
+	ss >> std::hex >> number;
+
+	return number;
+}
+
+int SocketCommunicator::receiveStandardRequestBody(const int& socket, Client& client)
+{
+	size_t bytesToRead = atol(client.request.getField("Content-Length").c_str());
+	if (bytesToRead <= 0)
+		throw (STATUS_411);
+
+	bytesToRead -= client.body.length();
+
+	if (bytesToRead > 32768)
+		bytesToRead = 32768;
+
+	char	temp[32768];
+	memset(temp, 0, 32768);
+	size_t n = recv(socket, temp, bytesToRead, 0);
+	if (n > 0)
+		client.body.append(temp, n);
+
+    if (n <= 0)
+        return n;
+
+	client.bytesRead += n;
+
+	return atol(client.request.getField("Content-Length").c_str()) - client.bytesRead;
+}
+
+int SocketCommunicator::receiveChunkedRequestBody(const int& socket, std::string& buffer)
 {
 	long totalBytesRead = 0;
 	int chunkLength = 1;
 	
-	while (totalBytesRead <= maxSize && chunkLength > 0)
+	while (chunkLength > 0)
 	{
 		chunkLength = receiveChunkLength(socket);
 		if (chunkLength == -1)
@@ -50,13 +86,10 @@ int SocketCommunicator::receiveChunkedRequestBody(const int& socket, std::string
 				totalBytesRead += nbytes;
 			}
 		}
-		if (nbytes == -1)
+		if (nbytes <= 0)
 			throw (STATUS_500);
 		buffer.erase(buffer.length() - 2, 2); // Remove "\r\n" (end of chunk indicator)
 	}
-
-	if (totalBytesRead > maxSize)
-		throw (STATUS_413);
 
 	return 0;
 }
@@ -73,46 +106,10 @@ int SocketCommunicator::receiveChunkLength(const int& socket)
 		if (nbytes > 0)
 			buffer += temp;
 	}
-	if (nbytes == -1) // Error occured in recv
+	if (nbytes <= 0) // Error occured in recv
 		return nbytes;
 	else
 		return convertHexaNumberInStrToInt(buffer);
-}
-
-int SocketCommunicator::convertHexaNumberInStrToInt(std::string& str)
-{
-	int number;
-
-	std::stringstream ss(str);
-	ss >> std::hex >> number;
-
-	return number;
-}
-
-int SocketCommunicator::receiveStandardRequestBody(const int& socket, Client& client, const long& maxSize)
-{
-	size_t bytesToRead = atol(client.request.getField("Content-Length").c_str());
-	if (bytesToRead <= 0)
-		throw (STATUS_411);
-	if (bytesToRead > static_cast<size_t>(maxSize))
-		throw (STATUS_413);
-
-	bytesToRead -= client.body.length();
-
-	if (bytesToRead > 32768)
-		bytesToRead = 32768;
-
-	char	temp[32768];
-	memset(temp, 0, 32768);
-	size_t n = recv(socket, temp, bytesToRead, 0);
-	if (n > 0)
-		client.body.append(temp, n);
-
-	client.bytesRead += n;
-
-
-	//return atol(header.getField("Content-Length").c_str()) - buffer.length();
-	return atol(client.request.getField("Content-Length").c_str()) - client.bytesRead;
 }
 
 bool SocketCommunicator::isChunkedRequest(const RequestHeader& header)
@@ -127,13 +124,8 @@ int SocketCommunicator::sendResponse(const int& socket, Client& client)
 	std::string str = client.response.response_header.substr(client.bytesSent, SIZE);
 
 	long n = send(socket, str.c_str(), str.size(), 0);
-	//std::cout << n << "/" << length << std::endl;
 	if (n <= 0)
-	{
-		std::cout << "error" << std::endl;
-		//perror("SEND");
 		return -1;
-	}
 	else
 		client.bytesSent += n;
 	return client.response.response_header.length() - client.bytesSent;
