@@ -27,11 +27,11 @@ Method	Post::exec(RequestConfig &config, const std::vector<BodyData> &bodyData, 
 
 void Post::uploadFiles(RequestConfig &config, const std::vector<BodyData> &bodyData)
 {
-	for (_filePos = 0; _filePos < static_cast<int>(bodyData.size() - 1); _filePos++)
+	for (_filePos = 0; _filePos < static_cast<int>(bodyData.size() - 2); _filePos++)
 	{
 		std::string fileName = getFileName(bodyData);
 		if (fileName == "")
-			throw (STATUS_500);
+			throw (STATUS_400);
 		createFile(fileName, config.getUpload(), bodyData[_filePos].content);
 	}
 }
