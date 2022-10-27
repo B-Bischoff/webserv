@@ -31,7 +31,7 @@ void Post::uploadFiles(RequestConfig &config, const std::vector<BodyData> &bodyD
 	{
 		std::string fileName = getFileName(bodyData);
 		if (fileName == "")
-			throw (STATUS_500);
+			throw (STATUS_400);
 		createFile(fileName, config.getUpload(), bodyData[_filePos].content);
 	}
 }

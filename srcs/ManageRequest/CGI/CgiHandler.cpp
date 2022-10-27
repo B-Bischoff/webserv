@@ -45,11 +45,9 @@ void	CgiHandler::initCharEnv(std::map<std::string, std::string> &_env, char **_c
 	while (it != _env.end())
 	{
 		_charEnv[i] = strdup((it->first + "=" + it->second).c_str());
-		// std::cout << _charEnv[i] << std::endl;
 		i++;
 		it++;
 	}
-	// std::cout << "end of initCharEnv" << std::endl;
 	_charEnv[i] = NULL;
 	_args[0] = (char *)_env["SCRIPT_NAME"].c_str();
 	_args[1] = (char *)_env["PATH_TRANSLATED"].c_str();
@@ -96,16 +94,17 @@ std::string	CgiHandler::execCgi(const Client &client)
 	}
 	else
 	{
-		char	c;
+		char	buffer[10] = {0};
 
-		waitpid(pid, NULL, 0);
+		waitpid(-1, NULL, 0);
 		lseek(fdOut, 0, SEEK_SET);
 
 		ret = 1;
 		while (ret > 0)
 		{
-			ret = read(fdOut, &c, 1);
-			response += c;
+			memset(buffer, 0, 10);
+			ret = read(fdOut, buffer, 10 - 1);
+			response += buffer;
 		}
 	}
 	dup2(saveStdin, STDIN_FILENO);
@@ -118,10 +117,7 @@ std::string	CgiHandler::execCgi(const Client &client)
 	close(saveStdout);
 	if (!pid)
 		exit(0);
-
-	// std::cout << "Cgi response:" << std::endl;
-	// std::cout << "================================" << std::endl;
-	// std::cout << response << std::endl;
-	// std::cout << "================================" << std::endl;
+	std::cout << "===================================" << std::endl;
+	std::cout << response << std::endl;
 	return (response);
 }
